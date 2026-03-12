@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git -C /Users/muhila/kato-devv/frontend status)",
+      "Bash(git -C /Users/muhila/kato-devv/frontend add src/App.css src/App.js src/LangContext.js src/components/ public/index.html)",
+      "Bash(git -C:*)"
+    ]
+  }
+}

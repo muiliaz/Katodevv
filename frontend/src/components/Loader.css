@@ -1,0 +1,96 @@
+/* ══════════════════════════════════════════
+   LOADER
+══════════════════════════════════════════ */
+.loader-overlay {
+  position: fixed;
+  inset: 0;
+  background: #020617;
+  z-index: 999999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+.loader-overlay.hide {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.loader-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+  animation: loaderFadeIn 0.6s ease forwards;
+}
+
+@keyframes loaderFadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Animated orb behind logo */
+.loader-orb {
+  position: absolute;
+  width: 280px;
+  height: 280px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(99,102,241,0.25) 0%, transparent 70%);
+  filter: blur(40px);
+  animation: loaderOrbPulse 2s ease-in-out infinite alternate;
+}
+
+@keyframes loaderOrbPulse {
+  from { transform: scale(0.8); opacity: 0.5; }
+  to   { transform: scale(1.2); opacity: 0.9; }
+}
+
+/* Logo */
+.loader-logo {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 32px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -0.5px;
+}
+
+.loader-dot-mark {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #a78bfa, #6366f1);
+  box-shadow: 0 0 16px #6366f1cc;
+  animation: dotGlow 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes dotGlow {
+  from { box-shadow: 0 0 8px #6366f1aa; }
+  to   { box-shadow: 0 0 22px #a78bfacc; }
+}
+
+/* Progress bar */
+.loader-bar-wrap {
+  width: 180px;
+  height: 2px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.loader-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #6366f1, #a78bfa);
+  border-radius: 2px;
+  animation: loaderBar 1.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  box-shadow: 0 0 8px #6366f1;
+}
+
+@keyframes loaderBar {
+  from { width: 0%; }
+  to   { width: 100%; }
+}

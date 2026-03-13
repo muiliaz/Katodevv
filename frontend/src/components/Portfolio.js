@@ -803,7 +803,7 @@ function Portfolio() {
           <div className="port-modal-wrapper" onClick={(e) => e.stopPropagation()}>
             <button className="port-close" onClick={() => setActive(null)}>✕</button>
             <div className="port-modal">
-              <div className="port-modal-inner">
+              <div className="port-modal-inner" data-lenis-prevent>
                 <activeStatic.Example />
               </div>
             </div>

@@ -425,7 +425,7 @@ function Services() {
 
       {activeCardData && ActiveExample && (
         <div className="modal-overlay" onClick={() => setActiveCard(null)}>
-          <div className="modal-box" onClick={(e) => e.stopPropagation()}>
+          <div className="modal-box" data-lenis-prevent onClick={(e) => e.stopPropagation()}>
             <button className="modal-close" onClick={() => setActiveCard(null)}>✕</button>
             <div className="modal-title">{activeCardData.modalTitle}</div>
             <div className="modal-subtitle">{activeCardData.modalSub}</div>

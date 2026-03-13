@@ -32,10 +32,12 @@
   filter: blur(130px);
   pointer-events: none;
   z-index: 0;
+  transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  will-change: transform;
 }
 .hero-blob-1 {
   width: 550px; height: 550px;
-  background: radial-gradient(circle, rgba(255,90,0,0.28), transparent 70%);
+  background: radial-gradient(circle, rgba(148,163,184,0.18), transparent 70%);
   top: -180px; left: -120px;
   animation: blobDrift1 13s ease-in-out infinite;
 }
@@ -127,8 +129,8 @@
 }
 
 .tech-icon-card:hover {
-  border-color: rgba(255, 90, 0, 0.4);
-  background: rgba(255, 90, 0, 0.07);
+  border-color: rgba(148, 163, 184, 0.45);
+  background: rgba(148, 163, 184, 0.07);
   transform: scale(1.06);
 }
 
@@ -162,38 +164,73 @@
 /* orb + text stacked */
 .hero-orb-wrap {
   position: relative;
-  width: 340px;
-  height: 340px;
+  width: 420px;
+  height: 420px;
   display: flex;
   align-items: center;
   justify-content: center;
   margin-bottom: 28px;
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
-.hero-orb {
+/* Silver Orb */
+.silver-orb {
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  background: radial-gradient(circle at 40% 35%,
-    rgba(255,140,66,0.45) 0%,
-    rgba(255,90,0,0.2)   45%,
-    transparent          75%);
-  border: 1px solid rgba(255,90,0,0.22);
-  animation: orbGlow 3.5s ease-in-out infinite;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.hero-orb::before {
-  content: "";
+/* Dark planet — big enough to comfortably fit the title */
+.silver-orb-inner {
   position: absolute;
-  inset: -18px;
+  width: 86%;
+  height: 86%;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(255,90,0,0.1), transparent 70%);
-  animation: orbGlow 3.5s ease-in-out infinite 1.2s;
+  background: radial-gradient(circle at 35% 32%,
+    #1e2a3a 0%, #0d1522 40%, #060c14 70%, #020812 100%
+  );
+  box-shadow:
+    0 0 0 2px  rgba(210, 225, 240, 0.5),
+    0 0 18px 4px  rgba(180, 200, 220, 0.65),
+    0 0 60px 14px rgba(148, 163, 184, 0.45),
+    0 0 130px 35px rgba(120, 145, 170, 0.22),
+    0 0 220px 60px rgba(90,  120, 155, 0.1),
+    inset 0 2px 10px rgba(255,255,255,0.07);
+  z-index: 2;
+  animation: orbPulse 3.5s ease-in-out infinite;
 }
 
-@keyframes orbGlow {
-  0%,100% { box-shadow: 0 0 50px rgba(255,90,0,0.25), 0 0 100px rgba(255,90,0,0.08); }
-  50%      { box-shadow: 0 0 80px rgba(255,90,0,0.50), 0 0 160px rgba(255,90,0,0.18); }
+/* Outer ambient halo — extends far beyond the orb */
+.silver-orb-glow {
+  position: absolute;
+  width: 260%;
+  height: 260%;
+  border-radius: 50%;
+  background: radial-gradient(circle,
+    transparent           30%,
+    rgba(148,163,184,0.07) 42%,
+    rgba(148,163,184,0.13) 50%,
+    rgba(120,145,170,0.08) 60%,
+    rgba(90, 115,145,0.04) 72%,
+    transparent           85%
+  );
+  z-index: 0;
+  pointer-events: none;
+  animation: orbPulse 3.5s ease-in-out infinite;
+}
+
+@keyframes orbPulse {
+  0%, 100% {
+    opacity: 0.85;
+    filter: brightness(0.9);
+  }
+  50% {
+    opacity: 1;
+    filter: brightness(1.25);
+  }
 }
 
 /* text sits on top of orb */
@@ -238,7 +275,7 @@
   font-weight: 900;
   line-height: 1;
   letter-spacing: -2px;
-  background: linear-gradient(135deg, #ffffff 40%, #ff8c42 100%);
+  background: linear-gradient(135deg, #ffffff 40%, #b0c4d4 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -256,7 +293,7 @@
 
 .hero-cycle-word {
   display: inline-block;
-  color: #ff8c42;
+  color: #b0c8dc;
   font-weight: 700;
   animation: wordFadeIn 0.4s ease forwards;
 }
@@ -279,7 +316,7 @@
   font-size: 28px;
   font-weight: 800;
   line-height: 1;
-  background: linear-gradient(90deg, #ff5a00, #ff8c42);
+  background: linear-gradient(90deg, #94a3b8, #e2e8f0);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -299,8 +336,8 @@
 .primary {
   padding: 14px 28px;
   border: none;
-  background: linear-gradient(90deg, #ff5a00, #ff8c42);
-  color: white;
+  background: linear-gradient(135deg, #64748b, #94a3b8, #e2e8f0);
+  color: #0f172a;
   font-size: 14px;
   font-weight: 700;
   cursor: pointer;
@@ -311,13 +348,13 @@
 
 .primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 12px 28px rgba(255,90,0,0.5) !important;
+  box-shadow: 0 12px 28px rgba(148,163,184,0.5) !important;
   animation: none;
 }
 
 @keyframes btnGlow {
-  0%,100% { box-shadow: 0 0 14px rgba(255,90,0,0.3); }
-  50%      { box-shadow: 0 0 28px rgba(255,90,0,0.6); }
+  0%,100% { box-shadow: 0 0 14px rgba(148,163,184,0.25); }
+  50%      { box-shadow: 0 0 28px rgba(148,163,184,0.5); }
 }
 
 .secondary {
@@ -334,8 +371,8 @@
 }
 
 .secondary:hover {
-  border-color: rgba(255,90,0,0.45);
-  background: rgba(255,90,0,0.07);
+  border-color: rgba(148,163,184,0.5);
+  background: rgba(148,163,184,0.08);
   transform: translateY(-2px);
 }
 
@@ -360,7 +397,7 @@
 .hero-scroll-line {
   width: 1px;
   height: 36px;
-  background: linear-gradient(to bottom, rgba(255,90,0,0.5), transparent);
+  background: linear-gradient(to bottom, rgba(148,163,184,0.5), transparent);
 }
 
 @keyframes scrollBounce {

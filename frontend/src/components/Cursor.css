@@ -1,0 +1,48 @@
+/* Кастомный курсор — только для устройств с мышью */
+
+.cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 999999;
+  opacity: 0;
+  transition: opacity 0.3s;
+  will-change: transform;
+}
+
+.cursor-ring.visible {
+  opacity: 1;
+}
+
+/* Lagging ring */
+.cursor-ring {
+  width: 36px;
+  height: 36px;
+  border: 1.5px solid rgba(255, 255, 255, 0.45);
+  border-radius: 50%;
+  margin-left: -18px;
+  margin-top: -18px;
+  transition: width 0.25s ease, height 0.25s ease,
+              margin 0.25s ease, border-color 0.25s ease,
+              background 0.25s ease, opacity 0.3s;
+}
+
+/* Grow on interactive elements */
+.cursor-ring.grow {
+  width: 56px;
+  height: 56px;
+  margin-left: -28px;
+  margin-top: -28px;
+  border-color: rgba(167,139,250,0.6);
+  background: rgba(99,102,241,0.07);
+}
+
+/* Click press */
+.cursor-ring.pressed {
+  width: 24px;
+  height: 24px;
+  margin-left: -12px;
+  margin-top: -12px;
+  background: rgba(255,255,255,0.1);
+}

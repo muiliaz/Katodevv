@@ -1,58 +1,52 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useLang } from "../LangContext";
 import "./Hero.css";
 
-const STATS_TARGETS = [50, 30, 3];
+const STATS_TARGETS  = [50, 30, 3];
 const STATS_SUFFIXES = ["+", "+", "+"];
 
-/* ── 4 icon columns — real devicon logos ── */
 const COL_LEFT_1 = [
-  { icon: "devicon-react-original colored",           name: "React"      },
-  { icon: "devicon-nodejs-plain colored",             name: "Node.js"    },
-  { icon: "devicon-python-plain colored",             name: "Python"     },
-  { icon: "devicon-typescript-plain colored",         name: "TypeScript" },
-  { icon: "devicon-mongodb-plain colored",            name: "MongoDB"    },
-  { icon: "devicon-postgresql-plain colored",         name: "PostgreSQL" },
-  { icon: "devicon-firebase-plain colored",           name: "Firebase"   },
-  { icon: "devicon-amazonwebservices-plain-wordmark colored", name: "AWS" },
+  { icon: "devicon-react-original colored",                   name: "React"      },
+  { icon: "devicon-nodejs-plain colored",                     name: "Node.js"    },
+  { icon: "devicon-python-plain colored",                     name: "Python"     },
+  { icon: "devicon-typescript-plain colored",                 name: "TypeScript" },
+  { icon: "devicon-mongodb-plain colored",                    name: "MongoDB"    },
+  { icon: "devicon-postgresql-plain colored",                 name: "PostgreSQL" },
+  { icon: "devicon-firebase-plain colored",                   name: "Firebase"   },
+  { icon: "devicon-amazonwebservices-plain-wordmark colored",  name: "AWS"        },
 ];
-
 const COL_LEFT_2 = [
-  { icon: "devicon-nextjs-plain",                     name: "Next.js"    },
-  { icon: "devicon-django-plain colored",             name: "Django"     },
-  { icon: "devicon-fastapi-plain colored",            name: "FastAPI"    },
-  { icon: "devicon-docker-plain colored",             name: "Docker"     },
-  { icon: "devicon-redis-plain colored",              name: "Redis"      },
-  { icon: "devicon-graphql-plain colored",            name: "GraphQL"    },
-  { icon: "devicon-nginx-plain colored",              name: "Nginx"      },
-  { icon: "devicon-kubernetes-plain colored",         name: "Kubernetes" },
+  { icon: "devicon-nextjs-plain",             name: "Next.js"    },
+  { icon: "devicon-django-plain colored",     name: "Django"     },
+  { icon: "devicon-fastapi-plain colored",    name: "FastAPI"    },
+  { icon: "devicon-docker-plain colored",     name: "Docker"     },
+  { icon: "devicon-redis-plain colored",      name: "Redis"      },
+  { icon: "devicon-graphql-plain colored",    name: "GraphQL"    },
+  { icon: "devicon-nginx-plain colored",      name: "Nginx"      },
+  { icon: "devicon-kubernetes-plain colored", name: "Kubernetes" },
 ];
-
 const COL_RIGHT_1 = [
-  { icon: "devicon-react-original colored",           name: "React Native" },
-  { icon: "devicon-flutter-plain colored",            name: "Flutter"      },
-  { icon: "devicon-swift-plain colored",              name: "Swift"        },
-  { icon: "devicon-kotlin-plain colored",             name: "Kotlin"       },
-  { icon: "devicon-figma-plain colored",              name: "Figma"        },
-  { icon: "devicon-xd-plain colored",                 name: "Adobe XD"     },
-  { icon: "devicon-photoshop-plain colored",          name: "Photoshop"    },
-  { icon: "devicon-illustrator-plain colored",        name: "Illustrator"  },
+  { icon: "devicon-react-original colored",     name: "React Native" },
+  { icon: "devicon-flutter-plain colored",      name: "Flutter"      },
+  { icon: "devicon-swift-plain colored",        name: "Swift"        },
+  { icon: "devicon-kotlin-plain colored",       name: "Kotlin"       },
+  { icon: "devicon-figma-plain colored",        name: "Figma"        },
+  { icon: "devicon-xd-plain colored",           name: "Adobe XD"     },
+  { icon: "devicon-photoshop-plain colored",    name: "Photoshop"    },
+  { icon: "devicon-illustrator-plain colored",  name: "Illustrator"  },
 ];
-
 const COL_RIGHT_2 = [
-  { icon: "devicon-github-original colored",          name: "GitHub"   },
-  { icon: "devicon-git-plain colored",                name: "Git"      },
-  { icon: "devicon-jira-plain colored",               name: "Jira"     },
-  { icon: "devicon-trello-plain colored",             name: "Trello"   },
-  { icon: "devicon-vscode-plain colored",             name: "VS Code"  },
-  { icon: "devicon-jenkins-plain colored",            name: "Jenkins"  },
-  { icon: "devicon-mysql-plain colored",              name: "MySQL"    },
-  { icon: "devicon-linux-plain colored",              name: "Linux"    },
+  { icon: "devicon-github-original colored",  name: "GitHub"  },
+  { icon: "devicon-git-plain colored",        name: "Git"     },
+  { icon: "devicon-jira-plain colored",       name: "Jira"    },
+  { icon: "devicon-trello-plain colored",     name: "Trello"  },
+  { icon: "devicon-vscode-plain colored",     name: "VS Code" },
+  { icon: "devicon-jenkins-plain colored",    name: "Jenkins" },
+  { icon: "devicon-mysql-plain colored",      name: "MySQL"   },
+  { icon: "devicon-linux-plain colored",      name: "Linux"   },
 ];
 
-function doubleList(arr) {
-  return [...arr, ...arr];
-}
+function doubleList(arr) { return [...arr, ...arr]; }
 
 function IconColumn({ items, direction }) {
   const doubled = doubleList(items);
@@ -70,26 +64,40 @@ function IconColumn({ items, direction }) {
   );
 }
 
+/* ── Silver Orb ── */
+function FireOrb() {
+  return (
+    <div className="silver-orb">
+      <div className="silver-orb-inner" />
+      <div className="silver-orb-glow" />
+    </div>
+  );
+}
+
+/* ── Hero Section ── */
 function Hero() {
   const { t } = useLang();
-  const h = t.hero;
+  const h     = t.hero;
 
   const [wordIdx, setWordIdx] = useState(0);
   const [wordKey, setWordKey] = useState(0);
-  const [counts, setCounts]   = useState(STATS_TARGETS.map(() => 0));
-  const started               = useRef(false);
+  const [counts,  setCounts]  = useState(STATS_TARGETS.map(() => 0));
+  const started  = useRef(false);
+  const heroRef  = useRef(null);
+  const orbRef   = useRef(null);
+  const blob1Ref = useRef(null);
+  const blob2Ref = useRef(null);
 
   useEffect(() => {
-    setWordIdx(0);
-    setWordKey((k) => k + 1);
+    setWordIdx(0); setWordKey((k) => k + 1);
   }, [h.cycleWords]);
 
   useEffect(() => {
-    const t = setInterval(() => {
+    const timer = setInterval(() => {
       setWordIdx((i) => (i + 1) % h.cycleWords.length);
       setWordKey((k) => k + 1);
     }, 2600);
-    return () => clearInterval(t);
+    return () => clearInterval(timer);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [h.cycleWords]);
 
@@ -98,7 +106,7 @@ function Hero() {
     started.current = true;
     STATS_TARGETS.forEach((target, i) => {
       let cur = 0;
-      const step = target / 55;
+      const step  = target / 55;
       const timer = setInterval(() => {
         cur += step;
         if (cur >= target) { cur = target; clearInterval(timer); }
@@ -107,13 +115,30 @@ function Hero() {
     });
   }, []);
 
+  /* Parallax on mouse move */
+  const onMouseMove = useCallback((e) => {
+    const rect = heroRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    const x = (e.clientX - rect.left - rect.width  / 2) / rect.width;
+    const y = (e.clientY - rect.top  - rect.height / 2) / rect.height;
+    if (orbRef.current)   orbRef.current.style.transform   = `translate(${x * 20}px, ${y * 16}px)`;
+    if (blob1Ref.current) blob1Ref.current.style.transform = `translate(${x * -32}px, ${y * -24}px)`;
+    if (blob2Ref.current) blob2Ref.current.style.transform = `translate(${x * 26}px,  ${y * 20}px)`;
+  }, []);
+
+  const onMouseLeave = useCallback(() => {
+    if (orbRef.current)   orbRef.current.style.transform   = "translate(0,0)";
+    if (blob1Ref.current) blob1Ref.current.style.transform = "translate(0,0)";
+    if (blob2Ref.current) blob2Ref.current.style.transform = "translate(0,0)";
+  }, []);
+
   return (
-    <section className="hero">
-      <div className="hero-blob hero-blob-1" />
-      <div className="hero-blob hero-blob-2" />
+    <section className="hero" ref={heroRef} onMouseMove={onMouseMove} onMouseLeave={onMouseLeave}>
+      <div className="hero-blob hero-blob-1" ref={blob1Ref} />
+      <div className="hero-blob hero-blob-2" ref={blob2Ref} />
 
       <div className="hero-row">
-        {/* LEFT columns */}
+        {/* LEFT */}
         <div className="hero-icons-side">
           <IconColumn items={COL_LEFT_1} direction="up"   />
           <IconColumn items={COL_LEFT_2} direction="down" />
@@ -121,8 +146,8 @@ function Hero() {
 
         {/* CENTER */}
         <div className="hero-center">
-          <div className="hero-orb-wrap">
-            <div className="hero-orb" />
+          <div className="hero-orb-wrap" ref={orbRef}>
+            <FireOrb />
             <div className="hero-orb-text">
               <div className="hero-badge">
                 <span className="hero-badge-dot" />
@@ -150,16 +175,16 @@ function Hero() {
           </div>
 
           <div className="hero-buttons">
-            <button className="primary" onClick={() => document.querySelector('.contact')?.scrollIntoView({ behavior: 'smooth' })}>
+            <button className="primary" onClick={() => document.querySelector(".contact")?.scrollIntoView({ behavior: "smooth" })}>
               {h.startProject}
             </button>
-            <button className="secondary" onClick={() => document.querySelector('.services')?.scrollIntoView({ behavior: 'smooth' })}>
+            <button className="secondary" onClick={() => document.querySelector(".services")?.scrollIntoView({ behavior: "smooth" })}>
               {h.ourServices}
             </button>
           </div>
         </div>
 
-        {/* RIGHT columns */}
+        {/* RIGHT */}
         <div className="hero-icons-side">
           <IconColumn items={COL_RIGHT_1} direction="down2" />
           <IconColumn items={COL_RIGHT_2} direction="up2"   />

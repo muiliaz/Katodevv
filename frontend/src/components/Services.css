@@ -13,9 +13,9 @@
   position: absolute;
   width: 500px;
   height: 500px;
-  background: linear-gradient(45deg, #ff5a00, #ff8c42);
+  background: linear-gradient(45deg, #64748b, #94a3b8);
   filter: blur(180px);
-  opacity: 0.15;
+  opacity: 0.1;
   bottom: -150px;
   right: -150px;
   pointer-events: none;
@@ -25,7 +25,7 @@
   font-size: 44px;
   font-weight: 700;
   margin-bottom: 60px;
-  background: linear-gradient(90deg, #ff5a00, #ff8c42);
+  background: linear-gradient(90deg, #94a3b8, #e2e8f0);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -78,7 +78,7 @@
   left: 100%;
 }
 
-/* оранжевая линия снизу */
+/* silver line bottom */
 .card::after {
   content: "";
   position: absolute;
@@ -86,7 +86,7 @@
   left: 0;
   width: 0%;
   height: 2px;
-  background: linear-gradient(90deg, #ff5a00, #ff8c42);
+  background: linear-gradient(90deg, #64748b, #e2e8f0);
   transition: width 0.4s ease;
 }
 
@@ -98,8 +98,8 @@
   transform: translateY(-8px);
   box-shadow:
     0 20px 50px rgba(0, 0, 0, 0.4),
-    0 0 30px rgba(255, 90, 0, 0.15);
-  border-color: rgba(255, 90, 0, 0.35);
+    0 0 30px rgba(148, 163, 184, 0.12);
+  border-color: rgba(148, 163, 184, 0.3);
 }
 
 /* иконка */
@@ -126,7 +126,7 @@
 .card-hint {
   margin-top: 18px;
   font-size: 13px;
-  color: #ff8c42;
+  color: #94a3b8;
   opacity: 0.85;
 }
 
@@ -140,7 +140,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 9500;
   padding: 20px;
   animation: fadeIn 0.25s ease;
 }

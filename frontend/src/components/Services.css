@@ -159,6 +159,7 @@
   max-width: 920px;
   max-height: 92vh;
   overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 40px;
   position: relative;
   animation: slideUp 0.3s ease;
@@ -615,7 +616,7 @@
   gap: 24px;
 }
 
-.bp-hero-left { flex: 1; }
+.bp-hero-left { flex: 1; text-align: center; }
 
 .bp-badge {
   display: inline-block;
@@ -641,7 +642,7 @@
   font-size: 13px;
   color: #64748b;
   line-height: 1.6;
-  margin-bottom: 16px;
+  margin: 0 auto 16px;
   max-width: 320px;
 }
 
@@ -1228,51 +1229,53 @@
    MOBILE — iPhone 17 & Samsung S26 Ultra
 ══════════════════════════════════════ */
 
-/* ── iPhone 17 frame (71.5 × 149.6 mm → 19.5:9 ratio) ── */
+/* ══════════════════════════════════════
+   iPhone 17 Pro Max — 77.6 × 165.9 mm
+   CSS: 252px × 539px  (ratio 2.138:1)
+══════════════════════════════════════ */
 .phone-ios17 {
-  width: 240px !important;
-  height: 519px !important;
+  width: 252px !important;
+  height: 539px !important;
   background: #f2f2f7 !important;
-  /* Titanium frame with highlight + shadow */
-  border: 9px solid transparent !important;
-  border-radius: 54px !important;
-  background-clip: padding-box !important;
-  outline: 9px solid #2a2a2a;
-  outline-offset: -9px;
+  border: 3px solid #2b2b2b !important;
+  border-radius: 46px !important;
   box-shadow:
-    0 0 0 1px #444,
-    0 0 0 2px #888,
-    0 0 0 3px #555,
-    0 35px 80px rgba(0,0,0,0.75),
-    inset 0 1px 0 rgba(255,255,255,0.15) !important;
+    0 0 0 1px rgba(255,255,255,0.14),
+    0 0 0 2px rgba(80,80,80,0.45),
+    0 36px 80px rgba(0,0,0,0.78),
+    inset 0 1px 0 rgba(255,255,255,0.08) !important;
   display: flex;
   flex-direction: column;
   overflow: hidden;
   position: relative;
 }
 
+/* Status bar — thin, Dynamic Island centred */
 .ios17-bar {
   background: #f2f2f7;
-  padding: 12px 18px 6px;
+  padding: 0 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-shrink: 0;
-  height: 48px;
+  height: 52px;
   position: relative;
 }
 
-/* Dynamic Island — pill shape with two "ears" suggestion */
+.ios17-bar .ios-time,
+.ios17-bar .ios-status { position: relative; z-index: 1; }
+
+/* Dynamic Island — accurate pill size */
 .ios17-island {
   position: absolute;
   left: 50%;
-  top: 50%;
+  top: 52%;
   transform: translate(-50%, -50%);
-  width: 96px;
-  height: 30px;
+  width: 88px;
+  height: 26px;
   background: #1c1c1e;
-  border-radius: 20px;
-  box-shadow: 0 0 0 1px rgba(255,255,255,0.06), inset 0 1px 3px rgba(0,0,0,0.5);
+  border-radius: 14px;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.6);
 }
 
 .ios17-screen {
@@ -1280,52 +1283,61 @@
   flex: 1;
   overflow: hidden;
   position: relative;
-  padding: 0;
 }
 
-/* ── Samsung Galaxy S26 Ultra (77.6 × 162.8 mm → 19.5:9) ── */
+/* Slight scale so app content has breathing room */
+.ios17-screen > .phone-homescreen,
+.ios17-screen > .ios-app-inner {
+  transform: scale(0.88);
+  transform-origin: top center;
+}
+
+/* ══════════════════════════════════════
+   Samsung Galaxy S26 Ultra — 77.9 × 163.4 mm
+   CSS: 250px × 524px  (ratio 2.098:1)
+══════════════════════════════════════ */
 .phone-s26 {
-  width: 240px !important;
-  height: 504px !important;
+  width: 250px !important;
+  height: 524px !important;
   background: #0a0a0a !important;
-  /* Armour aluminium frame */
-  border: 8px solid transparent !important;
-  border-radius: 22px !important;
-  outline: 8px solid #1a1a1a;
-  outline-offset: -8px;
+  border: 2px solid #1e1e1e !important;
+  border-radius: 26px !important;
   box-shadow:
-    0 0 0 1px #333,
-    0 0 0 2px #555,
-    0 35px 80px rgba(0,0,0,0.75) !important;
+    0 0 0 1px rgba(60,60,60,0.9),
+    0 0 0 2px rgba(110,110,110,0.25),
+    0 36px 80px rgba(0,0,0,0.78) !important;
   display: flex;
   flex-direction: column;
   overflow: hidden;
   position: relative;
 }
 
+/* Status bar — minimal, single punch-hole */
 .s26-bar {
   background: #0a0a0a;
-  padding: 8px 18px;
+  padding: 0 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-shrink: 0;
-  height: 32px;
+  height: 28px;
   position: relative;
 }
 
-/* Punch-hole camera */
+/* Punch-hole camera — tiny precise dot */
 .s26-camera {
   position: absolute;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  width: 10px;
-  height: 10px;
-  background: #111;
+  width: 8px;
+  height: 8px;
+  background: #0a0a0a;
   border-radius: 50%;
-  border: 1.5px solid #3a3a3a;
-  box-shadow: 0 0 0 1px rgba(255,255,255,0.08);
+  border: 1px solid #2a2a2a;
+  box-shadow:
+    inset 0 0 2px rgba(0,0,0,0.9),
+    0 0 0 1px rgba(255,255,255,0.04);
 }
 
 .s26-screen {
@@ -1334,6 +1346,13 @@
   overflow: hidden;
   position: relative;
   padding: 0;
+}
+
+/* Android app content breathing room */
+.s26-screen > .phone-homescreen,
+.s26-screen > .android-app-inner {
+  transform: scale(0.88);
+  transform-origin: top center;
 }
 
 /* ── Home screen (shared) ── */
@@ -1493,4 +1512,123 @@
 @keyframes appIn {
   from { opacity: 0; transform: scale(1.05); }
   to   { opacity: 1; transform: scale(1); }
+}
+
+/* ══════════════════════════════════════
+   MOBILE RESPONSIVE
+══════════════════════════════════════ */
+@media (max-width: 768px) {
+
+  /* Section */
+  .services { padding: 60px 5%; }
+  .services h2 { font-size: 30px; margin-bottom: 36px; }
+
+  /* Grid — single column */
+  .services-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  /* Modal */
+  .modal-overlay { padding: 0; align-items: flex-end; }
+
+  .modal-box {
+    max-width: 100%;
+    width: 100%;
+    max-height: 92vh;
+    border-radius: 24px 24px 0 0;
+    padding: 24px 16px 32px;
+  }
+
+  .modal-title { font-size: 20px; }
+  .modal-subtitle { font-size: 13px; margin-bottom: 20px; }
+
+  /* ── Web Dev mockup ── */
+  .browser-mockup { font-size: 11px; }
+
+  .bp-nav { padding: 10px 14px; flex-wrap: wrap; gap: 8px; }
+  .bp-logo { font-size: 14px; }
+  .bp-links { display: none; }       /* hide nav links on mobile */
+  .bp-cta { font-size: 11px; padding: 5px 12px; }
+
+  .bp-hero {
+    flex-direction: column;
+    padding: 20px 14px;
+    gap: 16px;
+  }
+  .bp-hero-left h1 { font-size: 18px; }
+  .bp-hero-left p  { font-size: 12px; }
+  .bp-btn { font-size: 12px; padding: 8px 16px; }
+
+  .bp-hero-right {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .bp-stat-card { min-width: unset; flex: 1; padding: 8px 12px; }
+  .bp-stat-n { font-size: 16px; }
+
+  .bp-cards {
+    grid-template-columns: repeat(2, 1fr);
+    border-top: none;
+  }
+  .bp-card { border-right: none; border-top: 1px solid #f1f5f9; }
+
+  /* ── Mobile phones ── */
+  .mobile-demo-wrap { gap: 14px; }
+
+  .platform-tabs { width: 100%; justify-content: center; }
+  .platform-tab  { padding: 8px 16px; font-size: 13px; }
+
+  .phone-demo { overflow-x: auto; padding-bottom: 8px; }
+
+  /* Scale phones down to fit mobile screens */
+  .phone-ios17 {
+    width: 210px !important;
+    height: 449px !important;
+    border-radius: 38px !important;
+  }
+
+  .phone-s26 {
+    width: 210px !important;
+    height: 440px !important;
+    border-radius: 22px !important;
+  }
+
+  /* ── Automation ── */
+  .auto-demo { padding: 16px; }
+
+  .auto-stats {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+  .auto-stat { padding: 12px 8px; }
+  .auto-stat-value { font-size: 20px; }
+  .auto-stat-label { font-size: 10px; }
+
+  .n8n-flow {
+    gap: 0;
+    padding: 12px 0 8px;
+  }
+  .n8n-node { width: 62px; padding: 8px 4px; }
+  .n8n-node-icon  { font-size: 18px; }
+  .n8n-node-label { font-size: 9px; }
+  .n8n-node-desc  { font-size: 8px; }
+  .n8n-connector  { width: 12px; }
+
+  /* ── AI Bot chat ── */
+  .chat-msgs-light { max-height: 200px; }
+  .chat-bubble { font-size: 12px; padding: 8px 12px; }
+}
+
+@media (max-width: 480px) {
+  .modal-box { padding: 20px 14px 28px; }
+
+  .bp-cards { grid-template-columns: 1fr 1fr; }
+
+  .auto-stats { grid-template-columns: repeat(3, 1fr); }
+  .auto-stat-value { font-size: 18px; }
+
+  .n8n-node { width: 56px; }
+  .n8n-node-label { font-size: 8px; }
 }

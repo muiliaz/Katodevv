@@ -2,7 +2,7 @@
    Hero
 ══════════════════════════════════════ */
 .hero {
-  min-height: 100vh;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -11,7 +11,7 @@
   color: white;
   position: relative;
   overflow: hidden;
-  padding: 100px 20px 60px;
+  padding: 68px 20px 80px;
 }
 
 /* dot grid */
@@ -379,7 +379,7 @@
 /* scroll hint */
 .hero-scroll {
   position: absolute;
-  bottom: 28px;
+  bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 2;

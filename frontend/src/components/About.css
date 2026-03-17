@@ -176,6 +176,7 @@
   color: #fff;
   margin-bottom: 32px;
   letter-spacing: -0.5px;
+  text-align: center;
 }
 
 /* ══════════════════════════════════════════
@@ -417,20 +418,118 @@
   justify-content: center;
 }
 
+/* ── Team Overview Card ── */
+.abt-team-overview {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 20px;
+  padding: 36px 40px;
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+.abt-team-overview-top {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.abt-team-avatars {
+  display: flex;
+  justify-content: center;
+  gap: -8px;
+  margin-bottom: 16px;
+}
+
+.abt-team-avatar-circle {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.06);
+  border: 2px solid rgba(255,255,255,0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  margin-left: -8px;
+}
+
+.abt-team-avatar-circle:first-child { margin-left: 0; }
+
+.abt-team-overview-count {
+  font-size: 22px;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 8px;
+}
+
+.abt-team-overview-sub {
+  font-size: 14px;
+  color: rgba(255,255,255,0.45);
+  max-width: 420px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+.abt-team-roles-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.abt-team-role-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.06);
+  transition: background 0.2s;
+}
+
+.abt-team-role-row:hover {
+  background: rgba(255,255,255,0.07);
+}
+
+.abt-team-role-emoji {
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.abt-team-role-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 2px;
+}
+
+.abt-team-role-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.abt-team-role-title {
+  font-size: 12px;
+  color: rgba(255,255,255,0.4);
+}
+
+.abt-team-role-exp {
+  font-size: 12px;
+  color: rgba(167,139,250,0.8);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
 /* ── Responsive ── */
 @media (max-width: 768px) {
   .about { padding: 80px 16px 100px; }
-
-  .abt-seniors { grid-template-columns: 1fr; }
-  .abt-staff   { grid-template-columns: repeat(2, 1fr); }
 
   .abt-stats { flex-direction: column; }
   .abt-stat  { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.06); }
   .abt-stat:last-child { border-bottom: none; }
 
   .abt-mission { flex-direction: column; }
-}
 
-@media (max-width: 480px) {
-  .abt-staff { grid-template-columns: 1fr; }
+  .abt-team-overview { padding: 24px 20px; }
 }

@@ -2,7 +2,7 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import { useLang } from "../LangContext";
 import "./Hero.css";
 
-const STATS_TARGETS  = [50, 30, 3];
+const STATS_TARGETS  = [10, 10, 1];
 const STATS_SUFFIXES = ["+", "+", "+"];
 
 const COL_LEFT_1 = [

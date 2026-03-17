@@ -1,16 +1,39 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useLang } from "../LangContext";
 import "./Contact.css";
 
 function Contact() {
   const { t } = useLang();
   const c = t.contact;
-  const [sent, setSent] = useState(false);
+  const [sent, setSent]       = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError]     = useState(null);
+  const formRef               = useRef(null);
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
-    setSent(true);
-    setTimeout(() => setSent(false), 4000);
+    setLoading(true);
+    setError(null);
+    const fd = new FormData(e.target);
+    try {
+      const res = await fetch("/.netlify/functions/contact", {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({
+          name:    fd.get("name"),
+          email:   fd.get("email"),
+          message: fd.get("message"),
+        }),
+      });
+      if (!res.ok) throw new Error();
+      setSent(true);
+      formRef.current?.reset();
+      setTimeout(() => setSent(false), 5000);
+    } catch {
+      setError(c.errorMsg || "Something went wrong. Try again.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -23,7 +46,7 @@ function Contact() {
 
         {/* Header */}
         <div className="contact-header">
-          <div className="contact-tag-pill">get in touch</div>
+          <div className="contact-tag-pill">{t.demos.contact.tagPill}</div>
           <h2>{c.sectionTitle}</h2>
           <p className="contact-subtitle">{c.subtitle}</p>
         </div>
@@ -101,30 +124,31 @@ function Contact() {
             {/* Decorative response-time badge */}
             <div className="contact-response-badge">
               <span className="contact-response-dot" />
-              24h response time
+              {t.demos.contact.responseTime}
             </div>
           </div>
 
           {/* Right — form */}
           <div className="contact-form-wrap">
             <div className="contact-form-title">{c.formTitle}</div>
-            <form className="contact-form" onSubmit={handleSubmit}>
+            <form className="contact-form" onSubmit={handleSubmit} ref={formRef}>
               <div className="cform-row">
                 <div className="cform-group">
                   <label>{c.name}</label>
-                  <input type="text" placeholder={c.name} required />
+                  <input type="text" name="name" placeholder={c.name} required />
                 </div>
                 <div className="cform-group">
                   <label>{c.email}</label>
-                  <input type="email" placeholder={c.email} required />
+                  <input type="email" name="email" placeholder={c.email} required />
                 </div>
               </div>
               <div className="cform-group">
                 <label>{c.message}</label>
-                <textarea placeholder={c.message} rows={5} required />
+                <textarea name="message" placeholder={c.message} rows={5} required />
               </div>
-              <button type="submit" className={`cform-btn ${sent ? "sent" : ""}`}>
-                {sent ? "✓ Sent!" : c.send}
+              {error && <div className="cform-error">{error}</div>}
+              <button type="submit" className={`cform-btn ${sent ? "sent" : ""}`} disabled={loading}>
+                {sent ? "✓ " + (c.sent || "Sent!") : loading ? "..." : c.send}
               </button>
             </form>
           </div>

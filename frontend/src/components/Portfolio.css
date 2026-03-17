@@ -538,6 +538,7 @@
   color: white;
   position: relative;
   overflow: hidden;
+  text-align: center;
 }
 
 .biz-home-hero::before {
@@ -552,7 +553,7 @@
 .biz-home-hero h1 {
   font-size: 42px;
   font-weight: 800;
-  margin-bottom: 14px;
+  margin: 0 auto 14px;
   max-width: 560px;
   position: relative;
 }
@@ -562,7 +563,7 @@
   opacity: 0.8;
   max-width: 480px;
   line-height: 1.7;
-  margin-bottom: 28px;
+  margin: 0 auto 28px;
   position: relative;
 }
 
@@ -907,6 +908,11 @@
   color: white;
 }
 
+.shop-banner-left {
+  flex: 1;
+  text-align: center;
+}
+
 .shop-banner h1 {
   font-size: 36px;
   font-weight: 800;
@@ -918,7 +924,7 @@
   color: rgba(255,255,255,0.6);
   max-width: 400px;
   line-height: 1.6;
-  margin-bottom: 22px;
+  margin: 0 auto 22px;
 }
 
 .shop-banner-badge {
@@ -1085,12 +1091,18 @@
 
 /* cart drawer */
 .shop-cart-drawer {
-  width: 300px;
+  width: 0;
   flex-shrink: 0;
   background: white;
-  border-left: 1px solid #e2e8f0;
+  border-left: none;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+  transition: width 0.25s ease;
+}
+.shop-cart-drawer.open {
+  width: 300px;
+  border-left: 1px solid #e2e8f0;
 }
 
 .shop-cart-header {
@@ -1505,3 +1517,163 @@
 }
 
 .crm-tab.active { background: #0f172a; color: white; font-weight: 600; }
+
+/* ══════════════════════════════════════
+   MOBILE RESPONSIVE
+══════════════════════════════════════ */
+@media (max-width: 768px) {
+
+  /* Section */
+  .portfolio { padding: 60px 5%; }
+  .portfolio h2 { font-size: 30px; margin-bottom: 36px; }
+  .portfolio-grid { grid-template-columns: 1fr; gap: 16px; }
+
+  /* Modal — full screen bottom sheet */
+  .port-overlay { padding: 0; align-items: flex-end; }
+
+  .port-modal-wrapper {
+    max-width: 100%;
+    height: 94vh;
+  }
+
+  .port-close {
+    top: -16px;
+    right: 12px;
+  }
+
+  .port-modal {
+    height: 100%;
+    border-radius: 20px 20px 0 0;
+  }
+
+  /* ══ 1. LANDING PAGE ══ */
+  .lp-nav { padding: 14px 20px; }
+  .lp-nav-links { display: none; }
+
+  .lp-hero { padding: 48px 20px 40px; }
+  .lp-hero h1 { font-size: 32px; }
+  .lp-hero p  { font-size: 14px; }
+
+  .lp-stats { gap: 24px; padding: 24px 20px; flex-wrap: wrap; }
+  .lp-stats > div { min-width: 80px; }
+  .lp-stat-num { font-size: 22px; }
+
+  .lp-features { padding: 40px 20px; }
+  .lp-features-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+  .lp-feature-card { padding: 20px 16px; }
+  .lp-section-title { font-size: 24px; }
+
+  .lp-testimonials { padding: 40px 20px; }
+  .lp-testi-grid { grid-template-columns: 1fr; }
+
+  .lp-cta { padding: 48px 20px; }
+  .lp-cta h2 { font-size: 24px; }
+
+  .lp-footer { flex-direction: column; gap: 12px; padding: 20px; }
+
+  /* ══ 2. BUSINESS WEBSITE ══ */
+  .biz-nav { padding: 0 16px; height: auto; flex-wrap: wrap; gap: 8px; padding: 10px 16px; }
+  .biz-tabs { overflow-x: auto; gap: 2px; }
+  .biz-tab { padding: 6px 12px; font-size: 13px; white-space: nowrap; }
+  .biz-nav-cta { display: none; }
+
+  .biz-home-hero { padding: 40px 20px; }
+  .biz-home-hero h1 { font-size: 26px; }
+  .biz-home-hero p  { font-size: 14px; }
+
+  .biz-home-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    border-bottom: 1px solid #e2e8f0;
+  }
+  .biz-stat-item {
+    border-right: none;
+    border-bottom: 1px solid #e2e8f0;
+    text-align: center;
+  }
+  .biz-stat-num { font-size: 22px; }
+
+  .biz-home-services { padding: 36px 20px; }
+  .biz-srv-grid { grid-template-columns: 1fr; }
+
+  .biz-services-page { padding: 36px 20px; }
+  .biz-srv-row { flex-wrap: wrap; gap: 12px; }
+  .biz-srv-row-price { margin-left: 0; }
+
+  .biz-about-page { padding: 36px 20px; }
+  .biz-about-hero { padding: 32px 20px; }
+  .biz-about-hero h2 { font-size: 24px; }
+  .biz-team-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+
+  .biz-contact-page { padding: 36px 20px; grid-template-columns: 1fr; gap: 24px; }
+
+  .biz-footer { flex-direction: column; gap: 10px; padding: 20px; text-align: center; }
+  .biz-footer-links { flex-wrap: wrap; justify-content: center; }
+
+  /* ══ 3. E-COMMERCE ══ */
+  .shop-nav { padding: 0 16px; height: 52px; }
+  .shop-nav-links { display: none; }
+  .shop-search { display: none; }
+
+  .shop-banner { flex-direction: column; padding: 32px 20px; gap: 16px; text-align: center; }
+  .shop-banner h1 { font-size: 26px; }
+  .shop-banner p  { font-size: 14px; }
+  .shop-banner-emoji { font-size: 50px; }
+
+  /* Stack: hide sidebar and cart drawer, products take full width */
+  .shop-main { flex-direction: column; }
+  .shop-sidebar { display: none; }
+  .shop-cart-drawer {
+    display: flex;
+    position: fixed;
+    bottom: -100%;
+    left: 0;
+    right: 0;
+    width: 100% !important;
+    max-height: 70vh;
+    border-radius: 20px 20px 0 0;
+    border-left: none !important;
+    border-top: 1px solid #e2e8f0;
+    box-shadow: 0 -8px 40px rgba(0,0,0,0.15);
+    transition: bottom 0.3s ease !important;
+    z-index: 9999;
+  }
+  .shop-cart-drawer.open {
+    width: 100% !important;
+    bottom: 0;
+  }
+
+  .shop-products-area { padding: 20px 16px; }
+  .shop-products-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .shop-product-img { height: 90px; font-size: 36px; }
+
+  /* ══ 4. CRM ══ */
+  .crm-topbar { padding: 0 16px; }
+  .crm-topbar-right span:first-child,
+  .crm-topbar-right span:nth-child(2) { display: none; }
+
+  /* Collapse sidebar to icon-only strip */
+  .crm-layout { flex-direction: column; }
+  .crm-sidebar {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    gap: 4px;
+    padding: 8px 12px;
+    overflow-x: auto;
+  }
+  .crm-nav-item { margin-bottom: 0; padding: 8px 14px; white-space: nowrap; font-size: 13px; }
+
+  .crm-main { padding: 16px; }
+
+  .crm-stats-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .crm-stat-value { font-size: 22px; }
+
+  .crm-two-col { grid-template-columns: 1fr; }
+
+  .crm-pipeline-grid { grid-template-columns: 1fr; }
+
+  /* Contacts table — make scrollable */
+  .crm-table-wrapper { overflow-x: auto; }
+  .crm-table { min-width: 520px; }
+}

@@ -15,8 +15,7 @@ function Loader({ onDone }) {
       <div className="loader-content">
         <div className="loader-orb" />
         <div className="loader-logo">
-          <span className="loader-dot-mark" />
-          Kato Devv
+          <img src="/logo-kd.png" alt="Kato Devv" className="loader-logo-img" />
         </div>
         <div className="loader-bar-wrap">
           <div className="loader-bar-fill" />

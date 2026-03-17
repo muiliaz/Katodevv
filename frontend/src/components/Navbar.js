@@ -25,8 +25,7 @@ function Navbar() {
       <div className="navbar-inner">
         {/* Logo */}
         <div className="navbar-logo" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
-          <span className="navbar-logo-dot" />
-          Kato Devv
+          <img src="/logo-kd.png" alt="Kato Devv" className="navbar-logo-img" />
         </div>
 
         {/* Desktop links */}

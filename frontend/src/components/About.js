@@ -4,10 +4,9 @@ import "./About.css";
 
 
 function About() {
-  const { lang, t } = useLang();
-  const a           = t.about;
-  const isRu        = lang === "ru";
-  const sectionRef  = useRef(null);
+  const { t } = useLang();
+  const a       = t.about;
+  const sectionRef = useRef(null);
 
   useEffect(() => {
     const observer = new IntersectionObserver(

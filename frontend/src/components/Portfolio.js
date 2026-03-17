@@ -288,6 +288,8 @@ function EcommerceExample() {
         <div className="shop-banner-emoji">💻</div>
       </div>
 
+      {showCart && <div className="shop-cart-overlay" onClick={() => setShowCart(false)} />}
+
       <div className="shop-main">
         <div className="shop-sidebar">
           <h4>{d.catTitle}</h4>
@@ -341,7 +343,7 @@ function EcommerceExample() {
           </div>
         </div>
 
-        <div className={`shop-cart-drawer ${showCart ? "open" : ""}`}>
+        <div className={`shop-cart-drawer ${showCart ? "open" : ""}`} onClick={e => e.stopPropagation()}>
           <div className="shop-cart-header">🛒 {d.cartHeader} {cartCount > 0 && `(${cartCount})`}</div>
           <div className="shop-cart-items">
             {cart.length === 0 ? (

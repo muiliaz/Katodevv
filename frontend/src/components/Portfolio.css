@@ -1089,6 +1089,11 @@
 .shop-add-btn:hover { opacity: 0.85; }
 .shop-add-btn.added { background: linear-gradient(90deg, #0ea5e9, #0284c7); }
 
+/* cart overlay (mobile close on tap outside) */
+.shop-cart-overlay {
+  display: none;
+}
+
 /* cart drawer */
 .shop-cart-drawer {
   width: 0;
@@ -1623,6 +1628,13 @@
   /* Stack: hide sidebar and cart drawer, products take full width */
   .shop-main { flex-direction: column; }
   .shop-sidebar { display: none; }
+  .shop-cart-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 9998;
+    background: transparent;
+  }
   .shop-cart-drawer {
     display: flex;
     position: fixed;

@@ -525,11 +525,27 @@
 @media (max-width: 768px) {
   .about { padding: 80px 16px 100px; }
 
-  .abt-stats { flex-direction: column; }
-  .abt-stat  { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.06); }
-  .abt-stat:last-child { border-bottom: none; }
+  .abt-header h2 { letter-spacing: -0.5px; }
 
-  .abt-mission { flex-direction: column; }
+  .abt-subtitle { font-size: 15px; }
+
+  .abt-stats { flex-direction: column; }
+  .abt-stat  { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.06); padding: 20px 16px; }
+  .abt-stat:last-child { border-bottom: none; }
+  .abt-stat-value { font-size: 28px; }
+
+  .abt-mission { flex-direction: column; padding: 20px; }
+  .abt-mission-text { font-size: 14px; }
+
+  .abt-seniors { grid-template-columns: 1fr; gap: 16px; }
+
+  .abt-staff { grid-template-columns: repeat(2, 1fr); gap: 12px; }
 
   .abt-team-overview { padding: 24px 20px; }
+  .abt-team-overview-sub { font-size: 13px; }
+}
+
+@media (max-width: 480px) {
+  .abt-staff { grid-template-columns: 1fr; }
+  .abt-subtitle { font-size: 14px; }
 }

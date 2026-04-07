@@ -460,15 +460,20 @@ function FloatingCubes() {
 // ═════════════════════════════════════════════════════════════════════════════
 function ScrollEffects() {
   const { camera } = useThree()
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768
 
   useFrame(() => {
     const raw   = window.__scrollProgress || 0
     const p     = Math.min(1, Math.max(0, raw))
     const eased = p * p * (3 - 2 * p)
 
-    // Camera zoom: z 10 → 4.2, slight y drop
-    const targetZ = 10  - eased * 5.8
-    const targetY = 0.5 - eased * 0.4
+    // Camera zoom: desktop z 10 → 4.2 | mobile z 11 → 5.5, y 4.0 → 0.5
+    const startZ  = isMobile ? 11  : 10
+    const endZ    = isMobile ? 5.5 : 4.2
+    const startY  = isMobile ? 4.0 : 0.5
+    const endY    = isMobile ? 0.5 : 0.1
+    const targetZ = startZ - eased * (startZ - endZ)
+    const targetY = startY - eased * (startY - endY)
     camera.position.z += (targetZ - camera.position.z) * 0.07
     camera.position.y += (targetY - camera.position.y) * 0.07
 
@@ -613,6 +618,8 @@ export default function BlackHole() {
   const mouseRef  = useRef(new Vector2(0.5, 0.5))
   const cardRefs  = useRef([])
 
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768
+
   // Wire up direct-DOM updater — no setState, no re-renders every frame
   useEffect(() => {
     _updateCard = (i, x, y, opacity) => {
@@ -629,9 +636,9 @@ export default function BlackHole() {
     <div className="bh-canvas-wrapper">
       <Suspense fallback={null}>
         <Canvas
-          camera={{ position: [0, 0.5, 10], fov: 40 }}
+          camera={{ position: [0, isMobile ? 4.0 : 0.5, isMobile ? 11 : 10], fov: 40 }}
           gl={{ antialias: true, powerPreference: 'high-performance', preserveDrawingBuffer: true }}
-          dpr={[1, 1.5]}
+          dpr={[1, isMobile ? 1 : 1.5]}
         >
           <Scene mouseRef={mouseRef} />
         </Canvas>

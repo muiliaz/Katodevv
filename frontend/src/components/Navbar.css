@@ -218,5 +218,6 @@
   .navbar-lang   { order: 2; }
   .navbar-right  { margin-left: auto; }
   .navbar-mobile-menu { display: flex; }
-  .navbar-inner  { padding: 0 20px; gap: 12px; }
+  .navbar-inner  { padding: 0 16px; gap: 8px; height: 60px; }
+  .navbar-logo-img { height: 52px; }
 }

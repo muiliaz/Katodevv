@@ -240,10 +240,10 @@ function Hero() {
     }, 0.92)
 
     // ── Buttons: scale + fade ──────────────────────────────────────────────
-    tl.from('.hero-v2-buttons > *', {
-      y: 22, opacity: 0, scale: 0.92, duration: 0.58,
-      ease: 'back.out(1.8)', stagger: 0.12,
-    }, 1.12)
+    tl.fromTo('.hero-v2-buttons > *',
+      { y: 22, opacity: 0, scale: 0.92 },
+      { y: 0, opacity: 1, scale: 1, duration: 0.58, ease: 'back.out(1.8)', stagger: 0.12, clearProps: 'all' },
+    1.12)
 
     // ── Left sidebar entrance — target only children, ScrollJourney owns the parent ──
     tl.from('.stack-columns', {

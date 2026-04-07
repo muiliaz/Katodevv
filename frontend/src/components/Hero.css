@@ -950,39 +950,69 @@
 }
 
 @media (max-width: 600px) {
-  .hero-v2-title {
-    gap: 10px;
-    letter-spacing: 3px;
+  .hero-v2-inner {
+    padding: 0 16px;
+    align-items: center;
   }
 
+  .hero-v2-center {
+    padding: 28px 20px 24px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    border-radius: 16px;
+  }
+
+  /* Both KATO and DEVV use the same parent size on mobile */
+  .hero-v2-title {
+    font-size: clamp(44px, 12vw, 72px);
+    gap: 10px;
+    letter-spacing: 2px;
+  }
+
+  /* Remove font-size override so KATO matches DEVV */
   .title-kato {
-    font-size: clamp(28px, 7vw, 40px);
     letter-spacing: 1px;
   }
 
   .hero-v2-subtitle {
-    font-size: 14px;
+    font-size: 13px;
+    margin-bottom: 28px;
+  }
+
+  .hero-badge {
+    font-size: 11px;
+    padding: 5px 12px;
+    margin-bottom: 18px;
   }
 
   .hero-v2-buttons {
     flex-direction: column;
     align-items: stretch;
+    gap: 10px;
+    margin-bottom: 32px;
   }
 
   .btn-primary-v2,
   .btn-ghost-v2 {
     text-align: center;
+    padding: 13px 24px;
+    font-size: 13px;
   }
 
   .hero-v2-stats {
-    gap: 14px;
+    gap: 12px;
   }
 
   .stat-num {
-    font-size: 22px;
+    font-size: 20px;
   }
 
-  .hero-v2-center {
-    padding: 32px 24px 28px;
+  .stat-label {
+    font-size: 9.5px;
+  }
+
+  .stat-divider {
+    height: 26px;
   }
 }

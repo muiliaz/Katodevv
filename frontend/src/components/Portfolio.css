@@ -1529,8 +1529,8 @@
 @media (max-width: 768px) {
 
   /* Section */
-  .portfolio { padding: 60px 5%; }
-  .portfolio h2 { font-size: 30px; margin-bottom: 36px; }
+  .portfolio { padding: 60px 16px; }
+  .portfolio h2 { font-size: 28px; margin-bottom: 32px; }
   .portfolio-grid { grid-template-columns: 1fr; gap: 16px; }
 
   /* Modal — full screen bottom sheet */

@@ -1554,8 +1554,8 @@
 @media (max-width: 768px) {
 
   /* Section */
-  .services { padding: 60px 5%; }
-  .services h2 { font-size: 30px; margin-bottom: 36px; }
+  .services { padding: 60px 16px; }
+  .services h2 { font-size: 28px; margin-bottom: 32px; }
 
   /* Grid — single column */
   .services-grid {

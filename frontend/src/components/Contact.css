@@ -304,7 +304,11 @@
 
 @media (max-width: 600px) {
   .contact { padding: 80px 16px 100px; }
-  .contact-form-wrap { padding: 24px 20px; }
+  .contact-header h2 { letter-spacing: -0.5px; }
+  .contact-subtitle { font-size: 14px; }
+  .contact-form-wrap { padding: 20px 16px; }
+  .contact-form-title { font-size: 17px; margin-bottom: 20px; }
   .cform-row { grid-template-columns: 1fr; }
   .contact-info { grid-template-columns: 1fr; }
+  .cic-value { font-size: 13px; }
 }

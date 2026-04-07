@@ -1,5 +1,4 @@
 import { useEffect, useState, useRef, Fragment } from "react";
-import ScrollReveal from "scrollreveal";
 import { useLang } from "../LangContext";
 import "./Services.css";
 
@@ -290,15 +289,6 @@ function Services() {
   const [activeCard, setActiveCard] = useState(null);
 
   useEffect(() => {
-    ScrollReveal().reveal(".card", {
-      duration: 1000,
-      origin: "bottom",
-      distance: "30px",
-      interval: 200,
-    });
-  }, []);
-
-  useEffect(() => {
     const handler = (e) => { if (e.key === "Escape") setActiveCard(null); };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
@@ -326,6 +316,10 @@ function Services() {
             className="card"
             onClick={() => setActiveCard(CARD_IDS[i])}
           >
+            {/* Cube-anchor: visual echo of where the metallic cube landed */}
+            <div className="card-cube-anchor">
+              <div className="card-cube-dot" />
+            </div>
             <span className="card-icon">{CARD_ICONS[i]}</span>
             <h3>{card.title}</h3>
             <p>{card.description}</p>

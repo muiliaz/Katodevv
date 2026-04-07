@@ -2,48 +2,51 @@ import { useEffect, useRef } from "react";
 import "./Cursor.css";
 
 function Cursor() {
-  const ringRef  = useRef(null);
-  const pos      = useRef({ x: -100, y: -100 });
-  const ring     = useRef({ x: -100, y: -100 });
+  const dotRef  = useRef(null);
+  const ringRef = useRef(null);
+  const pos     = useRef({ x: -100, y: -100 });
+  const ring    = useRef({ x: -100, y: -100 });
   const frameRef = useRef(null);
   const visible  = useRef(false);
 
   useEffect(() => {
-    /* Don't render cursor on touch devices */
     if (window.matchMedia("(hover: none)").matches) return;
 
     function onMove(e) {
       pos.current = { x: e.clientX, y: e.clientY };
+      if (dotRef.current) {
+        dotRef.current.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
+      }
       if (!visible.current) {
         visible.current = true;
+        dotRef.current?.classList.add("visible");
         ringRef.current?.classList.add("visible");
       }
     }
 
     function onLeave() {
       visible.current = false;
+      dotRef.current?.classList.remove("visible");
       ringRef.current?.classList.remove("visible");
     }
 
     function onDown() { ringRef.current?.classList.add("pressed"); }
     function onUp()   { ringRef.current?.classList.remove("pressed"); }
 
-    /* Interactive elements enlarge ring */
     function onEnterEl() { ringRef.current?.classList.add("grow"); }
     function onLeaveEl() { ringRef.current?.classList.remove("grow"); }
 
-    const interactives = document.querySelectorAll("button, a, [class*='card'], [class*='tab']");
+    const interactives = document.querySelectorAll("button, a, [class*='card'], [class*='tab'], [class*='sidebar-tag']");
     interactives.forEach(el => {
       el.addEventListener("mouseenter", onEnterEl);
       el.addEventListener("mouseleave", onLeaveEl);
     });
 
-    window.addEventListener("mousemove",  onMove);
+    window.addEventListener("mousemove",   onMove);
     document.addEventListener("mouseleave", onLeave);
-    window.addEventListener("mousedown",  onDown);
-    window.addEventListener("mouseup",    onUp);
+    window.addEventListener("mousedown",   onDown);
+    window.addEventListener("mouseup",     onUp);
 
-    /* Smooth ring follow */
     function animate() {
       ring.current.x += (pos.current.x - ring.current.x) * 0.1;
       ring.current.y += (pos.current.y - ring.current.y) * 0.1;
@@ -67,7 +70,12 @@ function Cursor() {
     };
   }, []);
 
-  return <div ref={ringRef} className="cursor-ring" />;
+  return (
+    <>
+      <div ref={dotRef}  className="cursor-dot"  />
+      <div ref={ringRef} className="cursor-ring" />
+    </>
+  );
 }
 
 export default Cursor;

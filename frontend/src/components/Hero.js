@@ -1,202 +1,224 @@
-import { useEffect, useState, useRef, useCallback } from "react";
-import { useLang } from "../LangContext";
-import "./Hero.css";
+import { useRef, useState } from 'react'
+import gsap from 'gsap'
+import { useGSAP } from '@gsap/react'
+import { useLang } from '../LangContext'
+import './Hero.css'
 
-const STATS_TARGETS  = [10, 10, 1];
-const STATS_SUFFIXES = ["+", "+", "+"];
+gsap.registerPlugin(useGSAP)
 
-const COL_LEFT_1 = [
-  { icon: "devicon-react-original colored",                   name: "React"      },
-  { icon: "devicon-nodejs-plain colored",                     name: "Node.js"    },
-  { icon: "devicon-python-plain colored",                     name: "Python"     },
-  { icon: "devicon-typescript-plain colored",                 name: "TypeScript" },
-  { icon: "devicon-mongodb-plain colored",                    name: "MongoDB"    },
-  { icon: "devicon-postgresql-plain colored",                 name: "PostgreSQL" },
-  { icon: "devicon-firebase-plain colored",                   name: "Firebase"   },
-  { icon: "devicon-amazonwebservices-plain-wordmark colored",  name: "AWS"        },
-];
-const COL_LEFT_2 = [
-  { icon: "devicon-nextjs-plain",             name: "Next.js"    },
-  { icon: "devicon-django-plain colored",     name: "Django"     },
-  { icon: "devicon-fastapi-plain colored",    name: "FastAPI"    },
-  { icon: "devicon-docker-plain colored",     name: "Docker"     },
-  { icon: "devicon-redis-plain colored",      name: "Redis"      },
-  { icon: "devicon-graphql-plain colored",    name: "GraphQL"    },
-  { icon: "devicon-nginx-plain colored",      name: "Nginx"      },
-  { icon: "devicon-kubernetes-plain colored", name: "Kubernetes" },
-];
-const COL_RIGHT_1 = [
-  { icon: "devicon-react-original colored",     name: "React Native" },
-  { icon: "devicon-flutter-plain colored",      name: "Flutter"      },
-  { icon: "devicon-swift-plain colored",        name: "Swift"        },
-  { icon: "devicon-kotlin-plain colored",       name: "Kotlin"       },
-  { icon: "devicon-figma-plain colored",        name: "Figma"        },
-  { icon: "devicon-xd-plain colored",           name: "Adobe XD"     },
-  { icon: "devicon-photoshop-plain colored",    name: "Photoshop"    },
-  { icon: "devicon-illustrator-plain colored",  name: "Illustrator"  },
-];
-const COL_RIGHT_2 = [
-  { icon: "devicon-github-original colored",  name: "GitHub"  },
-  { icon: "devicon-git-plain colored",        name: "Git"     },
-  { icon: "devicon-jira-plain colored",       name: "Jira"    },
-  { icon: "devicon-trello-plain colored",     name: "Trello"  },
-  { icon: "devicon-vscode-plain colored",     name: "VS Code" },
-  { icon: "devicon-jenkins-plain colored",    name: "Jenkins" },
-  { icon: "devicon-mysql-plain colored",      name: "MySQL"   },
-  { icon: "devicon-linux-plain colored",      name: "Linux"   },
-];
+const STACK_COL_A = [
+  { name: 'Go',         icon: 'go'       },
+  { name: 'Flutter',    icon: 'flutter'  },
+  { name: 'Postgres',   icon: 'postgres' },
+  { name: 'FastAPI',    icon: 'fastapi'  },
+  { name: 'Next.js',    icon: 'nextjs'   },
+  { name: 'Python',     icon: 'python'   },
+  { name: 'TypeScript', icon: 'ts'       },
+  { name: 'React',      icon: 'react'    },
+  { name: 'Docker',     icon: 'docker'   },
+  { name: 'Redis',      icon: 'redis'    },
+  { name: 'MongoDB',    icon: 'mongodb'  },
+  { name: 'Firebase',   icon: 'firebase' },
+  { name: 'Kotlin',     icon: 'kotlin'   },
+  { name: 'Swift',      icon: 'swift'    },
+]
 
-function doubleList(arr) { return [...arr, ...arr]; }
+const STACK_COL_B = [
+  { name: 'GraphQL',    icon: 'graphql'  },
+  { name: 'AWS',        icon: 'aws'      },
+  { name: 'Nginx',      icon: 'nginx'    },
+  { name: 'VS Code',    icon: 'vscode'   },
+  { name: 'MySQL',      icon: 'mysql'    },
+  { name: 'Node.js',    icon: 'nodejs'   },
+  { name: 'Git',        icon: 'git'      },
+  { name: 'GitHub',     icon: 'github'   },
+  { name: 'Figma',      icon: 'figma'    },
+  { name: 'Tailwind',   icon: 'tailwind' },
+  { name: 'Linux',      icon: 'linux'    },
+  { name: 'Vue',        icon: 'vue'      },
+  { name: 'Jira',       icon: 'jira'     },
+  { name: 'Jenkins',    icon: 'jenkins'  },
+]
 
-function IconColumn({ items, direction }) {
-  const doubled = doubleList(items);
-  return (
-    <div className={`icon-col ${direction}`}>
-      <div className="icon-col-inner">
-        {doubled.map((item, i) => (
-          <div className="tech-icon-card" key={i}>
-            <i className={`${item.icon} tech-icon-img`} />
-            <span className="tech-icon-name">{item.name}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
+const STATS = [
+  { target: 10,  suffix: '+', labelKey: 0 },
+  { target: 10,  suffix: '+', labelKey: 1 },
+  { target: 100, suffix: '%', labelKey: 2 },
+]
 
-/* ── Silver Orb ── */
-function FireOrb() {
-  return (
-    <div className="silver-orb">
-      <div className="silver-orb-inner" />
-      <div className="silver-orb-glow" />
-    </div>
-  );
-}
-
-/* ── Hero Section ── */
 function Hero() {
-  const { t } = useLang();
-  const h     = t.hero;
+  const { t } = useLang()
+  const h = t.hero
 
-  const [wordIdx, setWordIdx] = useState(0);
-  const [wordKey, setWordKey] = useState(0);
-  const [counts,  setCounts]  = useState(STATS_TARGETS.map(() => 0));
-  const started  = useRef(false);
-  const heroRef  = useRef(null);
-  const orbRef   = useRef(null);
-  const blob1Ref = useRef(null);
-  const blob2Ref = useRef(null);
+  const containerRef = useRef(null)
+  const [statValues, setStatValues] = useState([0, 0, 0])
 
-  useEffect(() => {
-    setWordIdx(0); setWordKey((k) => k + 1);
-  }, [h.cycleWords]);
+  useGSAP(() => {
+    const tl = gsap.timeline({ defaults: { ease: 'power3.out' } })
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setWordIdx((i) => (i + 1) % h.cycleWords.length);
-      setWordKey((k) => k + 1);
-    }, 2600);
-    return () => clearInterval(timer);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [h.cycleWords]);
+    // ── Badge ──────────────────────────────────────────────────────────────
+    tl.from('.hero-badge', {
+      y: 26, opacity: 0, duration: 0.65,
+    }, 0.3)
 
-  useEffect(() => {
-    if (started.current) return;
-    started.current = true;
-    STATS_TARGETS.forEach((target, i) => {
-      let cur = 0;
-      const step  = target / 55;
-      const timer = setInterval(() => {
-        cur += step;
-        if (cur >= target) { cur = target; clearInterval(timer); }
-        setCounts((prev) => { const n = [...prev]; n[i] = Math.round(cur); return n; });
-      }, 22);
-    });
-  }, []);
+    // ── Title: line-reveal — chars slide up from below the clip boundary ──
+    tl.from('.hero-v2-title .char', {
+      y: 88, duration: 0.88, stagger: 0.044,
+      // No opacity: overflow:hidden on .title-word handles visibility.
+      // Keeping opacity off avoids conflicts with gradient-text rendering.
+    }, 0.5)
 
-  /* Parallax on mouse move */
-  const onMouseMove = useCallback((e) => {
-    const rect = heroRef.current?.getBoundingClientRect();
-    if (!rect) return;
-    const x = (e.clientX - rect.left - rect.width  / 2) / rect.width;
-    const y = (e.clientY - rect.top  - rect.height / 2) / rect.height;
-    if (orbRef.current)   orbRef.current.style.transform   = `translate(${x * 20}px, ${y * 16}px)`;
-    if (blob1Ref.current) blob1Ref.current.style.transform = `translate(${x * -32}px, ${y * -24}px)`;
-    if (blob2Ref.current) blob2Ref.current.style.transform = `translate(${x * 26}px,  ${y * 20}px)`;
-  }, []);
+    // ── Subtitle ───────────────────────────────────────────────────────────
+    tl.from('.hero-v2-subtitle', {
+      y: 22, opacity: 0, duration: 0.65,
+    }, 0.92)
 
-  const onMouseLeave = useCallback(() => {
-    if (orbRef.current)   orbRef.current.style.transform   = "translate(0,0)";
-    if (blob1Ref.current) blob1Ref.current.style.transform = "translate(0,0)";
-    if (blob2Ref.current) blob2Ref.current.style.transform = "translate(0,0)";
-  }, []);
+    // ── Buttons: scale + fade ──────────────────────────────────────────────
+    tl.from('.hero-v2-buttons > *', {
+      y: 22, opacity: 0, scale: 0.92, duration: 0.58,
+      ease: 'back.out(1.8)', stagger: 0.12,
+    }, 1.12)
+
+    // ── Left sidebar entrance — target only children, ScrollJourney owns the parent ──
+    tl.from('.stack-columns', {
+      x: -32, opacity: 0, duration: 0.6, ease: 'power2.out',
+      clearProps: 'transform,opacity',
+    }, 0.55)
+    tl.from('.hero-sidebar-left .sidebar-label', {
+      x: -16, opacity: 0, duration: 0.5, ease: 'power2.out',
+      clearProps: 'transform,opacity',
+    }, 0.55)
+
+    // ── Right sidebar tags slide in from right ─────────────────────────────
+    tl.from('.hero-sidebar-right .sidebar-tag', {
+      x: 32, opacity: 0, duration: 0.5, ease: 'power2.out', stagger: 0.08,
+    }, 0.55)
+
+    // ── Stats counter (all three count up simultaneously) ──────────────────
+    const c = { p: 0, c: 0, s: 0 }
+    tl.to(c, {
+      p: STATS[0].target,
+      c: STATS[1].target,
+      s: STATS[2].target,
+      duration: 2.0,
+      ease: 'power2.out',
+      onUpdate() {
+        setStatValues([Math.round(c.p), Math.round(c.c), Math.round(c.s)])
+      },
+    }, 1.3)
+
+  }, { scope: containerRef })
 
   return (
-    <section className="hero" ref={heroRef} onMouseMove={onMouseMove} onMouseLeave={onMouseLeave}>
-      <div className="hero-blob hero-blob-1" ref={blob1Ref} />
-      <div className="hero-blob hero-blob-2" ref={blob2Ref} />
+    <section className="hero-v2" ref={containerRef}>
 
-      <div className="hero-row">
-        {/* LEFT */}
-        <div className="hero-icons-side">
-          <IconColumn items={COL_LEFT_1} direction="up"   />
-          <IconColumn items={COL_LEFT_2} direction="down" />
-        </div>
+      <div className="hero-v2-inner">
 
-        {/* CENTER */}
-        <div className="hero-center">
-          <div className="hero-orb-wrap" ref={orbRef}>
-            <FireOrb />
-            <div className="hero-orb-text">
-              <div className="hero-badge">
-                <span className="hero-badge-dot" />
-                {h.available}
+        {/* ── Left tech-stack sidebar ─────────────────────────────────────── */}
+        <aside className="hero-sidebar hero-sidebar-left">
+          <div className="sidebar-label">{h.stackLabel}</div>
+          <div className="stack-columns">
+
+            {/* Column A — scrolls bottom → top */}
+            <div className="stack-marquee">
+              <div className="stack-track stack-track-up">
+                {[...STACK_COL_A, ...STACK_COL_A].map((item, i) => (
+                  <div key={item.icon + i} className="stack-card">
+                    <img src={`https://skillicons.dev/icons?i=${item.icon}`} alt={item.name} width={32} height={32} />
+                    <span className="stack-card-name">{item.name}</span>
+                  </div>
+                ))}
               </div>
-              <h1>Kato Devv</h1>
+            </div>
+
+            {/* Column B — scrolls top → bottom */}
+            <div className="stack-marquee">
+              <div className="stack-track stack-track-down">
+                {[...STACK_COL_B, ...STACK_COL_B].map((item, i) => (
+                  <div key={item.icon + i} className="stack-card">
+                    <img src={`https://skillicons.dev/icons?i=${item.icon}`} alt={item.name} width={32} height={32} />
+                    <span className="stack-card-name">{item.name}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+          </div>
+        </aside>
+
+        {/* ── Center content ──────────────────────────────────────────────── */}
+        <div className="hero-v2-center">
+
+          {/* Availability badge */}
+          <div className="hero-badge">
+            <span className="hero-badge-dot" />
+            {h.available}
+          </div>
+
+          {/* Title – each character is a separate span for GSAP stagger */}
+          <h1 className="hero-v2-title">
+            <span className="title-word title-kato" data-text="KATO">
+              {'KATO'.split('').map((c, i) => (
+                <span key={i} className="char">{c}</span>
+              ))}
+            </span>
+            <span className="title-word title-devv" data-text="DEVV">
+              {'DEVV'.split('').map((c, i) => (
+                <span key={i} className="char">{c}</span>
+              ))}
+            </span>
+          </h1>
+
+          <p className="hero-v2-subtitle">
+            {h.subtitle}
+          </p>
+
+          <div className="hero-v2-buttons">
+            <button
+              className="btn-primary-v2"
+              onClick={() => document.querySelector('.contact')?.scrollIntoView({ behavior: 'smooth' })}
+            >
+              {h.startProject}
+            </button>
+            <button
+              className="btn-ghost-v2"
+              onClick={() => document.querySelector('.services')?.scrollIntoView({ behavior: 'smooth' })}
+            >
+              {h.viewOurWork}
+            </button>
+          </div>
+
+          {/* Live counter stats */}
+          <div className="hero-v2-stats">
+            <div className="stat-item">
+              <span className="stat-num">{statValues[0]}{STATS[0].suffix}</span>
+              <span className="stat-label">{h.statsLabels[0]}</span>
+            </div>
+            <div className="stat-divider" />
+            <div className="stat-item">
+              <span className="stat-num">{statValues[1]}{STATS[1].suffix}</span>
+              <span className="stat-label">{h.statsLabels[1]}</span>
+            </div>
+            <div className="stat-divider" />
+            <div className="stat-item">
+              <span className="stat-num">{statValues[2]}{STATS[2].suffix}</span>
+              <span className="stat-label">{h.statsLabels[2]}</span>
             </div>
           </div>
 
-          <p className="hero-subtitle">
-            {h.subtitlePre}{" "}
-            <span key={wordKey} className="hero-cycle-word">
-              {h.cycleWords[wordIdx]}
-            </span>{" "}
-            {h.subtitlePost}
-          </p>
-
-          <div className="hero-stats">
-            {STATS_TARGETS.map((_, i) => (
-              <div className="hero-stat-item" key={i}>
-                <div className="hero-stat-num">{counts[i]}{STATS_SUFFIXES[i]}</div>
-                <div className="hero-stat-label">{h.stats[i]}</div>
-              </div>
-            ))}
-          </div>
-
-          <div className="hero-buttons">
-            <button className="primary" onClick={() => document.querySelector(".contact")?.scrollIntoView({ behavior: "smooth" })}>
-              {h.startProject}
-            </button>
-            <button className="secondary" onClick={() => document.querySelector(".services")?.scrollIntoView({ behavior: "smooth" })}>
-              {h.ourServices}
-            </button>
-          </div>
         </div>
 
-        {/* RIGHT */}
-        <div className="hero-icons-side">
-          <IconColumn items={COL_RIGHT_1} direction="down2" />
-          <IconColumn items={COL_RIGHT_2} direction="up2"   />
-        </div>
-      </div>
+        {/* ── Right services sidebar ───────────────────────────────────────── */}
+        <aside className="hero-sidebar hero-sidebar-right">
+          <div className="sidebar-label">{h.servicesLabel}</div>
+          {h.rightTags.map(tag => (
+            <div key={tag} className="sidebar-tag">{tag}</div>
+          ))}
+        </aside>
 
-      <div className="hero-scroll">
-        <div className="hero-scroll-line" />
-        {h.scroll}
       </div>
     </section>
-  );
+  )
 }
 
-export default Hero;
+export default Hero

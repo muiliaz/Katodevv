@@ -1,10 +1,12 @@
 /* ── Services Section ── */
 .services {
   padding: 100px 10%;
-  background: radial-gradient(circle at 70% 50%, #1e293b, #020617);
+  /* Blue-purple radial glow at top — "emerging from the hole" feel */
+  background:
+    radial-gradient(ellipse 80% 40% at 50% -10%, rgba(60, 40, 120, 0.35) 0%, transparent 70%),
+    transparent;
   text-align: center;
   position: relative;
-  overflow: hidden;
 }
 
 /* декоративное свечение фона */
@@ -30,6 +32,28 @@
   -webkit-text-fill-color: transparent;
   background-clip: text;
   letter-spacing: -0.5px;
+  /* GSAP sets opacity:0 y:80 on mount — will-change for smooth scrub */
+  will-change: transform, opacity;
+}
+
+/* ── Cube landing indicator — silver accent at top of each card ─────────
+   Visually connects to where the metallic cubes landed.
+───────────────────────────────────────────────────────────────────────── */
+.card-cube-anchor {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.card-cube-dot {
+  width: 12px;
+  height: 12px;
+  background: linear-gradient(135deg, #c0c8d8, #e8eaff);
+  border-radius: 3px;
+  box-shadow: 0 0 8px rgba(200, 210, 240, 0.5);
+  transform: rotate(15deg);
+  flex-shrink: 0;
 }
 
 /* ── Grid ── */
@@ -39,20 +63,30 @@
   gap: 28px;
 }
 
-/* ── Glassmorphism Card ── */
+/* ── Card (spec values) ── */
 .card {
   position: relative;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  border-radius: 20px;
-  padding: 40px 28px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 16px;
+  padding: 28px;
   cursor: pointer;
   transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
   overflow: hidden;
   color: white;
   text-align: left;
+}
+
+/* Safari: backdrop-filter creates compositing layers that block the fixed
+   StarField from showing through transparent ancestors. Remove blur and
+   use a solid dark-glass background instead. */
+.is-safari .card {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  background: rgba(14, 20, 38, 0.82);
+  border-color: rgba(255, 255, 255, 0.11);
 }
 
 /* отблеск на карточке */

@@ -1,0 +1,65 @@
+/* ── BlackHole canvas wrapper ──────────────────────────────────────────────
+   Fixed, full-viewport, z-index 0.
+   ScrollJourney fades the canvas and card overlays independently.
+────────────────────────────────────────────────────────────────────────── */
+
+.bh-cards-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.bh-canvas-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.bh-canvas-wrapper canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* ── Cube-morph HTML card overlays ──────────────────────────────────────────
+   Positioned by BlackHole via Vector3.project → screen %.
+   Appear after morph completes (cubeCardIn animation).
+────────────────────────────────────────────────────────────────────────── */
+.cube-card-overlay {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 120px;
+  background: rgba(10, 10, 20, 0.72);
+  border: 1px solid rgba(200, 200, 216, 0.22);
+  border-radius: 10px;
+  padding: 12px 10px;
+  text-align: center;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  pointer-events: none;
+  /* opacity and position updated every frame by useFrame — no CSS transition */
+}
+
+.cube-card-icon {
+  font-size: 20px;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.cube-card-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.9);
+  letter-spacing: 0.3px;
+  margin-bottom: 4px;
+}
+
+.cube-card-desc {
+  font-size: 9.5px;
+  color: rgba(255, 255, 255, 0.45);
+  line-height: 1.4;
+}
+

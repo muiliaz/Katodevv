@@ -37,13 +37,16 @@ export default function ScrollJourney() {
 
     // ── Hero text + sidebars fade out (18–35%) ─────────────────────────────
     const heroCtx = gsap.context(() => {
-      gsap.to('.hero-v2-center', {
-        opacity: 0, y: -24, ease: 'none',
-        scrollTrigger: {
-          trigger: '#journey-scroll',
-          start: '20% top', end: '35% top', scrub: 1.2,
-        },
-      })
+      gsap.fromTo('.hero-v2-center',
+        { opacity: 1, y: 0 },
+        {
+          opacity: 0, y: -24, ease: 'none',
+          scrollTrigger: {
+            trigger: '#journey-scroll',
+            start: '20% top', end: '35% top', scrub: 1.2,
+          },
+        }
+      )
       gsap.fromTo('.hero-sidebar-left',
         { opacity: 1, x: 0 },
         {

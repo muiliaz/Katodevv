@@ -59,13 +59,11 @@ function Hero() {
     // ── Badge ──────────────────────────────────────────────────────────────
     tl.from('.hero-badge', {
       y: 26, opacity: 0, duration: 0.65,
-      clearProps: 'transform,opacity',
     }, 0.3)
 
     // ── Title: line-reveal — chars slide up from below the clip boundary ──
     tl.from('.hero-v2-title .char', {
       y: 88, duration: 0.88, stagger: 0.044,
-      clearProps: 'transform',
       // No opacity: overflow:hidden on .title-word handles visibility.
       // Keeping opacity off avoids conflicts with gradient-text rendering.
     }, 0.5)
@@ -73,14 +71,12 @@ function Hero() {
     // ── Subtitle ───────────────────────────────────────────────────────────
     tl.from('.hero-v2-subtitle', {
       y: 22, opacity: 0, duration: 0.65,
-      clearProps: 'transform,opacity',
     }, 0.92)
 
     // ── Buttons: scale + fade ──────────────────────────────────────────────
     tl.from('.hero-v2-buttons > *', {
       y: 22, opacity: 0, scale: 0.92, duration: 0.58,
       ease: 'back.out(1.8)', stagger: 0.12,
-      clearProps: 'transform,opacity',
     }, 1.12)
 
     // ── Left sidebar entrance — target only children, ScrollJourney owns the parent ──

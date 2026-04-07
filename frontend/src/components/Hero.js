@@ -1,8 +1,166 @@
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
 import { useLang } from '../LangContext'
 import './Hero.css'
+
+const SERVICE_INFO = [
+  {
+    icon: '🤖',
+    backType: 'telegram',
+    en: {
+      title: 'Telegram Bots',
+      desc: 'AI-powered bots for 24/7 customer support and full business automation.',
+      features: ['Smart AI responses', 'Order & payment flows', 'CRM integration'],
+    },
+    ru: {
+      title: 'Telegram Боты',
+      desc: 'AI-боты для поддержки клиентов 24/7 и полной автоматизации бизнеса.',
+      features: ['Умные AI-ответы', 'Оформление заказов и оплата', 'Интеграция с CRM'],
+    },
+  },
+  {
+    icon: '🧠',
+    backType: 'ai',
+    en: {
+      title: 'AI Integration',
+      desc: 'Embed cutting-edge AI models directly into your existing product.',
+      features: ['GPT / Claude APIs', 'Custom model fine-tuning', 'Real-time inference'],
+    },
+    ru: {
+      title: 'AI Интеграция',
+      desc: 'Встраиваем передовые AI-модели прямо в ваш существующий продукт.',
+      features: ['GPT / Claude API', 'Дообучение моделей', 'Инференс в реальном времени'],
+    },
+  },
+  {
+    icon: '🌐',
+    backType: 'web',
+    en: {
+      title: 'Web Apps',
+      desc: 'From landing pages to complex SaaS platforms — fast, modern & SEO-ready.',
+      features: ['React / Next.js', 'SEO-optimised', 'Mobile-first design'],
+    },
+    ru: {
+      title: 'Веб-приложения',
+      desc: 'От лендингов до сложных SaaS-платформ — быстро, современно и с SEO.',
+      features: ['React / Next.js', 'SEO-оптимизация', 'Mobile-first дизайн'],
+    },
+  },
+  {
+    icon: '📱',
+    backType: 'mobile',
+    en: {
+      title: 'Mobile Apps',
+      desc: 'Native iOS & Android apps with smooth UX and top performance.',
+      features: ['Flutter / React Native', 'App Store publishing', 'Push notifications'],
+    },
+    ru: {
+      title: 'Мобильные приложения',
+      desc: 'Нативные iOS и Android приложения с отличным UX и производительностью.',
+      features: ['Flutter / React Native', 'Публикация в App Store', 'Push-уведомления'],
+    },
+  },
+  {
+    icon: '⚡',
+    backType: 'automation',
+    en: {
+      title: 'Automation',
+      desc: 'Eliminate repetitive tasks and save hours every day with smart workflows.',
+      features: ['n8n / Zapier flows', 'API integrations', 'Custom dashboards'],
+    },
+    ru: {
+      title: 'Автоматизация',
+      desc: 'Устраняем рутину и экономим часы каждый день с помощью умных воркфлоу.',
+      features: ['n8n / Zapier потоки', 'API интеграции', 'Кастомные дашборды'],
+    },
+  },
+]
+
+function ServiceBack({ type }) {
+  switch (type) {
+    case 'telegram':
+      return (
+        <div className="sb-telegram">
+          <div className="sb-tg-header"><span>🤖</span> KatoBot</div>
+          <div className="sb-tg-msgs">
+            <div className="sb-tg-msg sb-bot">Hello! How can I help? 👋</div>
+            <div className="sb-tg-msg sb-user">Show me services</div>
+            <div className="sb-tg-msg sb-bot">We build bots & apps 🚀</div>
+            <div className="sb-tg-msg sb-user">Looks great!</div>
+          </div>
+        </div>
+      )
+    case 'ai':
+      return (
+        <div className="sb-ai">
+          <div className="sb-ai-label">Neural Network</div>
+          <div className="sb-nn">
+            <div className="sb-nn-layer">{[0,1,2].map(i=><span key={i} className="sb-nn-node"/>)}</div>
+            <div className="sb-nn-lines">
+              {[0,1,2,3].map(i=><div key={i} className="sb-nn-line"/>)}
+            </div>
+            <div className="sb-nn-layer">{[0,1,2,3].map(i=><span key={i} className="sb-nn-node sb-nn-mid"/>)}</div>
+            <div className="sb-nn-lines">
+              {[0,1].map(i=><div key={i} className="sb-nn-line"/>)}
+            </div>
+            <div className="sb-nn-layer">{[0,1].map(i=><span key={i} className="sb-nn-node sb-nn-out"/>)}</div>
+          </div>
+          <div className="sb-ai-label" style={{fontSize:'10px',marginTop:'6px'}}>GPT · Claude · Gemini</div>
+        </div>
+      )
+    case 'web':
+      return (
+        <div className="sb-web">
+          <div className="sb-browser">
+            <div className="sb-browser-bar">
+              <span className="sb-dot sb-red"/><span className="sb-dot sb-yellow"/><span className="sb-dot sb-green"/>
+              <div className="sb-url-bar">katodevv.com</div>
+            </div>
+            <div className="sb-browser-body">
+              <div className="sb-wb-hero">
+                <div className="sb-wb-line sb-big"/>
+                <div className="sb-wb-line"/>
+                <div className="sb-wb-btn">Get Started →</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )
+    case 'mobile':
+      return (
+        <div className="sb-mobile">
+          <div className="sb-phone">
+            <div className="sb-phone-notch"/>
+            <div className="sb-phone-screen">
+              <div className="sb-ph-status"/>
+              <div className="sb-ph-card">
+                <div className="sb-ph-line sb-ph-big"/>
+                <div className="sb-ph-line"/>
+              </div>
+              <div className="sb-ph-grid">
+                <div className="sb-ph-icon-box"/>
+                <div className="sb-ph-icon-box"/>
+                <div className="sb-ph-icon-box"/>
+                <div className="sb-ph-icon-box"/>
+              </div>
+            </div>
+          </div>
+        </div>
+      )
+    case 'automation':
+      return (
+        <div className="sb-auto">
+          <div className="sb-auto-node sb-auto-in">📥 Input</div>
+          <div className="sb-auto-arrow">↓</div>
+          <div className="sb-auto-node sb-auto-proc">⚙️ Process</div>
+          <div className="sb-auto-arrow">↓</div>
+          <div className="sb-auto-node sb-auto-out">✅ Output</div>
+        </div>
+      )
+    default: return null
+  }
+}
 
 gsap.registerPlugin(useGSAP)
 
@@ -47,11 +205,19 @@ const STATS = [
 ]
 
 function Hero() {
-  const { t } = useLang()
+  const { t, lang } = useLang()
   const h = t.hero
 
   const containerRef = useRef(null)
   const [statValues, setStatValues] = useState([0, 0, 0])
+  const [activeService, setActiveService] = useState(null)
+
+  // Close on Escape
+  useEffect(() => {
+    const onKey = (e) => { if (e.key === 'Escape') setActiveService(null) }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [])
 
   useGSAP(() => {
     const tl = gsap.timeline({ defaults: { ease: 'power3.out' } })
@@ -211,12 +377,57 @@ function Hero() {
         {/* ── Right services sidebar ───────────────────────────────────────── */}
         <aside className="hero-sidebar hero-sidebar-right">
           <div className="sidebar-label">{h.servicesLabel}</div>
-          {h.rightTags.map(tag => (
-            <div key={tag} className="sidebar-tag">{tag}</div>
+          {h.rightTags.map((tag, i) => (
+            <div
+              key={tag}
+              className={`sidebar-tag service-tag${activeService === i ? ' tag-active' : ''}`}
+              onClick={() => setActiveService(activeService === i ? null : i)}
+            >
+              {tag}
+            </div>
           ))}
         </aside>
 
       </div>
+
+      {/* ── Service card overlay ─────────────────────────────────────────── */}
+      {activeService !== null && (
+        <>
+          <div className="holo-dim" onClick={() => setActiveService(null)} />
+          <div
+            className="holo-card"
+            style={{ '--tag-offset': `${(activeService - 2) * 54}px` }}
+          >
+            <div className="holo-scan-line" />
+            <div className="holo-beam" />
+
+            {/* ── Flip card (icon front / illustration back) ── */}
+            <div className="holo-flip-wrapper" title="hover to flip">
+              <div className="holo-flip-inner">
+                <div className="holo-flip-front">
+                  <div className="holo-icon">{SERVICE_INFO[activeService].icon}</div>
+                  <div className="holo-flip-hint">hover</div>
+                </div>
+                <div className="holo-flip-back">
+                  <ServiceBack type={SERVICE_INFO[activeService].backType} />
+                </div>
+              </div>
+            </div>
+
+            <div className="holo-title">{SERVICE_INFO[activeService][lang].title}</div>
+            <div className="holo-desc">{SERVICE_INFO[activeService][lang].desc}</div>
+
+            <ul className="holo-features">
+              {SERVICE_INFO[activeService][lang].features.map(f => (
+                <li key={f}><span className="holo-check">✦</span>{f}</li>
+              ))}
+            </ul>
+
+            <button className="holo-close" onClick={() => setActiveService(null)}>✕</button>
+          </div>
+        </>
+      )}
+
     </section>
   )
 }

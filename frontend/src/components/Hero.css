@@ -1,5 +1,5 @@
 /* ══════════════════════════════════════════════════════════════
-   Hero  —  transparent over BlackHole canvas
+   Hero  —  cinematic, floating over BlackHole canvas
    Palette: #000 bg  |  #ffffff primary  |  #e8e8f0 silver
 ══════════════════════════════════════════════════════════════ */
 
@@ -17,17 +17,12 @@
 }
 
 /* ──────────────────────────────────────────────────────────────
-   Main flex row
+   Main container — fills viewport, BH-sync children are absolute
 ────────────────────────────────────────────────────────────── */
 .hero-v2-inner {
-  position: relative;
+  position: absolute;
+  inset: 0;
   z-index: 2;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  max-width: 1220px;
-  padding: 80px 28px;
 }
 
 /* ──────────────────────────────────────────────────────────────
@@ -39,7 +34,7 @@
   transform: translateY(-50%);
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   will-change: opacity, transform;
 }
 
@@ -47,12 +42,12 @@
 .hero-sidebar-right { right: 48px; }
 
 .sidebar-label {
-  font-size: 10px;
+  font-size: 9px;
   text-transform: uppercase;
   letter-spacing: 2.5px;
-  color: rgba(255, 255, 255, 0.20);
-  margin-bottom: 4px;
-  text-align: center;
+  color: rgba(255, 255, 255, 0.18);
+  margin-bottom: 6px;
+  text-align: left;
 }
 
 .sidebar-tag {
@@ -243,10 +238,8 @@
   inset: 0;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
-  /* translateZ forces a separate GPU layer — fixes Safari ghost rendering */
   transform: translateZ(0);
   border-radius: 10px;
-  /* overflow:hidden breaks preserve-3d in Safari — use clip-path instead */
   clip-path: inset(0 round 10px);
   display: flex;
   flex-direction: column;
@@ -265,8 +258,6 @@
 .holo-icon {
   font-size: 44px;
   display: block;
-  /* filter and animation on children break backface-visibility in Safari —
-     use opacity-only flicker on the parent wrapper instead */
 }
 
 .holo-flip-hint {
@@ -604,7 +595,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 .stack-track-up {
@@ -613,7 +604,6 @@
 
 .stack-track-down {
   animation: stackScrollDown 36s linear infinite;
-  /* offset so cols look independent */
   animation-delay: -12s;
 }
 
@@ -663,281 +653,255 @@
 }
 
 /* ──────────────────────────────────────────────────────────────
-   Center column  — dark glass panel
+   Center column — absolute, children positioned by JS BH sync
 ────────────────────────────────────────────────────────────── */
 .hero-v2-center {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none; /* let clicks pass through empty areas */
+}
+
+/* Restore interactivity on the actual text/button elements */
+.hero-v2-center .hero-service-line,
+.hero-v2-center .hero-v2-title,
+.hero-v2-center .hero-v2-buttons {
+  pointer-events: auto;
+}
+
+/* ── Service line: ● WEB · APPS · MOBILE · AI ── */
+.hero-service-line {
+  position: absolute;
+  left: 0; right: 0;
+  top: 35%; /* TEST: fixed — JS sync disabled */
   display: flex;
-  flex-direction: column;
+  justify-content: center;
   align-items: center;
-  text-align: center;
-  max-width: 700px;
-  background: rgba(0, 0, 0, 0.30);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  border-radius: 20px;
-  padding: 40px 44px 36px;
-  will-change: opacity, transform;
+  gap: 10px;
+  font-family: 'JetBrains Mono', 'Geist Mono', monospace;
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.6);
 }
 
-/* ── Availability badge ── */
-.hero-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 16px;
-  background: rgba(34, 197, 94, 0.08);
-  border: 1px solid rgba(34, 197, 94, 0.22);
-  border-radius: 100px;
-  font-size: 12px;
-  color: #4ade80;
-  font-weight: 500;
-  margin-bottom: 22px;
-}
-
-.hero-badge-dot {
-  width: 7px;
-  height: 7px;
-  background: #22c55e;
+.hero-service-dot {
+  width: 6px;
+  height: 6px;
+  background: rgba(74, 222, 128, 0.75);
   border-radius: 50%;
   flex-shrink: 0;
-  animation: pulseDot 1.8s ease-in-out infinite;
+  animation: pulseDot 2s ease-in-out infinite;
 }
 
 @keyframes pulseDot {
-  0%, 100% {
-    opacity: 1;
-    transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.5);
-  }
-  50% {
-    opacity: 0.85;
-    transform: scale(1.22);
-    box-shadow: 0 0 0 5px rgba(34, 197, 94, 0);
-  }
+  0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.5); }
+  50%       { opacity: 0.75; transform: scale(1.35); box-shadow: 0 0 0 5px rgba(34, 197, 94, 0); }
 }
 
-/* ── H1  KATO DEVV ── */
+/* ── H1 KATO DEVV — Cormorant Garamond, sitting on the disk ── */
 .hero-v2-title {
-  font-family: 'Micro 5', monospace;
-  font-size: clamp(72px, 10vw, 140px);
-  line-height: 0.88;
-  letter-spacing: 6px;
-  margin: 0 auto 24px;
-  width: fit-content;
-  display: flex;
-  gap: 20px;
-  justify-content: center;
-  align-items: center;
-  flex-wrap: nowrap;
-}
-
-/*
- * .title-word clips characters for the line-reveal animation.
- */
-.title-word {
-  display: inline-block;
-  overflow: hidden;
-  padding-bottom: 6px;
-  vertical-align: bottom;
+  position: absolute;
+  left: 0; right: 0;
+  top: 48%; /* TEST: fixed — JS sync disabled */
+  font-family: 'Cormorant Garamond', 'Instrument Serif', Georgia, serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: clamp(2.9rem, 4.2vw + 0.8vh, 5.8rem);
+  line-height: 1;
+  letter-spacing: 0.04em;
+  margin: 0;
   white-space: nowrap;
+  text-align: center;
 }
 
+/* Each char is independently transformable (rAF drives transforms) */
 .hero-v2-title .char {
   display: inline-block;
+  will-change: transform, opacity, filter;
 }
 
-/* ── KATO — Micro 5 пиксельный ── */
-.title-kato {
-  position: relative;
-}
-
-.title-kato .char {
+/* KATO letters — pure white with glow through disk light */
+.char-kato {
   color: #ffffff;
-  -webkit-text-fill-color: #ffffff;
+  text-shadow: 0 0 40px rgba(255, 255, 255, 0.3), 0 4px 24px rgba(0, 0, 0, 0.5);
 }
 
-/* Pixel-noise overlay: горизонтальные артефакты раз в ~6с */
-.title-kato::before {
-  content: attr(data-text);
-  position: absolute;
-  top: 0;
-  left: 0;
-  color: #ffffff;
-  pointer-events: none;
-  clip-path: inset(100% 0 0 0);
-  opacity: 0;
-  animation: katoPixelNoise 6s linear infinite;
-}
-
-@keyframes katoPixelNoise {
-  0%,  84%, 100% { clip-path: inset(100% 0 0 0); opacity: 0;   transform: translateX(0);    }
-  85%            { clip-path: inset(18% 0 62% 0); opacity: 1;   transform: translateX(-2px); }
-  86%            { clip-path: inset(54% 0 26% 0); opacity: 0.6; transform: translateX(3px);  }
-  87%            { clip-path: inset(9%  0 73% 0); opacity: 1;   transform: translateX(-1px); }
-  88%            { clip-path: inset(63% 0 17% 0); opacity: 0.7; transform: translateX(2px);  }
-  89%            { clip-path: inset(36% 0 44% 0); opacity: 1;   transform: translateX(-2px); }
-  90%            { clip-path: inset(100% 0 0 0);  opacity: 0;   transform: translateX(0);    }
-}
-
-/* ── DEVV — Bebas Neue + глитч (red + cyan) раз в ~4с ── */
-.title-devv {
-  position: relative;
-}
-
-.title-devv .char {
-  background: linear-gradient(135deg, #e8e8f0 0%, #c8cbd8 50%, #e0e2ec 100%);
+/* DEVV letters — silver gradient */
+.char-dev {
+  background: linear-gradient(160deg, #f0f2ff 0%, #c8cce0 45%, #e4e6f2 100%);
   background-size: 200% 200%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  animation: silverShift 5s ease-in-out infinite;
+  animation: silverDrift 6s ease-in-out infinite;
+  filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.18)) drop-shadow(0 4px 12px rgba(0, 0, 0, 0.5));
 }
 
-@keyframes silverShift {
-  0%, 100% { background-position:   0% 50%; }
+@keyframes silverDrift {
+  0%, 100% { background-position: 0% 50%; }
   50%       { background-position: 100% 50%; }
 }
 
-/* ::before — красный слой */
-.title-devv::before {
-  content: attr(data-text);
-  position: absolute;
-  top: 0;
-  left: 0;
-  color: #E94560;
-  pointer-events: none;
-  clip-path: inset(100% 0 0 0);
-  opacity: 0;
-  animation: devvGlitchRed 4s linear infinite;
+
+/* Space char — invisible, preserves width */
+.char-space {
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  min-width: 0.28em;
 }
 
-/* ::after — cyan слой */
-.title-devv::after {
-  content: attr(data-text);
-  position: absolute;
-  top: 0;
-  left: 0;
-  color: #00eaff;
-  pointer-events: none;
-  clip-path: inset(100% 0 0 0);
-  opacity: 0;
-  animation: devvGlitchCyan 4s linear infinite;
-  animation-delay: 0.12s;
-}
-
-@keyframes devvGlitchRed {
-  0%,  88%, 100% { clip-path: inset(100% 0 0 0); opacity: 0;   transform: translateX(0);    }
-  89%            { clip-path: inset(20% 0 58% 0); opacity: 1;   transform: translateX(-5px); }
-  90%            { clip-path: inset(57% 0 21% 0); opacity: 0;   transform: translateX(5px);  }
-  91%            { clip-path: inset(30% 0 47% 0); opacity: 1;   transform: translateX(-4px); }
-  92%            { clip-path: inset(8%  0 71% 0); opacity: 0.8; transform: translateX(4px);  }
-  93%            { clip-path: inset(100% 0 0 0);  opacity: 0;   transform: translateX(0);    }
-}
-
-@keyframes devvGlitchCyan {
-  0%,  88%, 100% { clip-path: inset(100% 0 0 0); opacity: 0;   transform: translateX(0);   }
-  89%            { clip-path: inset(100% 0 0 0);  opacity: 0;   transform: translateX(0);   }
-  90%            { clip-path: inset(47% 0 23% 0); opacity: 1;   transform: translateX(5px); }
-  91%            { clip-path: inset(14% 0 63% 0); opacity: 0;   transform: translateX(-5px); }
-  92%            { clip-path: inset(37% 0 39% 0); opacity: 1;   transform: translateX(4px); }
-  93%            { clip-path: inset(100% 0 0 0);  opacity: 0;   transform: translateX(0);   }
-}
-
-/* ── Subtitle ── */
-.hero-v2-subtitle {
-  font-size: 15px;
-  color: rgba(255, 255, 255, 0.45);
-  line-height: 1.72;
-  max-width: 430px;
-  margin-bottom: 36px;
-}
-
-/* ── CTA Buttons ── */
+/* ── CTA Button ── */
 .hero-v2-buttons {
+  position: absolute;
+  left: 0; right: 0;
+  top: 67%;
   display: flex;
-  gap: 14px;
-  margin-bottom: 42px;
+  align-items: center;
+  justify-content: center;
 }
 
-/* Primary: silver metallic gradient — matches navbar CTA */
 .btn-primary-v2 {
-  padding: 14px 34px;
-  background: linear-gradient(135deg, #8e9aaf, #d8dde6, #9aa0ad);
+  padding: 0;
+  background: transparent;
   border: none;
-  border-radius: 10px;
-  color: #111;
+  border-radius: 0;
+  color: #000000;
   font-size: 14px;
-  font-weight: 700;
-  font-family: inherit;
+  font-weight: 400;
+  font-family: 'JetBrains Mono', monospace;
   cursor: pointer;
-  transition: transform 0.22s, box-shadow 0.22s, opacity 0.22s;
-  box-shadow: 0 4px 20px rgba(180, 190, 210, 0.35);
-  letter-spacing: 0.3px;
+  letter-spacing: 0.06em;
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.6);
+  transition: color 0.2s, letter-spacing 0.2s;
 }
 
 .btn-primary-v2:hover {
-  opacity: 0.9;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 28px rgba(200, 210, 230, 0.5);
+  color: #111111;
+  letter-spacing: 0.09em;
 }
 
-/* Ghost: transparent, white border */
-.btn-ghost-v2 {
-  padding: 14px 34px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  border-radius: 8px;
-  color: #fff;
-  font-size: 14px;
-  font-weight: 600;
-  font-family: inherit;
-  cursor: pointer;
-  backdrop-filter: blur(10px);
-  transition: border-color 0.22s, background 0.22s, transform 0.22s;
-  letter-spacing: 0.3px;
+/* ── Service picker overlay ── */
+.hero-picker-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  z-index: 800;
+  animation: holo-fade-in 0.2s ease forwards;
 }
 
-.btn-ghost-v2:hover {
-  border-color: rgba(255, 255, 255, 0.50);
-  background: rgba(255, 255, 255, 0.09);
-  transform: translateY(-3px);
+.hero-picker-panel {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 801;
+  width: min(580px, calc(100vw - 32px));
+  padding: 30px 28px 26px;
+  background: rgba(5, 7, 18, 0.96);
+  border: 1px solid rgba(180, 190, 215, 0.22);
+  border-radius: 20px;
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  box-shadow:
+    0 0 0 1px rgba(180, 190, 215, 0.05),
+    0 28px 64px rgba(0, 0, 0, 0.65);
+  animation: pickerAppear 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
-/* ── Stats row ── */
-.hero-v2-stats {
-  display: flex;
+@keyframes pickerAppear {
+  from { opacity: 0; transform: translate(-50%, -50%) scale(0.92); }
+  to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+.hero-picker-heading {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(180, 190, 215, 0.45);
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.hero-picker-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+/* 5th item spans full row */
+.hero-picker-item:last-child {
+  grid-column: 1 / -1;
+  flex-direction: row;
   align-items: center;
-  gap: 22px;
+  gap: 14px;
 }
 
-.stat-item {
+.hero-picker-item {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 3px;
+  align-items: flex-start;
+  gap: 5px;
+  padding: 16px 18px;
+  background: rgba(180, 190, 215, 0.04);
+  border: 1px solid rgba(180, 190, 215, 0.10);
+  border-radius: 14px;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  width: 100%;
+  transition: background 0.18s, border-color 0.18s, transform 0.15s;
 }
 
-/* Numbers: solid white */
-.stat-num {
-  font-size: 28px;
-  font-weight: 800;
-  color: #ffffff;
+.hero-picker-item:hover {
+  background: rgba(255, 185, 0, 0.07);
+  border-color: rgba(255, 185, 0, 0.30);
+  transform: translateY(-2px);
+}
+
+.hero-picker-icon {
+  font-size: 1.75rem;
   line-height: 1;
-  letter-spacing: -0.5px;
+  display: block;
 }
 
-.stat-label {
-  font-size: 10.5px;
-  color: rgba(255, 255, 255, 0.30);
-  text-transform: uppercase;
-  letter-spacing: 1px;
+.hero-picker-item:last-child .hero-picker-icon {
+  font-size: 1.5rem;
 }
 
-.stat-divider {
-  width: 1px;
-  height: 32px;
-  background: rgba(255, 255, 255, 0.10);
-  flex-shrink: 0;
+.hero-picker-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.88);
+  letter-spacing: 0.2px;
+}
+
+.hero-picker-desc {
+  font-size: 11px;
+  color: rgba(180, 190, 215, 0.45);
+  line-height: 1.4;
+}
+
+.hero-picker-close {
+  position: absolute;
+  top: 13px;
+  right: 15px;
+  background: none;
+  border: none;
+  color: rgba(180, 190, 215, 0.28);
+  font-size: 13px;
+  cursor: pointer;
+  padding: 5px;
+  transition: color 0.18s;
+  font-family: inherit;
+  line-height: 1;
+}
+
+.hero-picker-close:hover {
+  color: rgba(255, 255, 255, 0.65);
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -949,70 +913,63 @@
   }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 767px) {
+  /* Restore flex column layout on mobile — JS BH sync is desktop-only */
   .hero-v2-inner {
-    padding: 0 16px;
+    position: relative;
+    display: flex;
     align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
   }
 
   .hero-v2-center {
-    padding: 28px 20px 24px;
+    position: relative;
+    inset: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
     width: 100%;
-    max-width: 100%;
+    padding: 0 16px;
     box-sizing: border-box;
-    border-radius: 16px;
+    transform: translateY(-2vh);
   }
 
-  /* Both KATO and DEVV use the same parent size on mobile */
+  .hero-service-line {
+    position: relative;
+    left: auto; right: auto;
+    font-size: 9.5px;
+    letter-spacing: 0.2em;
+    margin-bottom: 72px;
+    top: auto !important;
+  }
+
   .hero-v2-title {
-    font-size: clamp(44px, 12vw, 72px);
-    gap: 10px;
-    letter-spacing: 2px;
-  }
-
-  /* Remove font-size override so KATO matches DEVV */
-  .title-kato {
-    letter-spacing: 1px;
-  }
-
-  .hero-v2-subtitle {
-    font-size: 13px;
-    margin-bottom: 28px;
-  }
-
-  .hero-badge {
-    font-size: 11px;
-    padding: 5px 12px;
-    margin-bottom: 18px;
+    position: relative;
+    left: auto; right: auto;
+    font-size: clamp(2.1rem, 9.2vw, 3.3rem);
+    letter-spacing: 0.03em;
+    margin-bottom: 48px;
+    top: auto !important;
   }
 
   .hero-v2-buttons {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 10px;
-    margin-bottom: 32px;
+    position: relative;
+    left: auto; right: auto;
+    top: auto !important;
   }
 
-  .btn-primary-v2,
-  .btn-ghost-v2 {
-    text-align: center;
-    padding: 13px 24px;
+  .btn-primary-v2 {
     font-size: 13px;
   }
 
-  .hero-v2-stats {
-    gap: 12px;
+  .hero-picker-grid {
+    grid-template-columns: 1fr;
   }
 
-  .stat-num {
-    font-size: 20px;
-  }
-
-  .stat-label {
-    font-size: 9.5px;
-  }
-
-  .stat-divider {
-    height: 26px;
+  .hero-picker-item:last-child {
+    grid-column: auto;
   }
 }

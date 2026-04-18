@@ -61,7 +61,7 @@ function AppInner() {
 
       {/* ── JOURNEY: 300vh sticky Hero while BlackHole zooms ── */}
       <div id="journey-scroll" style={{ height: "300vh", position: "relative" }}>
-        <div style={{ position: "sticky", top: 0, height: "100vh", overflow: "hidden" }}>
+        <div style={{ position: "sticky", top: 0, height: "100vh" }}>
           <Hero />
         </div>
       </div>

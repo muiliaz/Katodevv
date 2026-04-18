@@ -291,6 +291,68 @@
 .cform-btn:disabled { opacity: 0.7; cursor: not-allowed; }
 .cform-error { color: #f87171; font-size: 13px; margin-bottom: 8px; }
 
+/* ── Pre-selected service chip ── */
+.cform-service-chip {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 14px;
+  background: rgba(255, 185, 0, 0.06);
+  border: 1px solid rgba(255, 185, 0, 0.22);
+  border-radius: 12px;
+  animation: chipAppear 0.25s ease forwards;
+}
+
+@keyframes chipAppear {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.cform-chip-icon {
+  font-size: 1.4rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.cform-chip-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.cform-chip-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: rgba(255, 185, 0, 0.55);
+}
+
+.cform-chip-value {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.cform-chip-remove {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.25);
+  font-size: 11px;
+  cursor: pointer;
+  padding: 4px 6px;
+  transition: color 0.18s;
+  font-family: inherit;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.cform-chip-remove:hover {
+  color: rgba(255, 255, 255, 0.65);
+}
+
 /* ── Responsive ── */
 @media (max-width: 900px) {
   .contact-body {

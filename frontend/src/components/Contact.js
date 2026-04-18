@@ -1,14 +1,28 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useLang } from "../LangContext";
 import "./Contact.css";
 
 function Contact() {
   const { t } = useLang();
   const c = t.contact;
-  const [sent, setSent]       = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError]     = useState(null);
-  const formRef               = useRef(null);
+  const [sent, setSent]             = useState(false);
+  const [loading, setLoading]       = useState(false);
+  const [error, setError]           = useState(null);
+  const [preService, setPreService] = useState(null);
+  const formRef                     = useRef(null);
+
+  // Listen for service selection from Hero picker
+  useEffect(() => {
+    const handler = (e) => {
+      setPreService(e.detail);
+      // Focus the name field after scroll animation completes
+      setTimeout(() => {
+        formRef.current?.querySelector('input[name="name"]')?.focus();
+      }, 750);
+    };
+    window.addEventListener('kato:serviceSelected', handler);
+    return () => window.removeEventListener('kato:serviceSelected', handler);
+  }, []);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -22,7 +36,9 @@ function Contact() {
         body:    JSON.stringify({
           name:    fd.get("name"),
           email:   fd.get("email"),
-          message: fd.get("message"),
+          message: preService
+            ? `[${preService.icon} ${preService.label}]\n${fd.get("message")}`
+            : fd.get("message"),
         }),
       });
       if (!res.ok) throw new Error();
@@ -142,6 +158,23 @@ function Contact() {
                   <input type="email" name="email" placeholder={c.email} required />
                 </div>
               </div>
+              {preService && (
+                <div className="cform-service-chip">
+                  <span className="cform-chip-icon">{preService.icon}</span>
+                  <div className="cform-chip-body">
+                    <span className="cform-chip-label">
+                      {t.contact?.projectType || 'Project type'}
+                    </span>
+                    <span className="cform-chip-value">{preService.label}</span>
+                  </div>
+                  <button
+                    type="button"
+                    className="cform-chip-remove"
+                    onClick={() => setPreService(null)}
+                    aria-label="Remove"
+                  >✕</button>
+                </div>
+              )}
               <div className="cform-group">
                 <label>{c.message}</label>
                 <textarea name="message" placeholder={c.message} rows={5} required />

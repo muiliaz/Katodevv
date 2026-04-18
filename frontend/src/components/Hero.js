@@ -4,6 +4,7 @@ import { useGSAP } from '@gsap/react'
 import { useLang } from '../LangContext'
 import './Hero.css'
 
+// ─── Service data (used by picker + holo-card) ────────────────────────────────
 const SERVICE_INFO = [
   {
     icon: '🤖',
@@ -77,353 +78,164 @@ const SERVICE_INFO = [
   },
 ]
 
-function ServiceBack({ type }) {
-  switch (type) {
-    case 'telegram':
-      return (
-        <div className="sb-telegram">
-          <div className="sb-tg-header"><span>🤖</span> KatoBot</div>
-          <div className="sb-tg-msgs">
-            <div className="sb-tg-msg sb-bot">Hello! How can I help? 👋</div>
-            <div className="sb-tg-msg sb-user">Show me services</div>
-            <div className="sb-tg-msg sb-bot">We build bots & apps 🚀</div>
-            <div className="sb-tg-msg sb-user">Looks great!</div>
-          </div>
-        </div>
-      )
-    case 'ai':
-      return (
-        <div className="sb-ai">
-          <div className="sb-ai-label">Neural Network</div>
-          <div className="sb-nn">
-            <div className="sb-nn-layer">{[0,1,2].map(i=><span key={i} className="sb-nn-node"/>)}</div>
-            <div className="sb-nn-lines">
-              {[0,1,2,3].map(i=><div key={i} className="sb-nn-line"/>)}
-            </div>
-            <div className="sb-nn-layer">{[0,1,2,3].map(i=><span key={i} className="sb-nn-node sb-nn-mid"/>)}</div>
-            <div className="sb-nn-lines">
-              {[0,1].map(i=><div key={i} className="sb-nn-line"/>)}
-            </div>
-            <div className="sb-nn-layer">{[0,1].map(i=><span key={i} className="sb-nn-node sb-nn-out"/>)}</div>
-          </div>
-          <div className="sb-ai-label" style={{fontSize:'10px',marginTop:'6px'}}>GPT · Claude · Gemini</div>
-        </div>
-      )
-    case 'web':
-      return (
-        <div className="sb-web">
-          <div className="sb-browser">
-            <div className="sb-browser-bar">
-              <span className="sb-dot sb-red"/><span className="sb-dot sb-yellow"/><span className="sb-dot sb-green"/>
-              <div className="sb-url-bar">katodevv.com</div>
-            </div>
-            <div className="sb-browser-body">
-              <div className="sb-wb-hero">
-                <div className="sb-wb-line sb-big"/>
-                <div className="sb-wb-line"/>
-                <div className="sb-wb-btn">Get Started →</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )
-    case 'mobile':
-      return (
-        <div className="sb-mobile">
-          <div className="sb-phone">
-            <div className="sb-phone-notch"/>
-            <div className="sb-phone-screen">
-              <div className="sb-ph-status"/>
-              <div className="sb-ph-card">
-                <div className="sb-ph-line sb-ph-big"/>
-                <div className="sb-ph-line"/>
-              </div>
-              <div className="sb-ph-grid">
-                <div className="sb-ph-icon-box"/>
-                <div className="sb-ph-icon-box"/>
-                <div className="sb-ph-icon-box"/>
-                <div className="sb-ph-icon-box"/>
-              </div>
-            </div>
-          </div>
-        </div>
-      )
-    case 'automation':
-      return (
-        <div className="sb-auto">
-          <div className="sb-auto-node sb-auto-in">📥 Input</div>
-          <div className="sb-auto-arrow">↓</div>
-          <div className="sb-auto-node sb-auto-proc">⚙️ Process</div>
-          <div className="sb-auto-arrow">↓</div>
-          <div className="sb-auto-node sb-auto-out">✅ Output</div>
-        </div>
-      )
-    default: return null
-  }
-}
-
 gsap.registerPlugin(useGSAP)
 
-const STACK_COL_A = [
-  { name: 'Go',         icon: 'go'       },
-  { name: 'Flutter',    icon: 'flutter'  },
-  { name: 'Postgres',   icon: 'postgres' },
-  { name: 'FastAPI',    icon: 'fastapi'  },
-  { name: 'Next.js',    icon: 'nextjs'   },
-  { name: 'Python',     icon: 'python'   },
-  { name: 'TypeScript', icon: 'ts'       },
-  { name: 'React',      icon: 'react'    },
-  { name: 'Docker',     icon: 'docker'   },
-  { name: 'Redis',      icon: 'redis'    },
-  { name: 'MongoDB',    icon: 'mongodb'  },
-  { name: 'Firebase',   icon: 'firebase' },
-  { name: 'Kotlin',     icon: 'kotlin'   },
-  { name: 'Swift',      icon: 'swift'    },
-]
+// Title: K-A-T-O-[space]-D-E-V-V  (9 chars, 8 letters + 1 space)
+const TITLE_CHARS = 'KATO DEVV'.split('')
 
-const STACK_COL_B = [
-  { name: 'GraphQL',    icon: 'graphql'  },
-  { name: 'AWS',        icon: 'aws'      },
-  { name: 'Nginx',      icon: 'nginx'    },
-  { name: 'VS Code',    icon: 'vscode'   },
-  { name: 'MySQL',      icon: 'mysql'    },
-  { name: 'Node.js',    icon: 'nodejs'   },
-  { name: 'Git',        icon: 'git'      },
-  { name: 'GitHub',     icon: 'github'   },
-  { name: 'Figma',      icon: 'figma'    },
-  { name: 'Tailwind',   icon: 'tailwind' },
-  { name: 'Linux',      icon: 'linux'    },
-  { name: 'Vue',        icon: 'vue'      },
-  { name: 'Jira',       icon: 'jira'     },
-  { name: 'Jenkins',    icon: 'jenkins'  },
-]
-
-const STATS = [
-  { target: 10,  suffix: '+', labelKey: 0 },
-  { target: 10,  suffix: '+', labelKey: 1 },
-  { target: 100, suffix: '%', labelKey: 2 },
-]
 
 function Hero() {
   const { t, lang } = useLang()
   const h = t.hero
 
-  const containerRef = useRef(null)
-  const [statValues, setStatValues] = useState([0, 0, 0])
-  const [activeService, setActiveService] = useState(null)
+  const containerRef    = useRef(null)
+  const titleRef        = useRef(null)
+  const serviceLineRef  = useRef(null)
+  const buttonsRef      = useRef(null)
+  const [showPicker, setShowPicker] = useState(false)
 
-  // Close on Escape
+  // Close picker on Escape
   useEffect(() => {
-    const onKey = (e) => { if (e.key === 'Escape') setActiveService(null) }
+    const onKey = (e) => { if (e.key === 'Escape') setShowPicker(false) }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [])
 
+  // ── rAF: idle arc+sway + BH-sync (GSAP owns DOM when p > 0) ─────────────
+  useEffect(() => {
+    const titleEl = titleRef.current
+    if (!titleEl) return
+    const spans = Array.from(titleEl.querySelectorAll('.char'))
+    const total = spans.length
+    let raf
+
+    const tick = (time) => {
+      const sp = Math.min(1, Math.max(0, window.__scrollProgress || 0))
+      const p  = Math.min(1, sp / 0.35)
+
+      // When scrolling: GSAP owns all transforms — rAF touches nothing
+      if (p > 0) {
+        raf = requestAnimationFrame(tick)
+        return
+      }
+
+      // p === 0: idle arc + sway (positions now fixed in CSS, BH-sync removed)
+      const mob     = window.innerWidth < 768
+      const sLineEl = serviceLineRef.current
+      const titleH1 = titleRef.current
+      const btnsEl  = buttonsRef.current
+
+      spans.forEach((span, i) => {
+        const norm   = total > 1 ? (i / (total - 1)) * 2 - 1 : 0
+        const t2     = norm * norm
+        const arcAmp = mob ? 16 : 32
+        const arcY   = arcAmp * (1 - t2)
+        const arcRot = norm * (mob ? 6 : 12)
+        const sway   = Math.sin(time / 6000 * Math.PI * 2 + i * 0.55) * 1.5
+        span.style.transform = `translateY(${(arcY + sway).toFixed(2)}px) rotateZ(${arcRot.toFixed(2)}deg)`
+      })
+
+      // Subtle tidal pull on parent elements — BH "breathes" text toward it
+      const pullY     = Math.sin(time / 3000 * Math.PI * 2) * 2
+      const pullScale = 1 - Math.abs(Math.sin(time / 3000 * Math.PI * 2)) * 0.003
+      if (titleH1) titleH1.style.transform = `translateY(${pullY.toFixed(3)}px) scale(${pullScale.toFixed(4)})`
+      if (sLineEl) sLineEl.style.transform = `translateY(${(pullY * 0.7).toFixed(3)}px) scale(${pullScale.toFixed(4)})`
+      if (btnsEl)  btnsEl.style.transform  = `translateY(${(pullY * 0.5).toFixed(3)}px) scale(${pullScale.toFixed(4)})`
+
+      raf = requestAnimationFrame(tick)
+    }
+
+    raf = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(raf)
+  }, [])
+
+  // ── Service picker: broadcast to Contact ─────────────────────────────────
+  function handleServicePick(service) {
+    setShowPicker(false)
+    window.dispatchEvent(new CustomEvent('kato:serviceSelected', { detail: service }))
+    setTimeout(() => {
+      document.querySelector('.contact')?.scrollIntoView({ behavior: 'smooth' })
+    }, 80)
+  }
+
+  // ── Entrance animations ───────────────────────────────────────────────────
   useGSAP(() => {
     const tl = gsap.timeline({ defaults: { ease: 'power3.out' } })
 
-    // ── Badge ──────────────────────────────────────────────────────────────
-    tl.from('.hero-badge', {
-      y: 26, opacity: 0, duration: 0.65,
-    }, 0.3)
-
-    // ── Title: line-reveal — chars slide up from below the clip boundary ──
-    tl.from('.hero-v2-title .char', {
-      y: 88, duration: 0.88, stagger: 0.044,
-      // No opacity: overflow:hidden on .title-word handles visibility.
-      // Keeping opacity off avoids conflicts with gradient-text rendering.
-    }, 0.5)
-
-    // ── Subtitle ───────────────────────────────────────────────────────────
-    tl.from('.hero-v2-subtitle', {
-      y: 22, opacity: 0, duration: 0.65,
-    }, 0.92)
-
-    // ── Buttons: scale + fade ──────────────────────────────────────────────
+    // Service line: opacity only (rAF drives position via style.top, skip y tween)
+    tl.from('.hero-service-line', { opacity: 0, duration: 0.7 }, 0.3)
+    tl.from('.hero-v2-title', {
+      y: 30, opacity: 0, duration: 0.9, ease: 'power2.out', clearProps: 'transform',
+    }, 0.4)
     tl.fromTo('.hero-v2-buttons > *',
-      { y: 22, opacity: 0, scale: 0.92 },
-      { y: 0, opacity: 1, scale: 1, duration: 0.58, ease: 'back.out(1.8)', stagger: 0.12, clearProps: 'all' },
-    1.12)
-
-    // ── Left sidebar entrance — target only children, ScrollJourney owns the parent ──
-    tl.from('.stack-columns', {
-      x: -32, opacity: 0, duration: 0.6, ease: 'power2.out',
-      clearProps: 'transform,opacity',
-    }, 0.55)
-    tl.from('.hero-sidebar-left .sidebar-label', {
-      x: -16, opacity: 0, duration: 0.5, ease: 'power2.out',
-      clearProps: 'transform,opacity',
-    }, 0.55)
-
-    // ── Right sidebar tags slide in from right ─────────────────────────────
-    tl.from('.hero-sidebar-right .sidebar-tag', {
-      x: 32, opacity: 0, duration: 0.5, ease: 'power2.out', stagger: 0.08,
-    }, 0.55)
-
-    // ── Stats counter (all three count up simultaneously) ──────────────────
-    const c = { p: 0, c: 0, s: 0 }
-    tl.to(c, {
-      p: STATS[0].target,
-      c: STATS[1].target,
-      s: STATS[2].target,
-      duration: 2.0,
-      ease: 'power2.out',
-      onUpdate() {
-        setStatValues([Math.round(c.p), Math.round(c.c), Math.round(c.s)])
-      },
-    }, 1.3)
-
+      { y: 16, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.5, ease: 'back.out(1.6)', clearProps: 'all' },
+    0.9)
   }, { scope: containerRef })
 
   return (
     <section className="hero-v2" ref={containerRef}>
 
+      {/* ── Center content only ──────────────────────────────────────── */}
       <div className="hero-v2-inner">
-
-        {/* ── Left tech-stack sidebar ─────────────────────────────────────── */}
-        <aside className="hero-sidebar hero-sidebar-left">
-          <div className="sidebar-label">{h.stackLabel}</div>
-          <div className="stack-columns">
-
-            {/* Column A — scrolls bottom → top */}
-            <div className="stack-marquee">
-              <div className="stack-track stack-track-up">
-                {[...STACK_COL_A, ...STACK_COL_A].map((item, i) => (
-                  <div key={item.icon + i} className="stack-card">
-                    <img src={`https://skillicons.dev/icons?i=${item.icon}`} alt={item.name} width={32} height={32} />
-                    <span className="stack-card-name">{item.name}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Column B — scrolls top → bottom */}
-            <div className="stack-marquee">
-              <div className="stack-track stack-track-down">
-                {[...STACK_COL_B, ...STACK_COL_B].map((item, i) => (
-                  <div key={item.icon + i} className="stack-card">
-                    <img src={`https://skillicons.dev/icons?i=${item.icon}`} alt={item.name} width={32} height={32} />
-                    <span className="stack-card-name">{item.name}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-          </div>
-        </aside>
-
-        {/* ── Center content ──────────────────────────────────────────────── */}
         <div className="hero-v2-center">
 
-          {/* Availability badge */}
-          <div className="hero-badge">
-            <span className="hero-badge-dot" />
-            {h.available}
+          {/* ● WEB · APPS · MOBILE · AI */}
+          <div className="hero-service-line" ref={serviceLineRef}>
+            <span className="hero-service-dot" />
+            <span>WEB · APPS · MOBILE · AI</span>
           </div>
 
-          {/* Title – each character is a separate span for GSAP stagger */}
-          <h1 className="hero-v2-title">
-            <span className="title-word title-kato" data-text="KATO">
-              {'KATO'.split('').map((c, i) => (
-                <span key={i} className="char">{c}</span>
-              ))}
-            </span>
-            <span className="title-word title-devv" data-text="DEVV">
-              {'DEVV'.split('').map((c, i) => (
-                <span key={i} className="char">{c}</span>
-              ))}
-            </span>
+          {/* Title — flat chars, rAF drives all per-letter transforms */}
+          <h1 className="hero-v2-title" ref={titleRef}>
+            {TITLE_CHARS.map((ch, i) => (
+              <span
+                key={i}
+                className={`char${ch === ' ' ? ' char-space' : i < 4 ? ' char-kato' : ' char-dev'}`}
+              >
+                {ch === ' ' ? '\u00A0' : ch}
+              </span>
+            ))}
           </h1>
 
-          <p className="hero-v2-subtitle">
-            {h.subtitle}
-          </p>
-
-          <div className="hero-v2-buttons">
-            <button
-              className="btn-primary-v2"
-              onClick={() => document.querySelector('.contact')?.scrollIntoView({ behavior: 'smooth' })}
-            >
-              {h.startProject}
+          {/* CTA — opens service type picker */}
+          <div className="hero-v2-buttons" ref={buttonsRef}>
+            <button className="btn-primary-v2" onClick={() => setShowPicker(true)}>
+              {h.startProject} ↗
             </button>
-            <button
-              className="btn-ghost-v2"
-              onClick={() => document.querySelector('.services')?.scrollIntoView({ behavior: 'smooth' })}
-            >
-              {h.viewOurWork}
-            </button>
-          </div>
-
-          {/* Live counter stats */}
-          <div className="hero-v2-stats">
-            <div className="stat-item">
-              <span className="stat-num">{statValues[0]}{STATS[0].suffix}</span>
-              <span className="stat-label">{h.statsLabels[0]}</span>
-            </div>
-            <div className="stat-divider" />
-            <div className="stat-item">
-              <span className="stat-num">{statValues[1]}{STATS[1].suffix}</span>
-              <span className="stat-label">{h.statsLabels[1]}</span>
-            </div>
-            <div className="stat-divider" />
-            <div className="stat-item">
-              <span className="stat-num">{statValues[2]}{STATS[2].suffix}</span>
-              <span className="stat-label">{h.statsLabels[2]}</span>
-            </div>
           </div>
 
         </div>
-
-        {/* ── Right services sidebar ───────────────────────────────────────── */}
-        <aside className="hero-sidebar hero-sidebar-right">
-          <div className="sidebar-label">{h.servicesLabel}</div>
-          {h.rightTags.map((tag, i) => (
-            <div
-              key={tag}
-              className={`sidebar-tag service-tag${activeService === i ? ' tag-active' : ''}`}
-              onClick={() => setActiveService(activeService === i ? null : i)}
-            >
-              {tag}
-            </div>
-          ))}
-        </aside>
-
       </div>
 
-      {/* ── Service card overlay ─────────────────────────────────────────── */}
-      {activeService !== null && (
+      {/* ── Service type picker ──────────────────────────────────────────── */}
+      {showPicker && (
         <>
-          <div className="holo-dim" onClick={() => setActiveService(null)} />
-          <div
-            className="holo-card"
-            style={{ '--tag-offset': `${(activeService - 2) * 54}px` }}
-          >
-            <div className="holo-scan-line" />
-            <div className="holo-beam" />
-
-            {/* ── Flip card (icon front / illustration back) ── */}
-            <div className="holo-flip-wrapper" title="hover to flip">
-              <div className="holo-flip-inner">
-                <div className="holo-flip-front">
-                  <div className="holo-icon">{SERVICE_INFO[activeService].icon}</div>
-                  <div className="holo-flip-hint">hover</div>
-                </div>
-                <div className="holo-flip-back">
-                  <ServiceBack type={SERVICE_INFO[activeService].backType} />
-                </div>
-              </div>
+          <div className="hero-picker-backdrop" onClick={() => setShowPicker(false)} />
+          <div className="hero-picker-panel">
+            <button className="hero-picker-close" onClick={() => setShowPicker(false)}>✕</button>
+            <div className="hero-picker-heading">
+              {lang === 'ru' ? 'Выберите тип проекта' : 'Choose a service'}
             </div>
-
-            <div className="holo-title">{SERVICE_INFO[activeService][lang].title}</div>
-            <div className="holo-desc">{SERVICE_INFO[activeService][lang].desc}</div>
-
-            <ul className="holo-features">
-              {SERVICE_INFO[activeService][lang].features.map(f => (
-                <li key={f}><span className="holo-check">✦</span>{f}</li>
+            <div className="hero-picker-grid">
+              {SERVICE_INFO.map((svc, i) => (
+                <button
+                  key={i}
+                  className="hero-picker-item"
+                  onClick={() => handleServicePick({
+                    key:   svc.backType,
+                    label: svc[lang].title,
+                    icon:  svc.icon,
+                  })}
+                >
+                  <span className="hero-picker-icon">{svc.icon}</span>
+                  <span className="hero-picker-label">{svc[lang].title}</span>
+                  <span className="hero-picker-desc">
+                    {svc[lang].desc.split('.')[0]}
+                  </span>
+                </button>
               ))}
-            </ul>
-
-            <button className="holo-close" onClick={() => setActiveService(null)}>✕</button>
+            </div>
           </div>
         </>
       )}

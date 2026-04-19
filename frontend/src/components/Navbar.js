@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import gsap from "gsap";
 import { useLang } from "../LangContext";
 import "./Navbar.css";
 
@@ -6,6 +7,14 @@ function Navbar() {
   const { lang, setLang, t } = useLang();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+
+  // Entrance: navbar slides down after loader cascade (1.9s from mount)
+  useEffect(() => {
+    gsap.fromTo('.navbar',
+      { opacity: 0, y: -10 },
+      { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out', delay: 1.9, clearProps: 'transform' }
+    )
+  }, [])
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 30);

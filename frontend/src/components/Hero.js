@@ -158,19 +158,32 @@ function Hero() {
     }, 80)
   }
 
-  // ── Entrance animations ───────────────────────────────────────────────────
+  // ── Entrance animations — cascade after loader (Navbar 1.9s, Title 2.05s, rest 2.2s)
   useGSAP(() => {
+    // Hide immediately so elements don't flash before the cascade
+    gsap.set('.hero-service-line', { opacity: 0 })
+    gsap.set('.hero-v2-title',     { opacity: 0 })
+    gsap.set('.hero-v2-buttons > *', { opacity: 0 })
+
     const tl = gsap.timeline({ defaults: { ease: 'power3.out' } })
 
-    // Service line: opacity only (rAF drives position via style.top, skip y tween)
-    tl.from('.hero-service-line', { opacity: 0, duration: 0.7 }, 0.3)
-    tl.from('.hero-v2-title', {
-      y: 30, opacity: 0, duration: 0.9, ease: 'power2.out', clearProps: 'transform',
-    }, 0.4)
+    // Title first (2.05s) — the visual anchor
+    tl.fromTo('.hero-v2-title',
+      { opacity: 0 },
+      { opacity: 1, duration: 0.65, ease: 'power2.out' },
+      2.05,
+    )
+    // Service line + buttons together (2.2s) — 150ms after title
+    tl.fromTo('.hero-service-line',
+      { opacity: 0 },
+      { opacity: 1, duration: 0.55 },
+      2.2,
+    )
     tl.fromTo('.hero-v2-buttons > *',
-      { y: 16, opacity: 0 },
-      { y: 0, opacity: 1, duration: 0.5, ease: 'back.out(1.6)', clearProps: 'all' },
-    0.9)
+      { opacity: 0 },
+      { opacity: 1, duration: 0.45, ease: 'back.out(1.4)', clearProps: 'all' },
+      2.2,
+    )
   }, { scope: containerRef })
 
   return (

@@ -914,51 +914,26 @@
 }
 
 @media (max-width: 767px) {
-  /* Restore flex column layout on mobile — JS BH sync is desktop-only */
-  .hero-v2-inner {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 100%;
-  }
-
+  /* Keep fixed-position layout on mobile so GSAP scroll animations work */
   .hero-v2-center {
-    position: relative;
-    inset: auto;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    width: 100%;
     padding: 0 16px;
     box-sizing: border-box;
-    transform: translateY(-2vh);
   }
 
   .hero-service-line {
-    position: relative;
-    left: auto; right: auto;
     font-size: 9.5px;
     letter-spacing: 0.2em;
-    margin-bottom: 72px;
-    top: auto !important;
+    top: 37%;
   }
 
   .hero-v2-title {
-    position: relative;
-    left: auto; right: auto;
     font-size: clamp(2.1rem, 9.2vw, 3.3rem);
     letter-spacing: 0.03em;
-    margin-bottom: 48px;
-    top: auto !important;
+    top: 52%;
   }
 
   .hero-v2-buttons {
-    position: relative;
-    left: auto; right: auto;
-    top: auto !important;
+    top: 67%;
   }
 
   .btn-primary-v2 {

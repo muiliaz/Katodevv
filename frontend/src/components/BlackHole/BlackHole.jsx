@@ -88,6 +88,7 @@ uniform vec2  uResolution;
 uniform vec3  uCamPos;
 uniform vec3  uCamTarget;
 uniform float uCamFov;
+uniform float uLoaderProgress; // -1 = inactive, 0..1 = loading
 
 varying vec2 vUv;
 
@@ -149,9 +150,15 @@ vec4 sampleDisk(vec3 p, float r){
 
   float ang = atan(p.z, p.x);
 
+  // ─── Loader progress integration ───
+  float loaderActive = step(0.0, uLoaderProgress);         // 1 while loading, 0 inactive
+  float prog         = max(0.0, uLoaderProgress);          // 0..1 only
+  float breathe      = sin(TWO_PI * prog);                 // full sin cycle, 0 at start & end
+
   // ─── ORBITAL ROTATION — gas physically orbits the black hole ───
-  // Kepler velocity: faster closer to BH (v ∝ 1/√r)
-  float orbitalSpeed = 0.12 / sqrt(max(r, DISK_IN));
+  // Kepler velocity: faster closer to BH (v ∝ 1/√r). Subtle speed breath on loader (1×→1.3×).
+  float speedMult    = 1.0 + loaderActive * 0.3 * max(0.0, breathe);
+  float orbitalSpeed = 0.12 * speedMult / sqrt(max(r, DISK_IN));
   float rotatedAng = ang + uTime * orbitalSpeed;
 
   // ─── Doppler beaming — strong asymmetry ───
@@ -210,7 +217,10 @@ vec4 sampleDisk(vec3 p, float r){
 
   float alpha = clamp(brightness * vertDensity * 1.3, 0.0, 1.0);
 
-  return vec4(col * brightness, alpha);
+  // Loader: gentle breathing 0.85×–1.15×, seamless at start/end (1.0× baseline)
+  float loaderBoost = mix(1.0, 1.0 + 0.15 * breathe, loaderActive);
+
+  return vec4(col * brightness * loaderBoost, alpha);
 }
 
 void main(){
@@ -354,24 +364,30 @@ const _quad = new PlaneGeometry(2,2)
 function RaymarchedBlackHole({mouseRef}){
   const mat = useRef()
   const {size} = useThree()
+  const reducedMotion = useMemo(()=>
+    typeof window!=='undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  ,[])
+
   const uniforms = useMemo(()=>({
-    uTime:       {value:0},
-    uResolution: {value:new Vector2(size.width,size.height)},
-    uMouse:      {value:new Vector2(0.5,0.5)},
-    uCamPos:     {value:new Vector3(0,2.5,9)},
-    uCamTarget:  {value:new Vector3(0,0,0)},
-    uCamFov:     {value:38.0},
+    uTime:           {value:0},
+    uResolution:     {value:new Vector2(size.width,size.height)},
+    uMouse:          {value:new Vector2(0.5,0.5)},
+    uCamPos:         {value:new Vector3(0,2.5,9)},
+    uCamTarget:      {value:new Vector3(0,0,0)},
+    uCamFov:         {value:38.0},
+    uLoaderProgress: {value:-1.0},
   }),[])
 
   useFrame(({clock,camera})=>{
     if(!mat.current) return
     const u = mat.current.uniforms
-    u.uTime.value      = clock.elapsedTime
+    u.uTime.value            = reducedMotion ? clock.elapsedTime * 0.05 : clock.elapsedTime
     u.uResolution.value.set(size.width, size.height)
     u.uMouse.value.copy(mouseRef.current)
     u.uCamPos.value.copy(camera.position)
     u.uCamTarget.value.set(0,0,0)
-    u.uCamFov.value    = camera.fov || 38
+    u.uCamFov.value          = camera.fov || 38
+    u.uLoaderProgress.value  = window.__loaderProgress ?? -1
   })
 
   return(

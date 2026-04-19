@@ -659,7 +659,7 @@
   position: fixed;
   inset: 0;
   z-index: 2;
-  pointer-events: none; /* let clicks pass through empty areas */
+  pointer-events: none;
 }
 
 /* Restore interactivity on the actual text/button elements */
@@ -673,7 +673,7 @@
 .hero-service-line {
   position: absolute;
   left: 0; right: 0;
-  top: 35%; /* TEST: fixed — JS sync disabled */
+  top: 35%;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -705,7 +705,7 @@
 .hero-v2-title {
   position: absolute;
   left: 0; right: 0;
-  top: 48%; /* TEST: fixed — JS sync disabled */
+  top: 48%;
   font-family: 'Cormorant Garamond', 'Instrument Serif', Georgia, serif;
   font-style: normal;
   font-weight: 400;
@@ -744,7 +744,6 @@
   0%, 100% { background-position: 0% 50%; }
   50%       { background-position: 100% 50%; }
 }
-
 
 /* Space char — invisible, preserves width */
 .char-space {
@@ -914,26 +913,51 @@
 }
 
 @media (max-width: 767px) {
-  /* Keep fixed-position layout on mobile so GSAP scroll animations work */
+  /* Restore flex column layout on mobile — JS BH sync is desktop-only */
+  .hero-v2-inner {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+  }
+
   .hero-v2-center {
+    position: relative;
+    inset: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    width: 100%;
     padding: 0 16px;
     box-sizing: border-box;
+    transform: translateY(-2vh);
   }
 
   .hero-service-line {
+    position: relative;
+    left: auto; right: auto;
     font-size: 9.5px;
     letter-spacing: 0.2em;
-    top: 37%;
+    margin-bottom: 72px;
+    top: auto !important;
   }
 
   .hero-v2-title {
+    position: relative;
+    left: auto; right: auto;
     font-size: clamp(2.1rem, 9.2vw, 3.3rem);
     letter-spacing: 0.03em;
-    top: 52%;
+    margin-bottom: 48px;
+    top: auto !important;
   }
 
   .hero-v2-buttons {
-    top: 67%;
+    position: relative;
+    left: auto; right: auto;
+    top: auto !important;
   }
 
   .btn-primary-v2 {

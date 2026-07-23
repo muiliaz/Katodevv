@@ -1,0 +1,73 @@
+/* Hide system cursor on pointer devices — scoped to when Cursor is actually
+   mounted (body.custom-cursor-active), so it can never leak into other
+   pages that don't render this component. */
+@media (hover: hover) {
+  body.custom-cursor-active * { cursor: none !important; }
+}
+
+/* ── Dot: snaps instantly to cursor position ─────────────────────────────── */
+.cursor-dot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 6px;
+  height: 6px;
+  background: #ffffff;
+  border-radius: 50%;
+  margin-left: -3px;
+  margin-top: -3px;
+  pointer-events: none;
+  z-index: 999999;
+  opacity: 0;
+  transition: opacity 0.3s;
+  will-change: transform;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.7);
+}
+
+.cursor-dot.visible { opacity: 1; }
+
+/* ── Ring: lags behind with 10% lerp ────────────────────────────────────── */
+.cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 32px;
+  height: 32px;
+  border: 1.5px solid rgba(255, 255, 255, 0.45);
+  border-radius: 50%;
+  margin-left: -16px;
+  margin-top: -16px;
+  pointer-events: none;
+  z-index: 999998;
+  opacity: 0;
+  transition:
+    width 0.25s ease,
+    height 0.25s ease,
+    margin 0.25s ease,
+    border-color 0.25s ease,
+    background 0.25s ease,
+    opacity 0.3s;
+  will-change: transform;
+}
+
+.cursor-ring.visible { opacity: 1; }
+
+/* Scale on interactive elements */
+.cursor-ring.grow {
+  width: 52px;
+  height: 52px;
+  margin-left: -26px;
+  margin-top: -26px;
+  border-color: rgba(255, 255, 255, 0.65);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* Click press */
+.cursor-ring.pressed {
+  width: 22px;
+  height: 22px;
+  margin-left: -11px;
+  margin-top: -11px;
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.80);
+}

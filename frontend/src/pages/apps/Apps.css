@@ -1,0 +1,106 @@
+.apps-page {
+  --ease-premium: cubic-bezier(.16,1,.3,1);
+  position: relative;
+  min-height: 100vh;
+  background: #050508;
+  color: #f1f1f6;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Same signature background language as /bots — one quiet grid + a slow
+   two-tone drift, not a pile of competing effects. */
+.apps-aurora {
+  position: fixed; inset: -12%; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(36% 28% at 78% 14%, rgba(255,179,71,.14), transparent 70%),
+    radial-gradient(32% 26% at 18% 64%, rgba(124,92,255,.12), transparent 70%);
+  filter: blur(20px);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .apps-aurora { animation: appsAuroraDrift 48s ease-in-out infinite alternate; }
+}
+@keyframes appsAuroraDrift {
+  0%   { transform: translate(0, 0) scale(1); }
+  50%  { transform: translate(2.5%, -3%) scale(1.06); }
+  100% { transform: translate(-3%, 2%) scale(1); }
+}
+
+.apps-grid {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(120% 70% at 50% 0%, #000 35%, transparent 100%);
+  -webkit-mask-image: radial-gradient(120% 70% at 50% 0%, #000 35%, transparent 100%);
+}
+
+.apps-vignette {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  box-shadow: inset 0 0 260px 80px rgba(0,0,0,.78);
+}
+
+/* ── Header ────────────────────────────────────────── */
+.apps-header {
+  position: relative; z-index: 2;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 22px clamp(20px, 5vw, 56px) 0;
+}
+.apps-back {
+  display: inline-flex; align-items: center; gap: 7px;
+  color: #9b9ba8; text-decoration: none;
+  font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .1em;
+  transition: color .25s var(--ease-premium);
+}
+.apps-back:hover { color: #f1f1f6; }
+.apps-back-arrow { display: inline-block; transition: transform .3s var(--ease-premium); }
+.apps-back:hover .apps-back-arrow { transform: translateX(-3px); }
+
+/* Sits between the back-link and the lang switcher, on the same row —
+   absolutely centered so it stays dead-center regardless of how those two
+   (unequal-width) siblings measure up. */
+.apps-header .apps-eyebrow {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  margin: 0;
+  white-space: nowrap;
+}
+
+.apps-lang { display: flex; align-items: center; gap: 8px; }
+.apps-lang-btn {
+  background: none; border: none; color: #6a6d78; cursor: pointer;
+  font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .04em;
+  padding: 5px 11px; border-radius: 999px; transition: all .25s var(--ease-premium);
+}
+.apps-lang-btn.active { color: #fff; background: rgba(255,255,255,.08); }
+.apps-lang-btn:hover { color: #fff; }
+.apps-lang-sep { width: 1px; height: 11px; background: rgba(255,255,255,.2); }
+
+/* ── Hero copy ─────────────────────────────────────── */
+.apps-hero {
+  position: relative; z-index: 2;
+  max-width: 640px; margin: 0 auto;
+  text-align: center;
+  padding: 14px clamp(20px, 5vw, 56px) 0;
+}
+.apps-eyebrow {
+  font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .18em; text-transform: uppercase;
+  color: #ffb347;
+}
+/* Smaller than before — freeing up vertical room for the (now larger)
+   phone mockup below, which is the actual focal point of this page. */
+.apps-headline {
+  font-size: clamp(21px, 2.6vw, 28px); line-height: 1.2; font-weight: 700; letter-spacing: -.02em;
+  color: #fff; margin: 0 0 10px;
+}
+.apps-subtitle { font-size: 14px; line-height: 1.55; color: #9b9ba8; margin: 0; }
+
+@media (max-width: 780px) {
+  .apps-hero { padding-top: 20px; padding-bottom: 0; }
+}
+
+/* ── Footer ────────────────────────────────────────── */
+.apps-footer {
+  position: relative; z-index: 2; text-align: center;
+  font-family: 'JetBrains Mono', monospace; font-size: 10.5px; color: #5c5c68;
+  padding: 0 20px 40px;
+}

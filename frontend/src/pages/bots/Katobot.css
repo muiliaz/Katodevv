@@ -1,0 +1,79 @@
+.katobot-stage {
+  --kb-size: 320px;
+  width: var(--kb-size);
+  max-width: 100%;
+  aspect-ratio: 1 / 1;
+  display: block;
+  cursor: pointer;
+}
+.katobot-stage:focus-visible { outline: 2px solid #ffb347; outline-offset: 6px; border-radius: 24px; }
+
+.katobot {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: flat;
+  backface-visibility: hidden;
+  will-change: transform;
+  filter: drop-shadow(0 18px 46px rgba(0,0,0,.55)) drop-shadow(0 0 34px rgba(255,176,0,.16));
+  transition: filter .35s ease;
+}
+.katobot.alert {
+  filter: drop-shadow(0 18px 46px rgba(0,0,0,.55)) drop-shadow(0 0 54px rgba(255,176,0,.4));
+}
+
+.katobot-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* ── Eyes — positioned from pixel-measured centroids of the source PNG ── */
+.katobot-eye {
+  position: absolute;
+  top: 50.5%;
+  width: 12%;
+  height: 13%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+.katobot-eye-l { left: 35.27%; }
+.katobot-eye-r { left: 64.48%; top: 50.46%; }
+
+/* Brightening pulse — screen-blend so it only ever adds light to the real
+   eye artwork underneath, it can't desync or look pasted-on. */
+.katobot-eye-boost {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff2d9 0%, #ffb347 46%, rgba(255,179,71,0) 78%);
+  mix-blend-mode: screen;
+  opacity: .32;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .katobot-eye-boost { animation: kbBreathe 3.6s ease-in-out infinite; }
+  .katobot-eye-r .katobot-eye-boost { animation-delay: .15s; }
+}
+@keyframes kbBreathe { 0%, 100% { opacity: .22; } 50% { opacity: .55; } }
+.katobot.alert .katobot-eye-boost { opacity: .85; animation: none; }
+
+/* Blink lid — solid ellipse matched to the screen's matte behind the eyes
+   (sampled from the PNG: rgb(19,26,32)), scales down over the eye. */
+.katobot-eye-lid {
+  position: absolute;
+  inset: -6%;
+  border-radius: 50%;
+  background: rgb(20,28,36);
+  transform: scaleY(0);
+  transform-origin: 50% 50%;
+  transition: transform .1s cubic-bezier(.4,0,.2,1);
+}
+.katobot.blinking .katobot-eye-lid { transform: scaleY(1); }
+
+@media (prefers-reduced-motion: reduce) {
+  .katobot-eye-boost { animation: none; opacity: .4; }
+}

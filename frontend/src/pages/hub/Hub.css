@@ -1,0 +1,452 @@
+.hub-page {
+  --hub-bg: #07060b;
+  --hub-ink: #f1f1f6;
+  --hub-ink-dim: #9b9ba8;
+  --hub-ink-faint: #5c5c68;
+  --hub-line: rgba(255,255,255,.09);
+  --hub-line-strong: rgba(255,255,255,.16);
+  --hub-violet: #8b5cf6;
+  --hub-cyan: #22d3ee;
+  --hub-amber: #FFB000;
+  --hub-emerald: #34d399;
+  --hub-blue: #3b82f6;
+  --ease-premium: cubic-bezier(.16,1,.3,1);
+
+  position: relative;
+  min-height: 100vh;
+  background: var(--hub-bg);
+  color: var(--hub-ink);
+  font-family: 'Inter', sans-serif;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.hub-stars {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: .4;
+  pointer-events: none;
+}
+
+/* One quiet signature glow, not three competing blobs — restraint reads
+   as confidence, not a stacked pile of gradient/particle/vignette effects. */
+.hub-ambient {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(760px 520px at 50% 6%, rgba(139,92,246,.14), transparent 62%);
+}
+
+.hub-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  box-shadow: inset 0 0 220px 60px rgba(0,0,0,.7);
+}
+
+/* ── Header ────────────────────────────────────────── */
+.hub-header {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 26px clamp(20px, 5vw, 56px) 0;
+}
+
+.hub-brand { display: flex; align-items: center; gap: 13px; }
+
+/* logo-kd.png has heavy internal padding around the mark (~35% of the
+   canvas) — crop+zoom it instead of just scaling the box, or it stays
+   illegible no matter how big the box gets. */
+.hub-logo-frame {
+  width: 40px; height: 36px;
+  overflow: hidden;
+  display: flex;
+  flex: none;
+}
+.hub-logo {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  object-position: 52% 48%;
+  transform: scale(2.35);
+}
+
+/* The actual brand name — previously the only "Kato Devv" text on the
+   page was an 11px eyebrow tag, easy to miss as a proper wordmark. */
+.hub-wordmark {
+  font-size: 16.5px;
+  font-weight: 700;
+  letter-spacing: -.01em;
+  color: #f1f1f6;
+  white-space: nowrap;
+  margin-top: -3px;
+}
+/* Same silver-gradient treatment as the "DEVV" letters in the /web hero
+   (see Hero.css .char-dev) — one consistent brand accent across pages. */
+.hub-wordmark-accent {
+  background: linear-gradient(160deg, #f0f2ff 0%, #c8cce0 45%, #e4e6f2 100%);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 10px rgba(255,255,255,.14));
+}
+@media (prefers-reduced-motion: no-preference) {
+  .hub-wordmark-accent { animation: hubSilverDrift 6s ease-in-out infinite; }
+}
+@keyframes hubSilverDrift {
+  0%, 100% { background-position: 0% 50%; }
+  50%      { background-position: 100% 50%; }
+}
+
+.hub-lang { display: flex; align-items: center; gap: 8px; }
+.hub-lang-btn {
+  background: none; border: none; color: var(--hub-ink-faint);
+  font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: .04em;
+  padding: 4px 2px; cursor: pointer; transition: color .15s;
+}
+.hub-lang-btn.active { color: var(--hub-ink); }
+.hub-lang-btn:hover { color: var(--hub-ink); }
+.hub-lang-sep { width: 1px; height: 11px; background: var(--hub-line-strong); }
+
+/* ── Main ──────────────────────────────────────────── */
+.hub-main {
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 64px clamp(20px, 5vw, 56px) 56px;
+  max-width: 1040px;
+  margin: 0 auto;
+}
+
+.hub-eyebrow-wrap {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 22px;
+  order: 1;
+}
+
+.hub-eyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; letter-spacing: .18em; text-transform: uppercase;
+  color: var(--hub-cyan);
+}
+
+/* Small accent rule beneath the eyebrow — draws in as part of the entrance
+   (see .hub-eyebrow-rule below is static width; the "draw" comes from the
+   entrance choreography easing the eyebrow+headline in above it), then
+   idles with a slow gradient shimmer, echoing .hub-wordmark-accent. */
+.hub-eyebrow-rule {
+  width: 46px; height: 2px; border-radius: 2px;
+  background: linear-gradient(90deg, var(--hub-cyan), var(--hub-violet), var(--hub-cyan));
+  background-size: 200% 100%;
+  opacity: .75;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .hub-eyebrow-rule { animation: hubRuleShimmer 5s ease-in-out infinite; }
+}
+@keyframes hubRuleShimmer {
+  0%, 100% { background-position: 0% 50%; }
+  50%      { background-position: 100% 50%; }
+}
+
+.hub-headline {
+  font-size: clamp(36px, 6.4vw, 68px);
+  line-height: 1.08;
+  font-weight: 700;
+  letter-spacing: -.03em;
+  margin: 0 0 22px;
+  max-width: 17ch;
+  text-wrap: balance;
+  color: #fff;
+  order: 2;
+}
+
+/* Word-by-word reveal mask — each word sits in its own overflow:hidden
+   box so the entrance timeline can wipe it up from below without
+   affecting the balanced multi-line wrap (each mask is still just an
+   inline-level box, so normal line-breaking is unaffected). */
+.hub-word-mask { display: inline-block; overflow: hidden; vertical-align: top; }
+.hub-word-inner { display: inline-block; will-change: transform; }
+
+.hub-subtitle {
+  font-size: 16.5px;
+  line-height: 1.65;
+  color: var(--hub-ink-dim);
+  max-width: 52ch;
+  margin: 0 0 8px;
+  order: 3;
+}
+
+/* ── Hub-and-spoke connector ──────────────────────────
+   One small node above the cards, a curved line running down into each
+   card — colored to match that card's own accent so the line visually
+   continues into its border-top. Desktop/tablet only: on a single-column
+   mobile layout there's nothing for a 3-way fan to fan out to. */
+.hub-connector {
+  position: relative;
+  width: 100%;
+  height: 56px;
+  /* Rendered after .hub-cards in the DOM (see Hub.js) so cardsWrapRef is
+     already attached when this measures card positions; `order` restores
+     the correct visual sequence (connector above cards). */
+  order: 4;
+}
+.hub-connector-svg { position: absolute; inset: 0; overflow: visible; }
+.hub-connector-path {
+  stroke-width: 1.5;
+  opacity: .55;
+  stroke-linecap: round;
+  transition: stroke-width .35s var(--ease-premium), opacity .35s var(--ease-premium),
+              filter .35s var(--ease-premium);
+}
+.hub-connector-pulse { filter: drop-shadow(0 0 3px currentColor); }
+
+/* Lit up while its card is hovered — thicker, brighter, glowing at the
+   end, so it visually "flows into" that card's now-glowing border rather
+   than reading as a separate line stopping short of it. */
+g.is-lit .hub-connector-path {
+  stroke-width: 2.5;
+  opacity: 1;
+  filter: drop-shadow(0 0 6px currentColor);
+}
+@media (prefers-reduced-motion: reduce) {
+  /* SMIL (animateMotion/animate) isn't gated by the JS reduced-motion
+     check that drives the GSAP entrance — hide the traveling pulses here. */
+  .hub-connector-pulse { display: none; }
+}
+.hub-connector-node {
+  position: absolute;
+  top: -3px;
+  width: 8px; height: 8px;
+  margin-left: -4px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff, var(--hub-cyan));
+  box-shadow: 0 0 12px 2px rgba(34,211,238,.55), 0 0 26px 8px rgba(34,211,238,.2);
+}
+@media (max-width: 860px) {
+  .hub-connector { display: none; }
+}
+
+/* ── Cards ─────────────────────────────────────────── */
+.hub-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0,1fr));
+  gap: 20px;
+  width: 100%;
+  perspective: 900px;
+  order: 5;
+}
+
+.hub-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  gap: 10px;
+  padding: 32px 26px 28px;
+  border-radius: 18px;
+  border: 1px solid var(--hub-line);
+  background: linear-gradient(180deg, rgba(255,255,255,.035), rgba(255,255,255,.01));
+  text-decoration: none;
+  color: inherit;
+  font: inherit;
+  overflow: hidden;
+  transform-style: preserve-3d;
+  /* JS sets the hover/tilt transform inline on mousemove — the CSS
+     transition still governs it (inline style changes are transitioned
+     same as any other), and clearing the inline style on mouseleave falls
+     back cleanly to this same transition for the return-to-rest. */
+  transition: border-color .35s var(--ease-premium), transform .35s var(--ease-premium),
+              background .35s var(--ease-premium), box-shadow .35s var(--ease-premium);
+  cursor: pointer;
+}
+
+/* Cursor-follow spotlight — a second, pointer-tracked light layered above
+   the resting glow (::before). Position comes from --mx/--my, set on
+   mousemove; visibility is plain CSS :hover so no JS is needed just to
+   fade it in/out. */
+.hub-card-spotlight {
+  position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background: radial-gradient(220px circle at var(--mx, 50%) var(--my, 50%), rgba(255,255,255,.10), transparent 68%);
+  opacity: 0;
+  transition: opacity .3s var(--ease-premium);
+}
+.hub-card:hover .hub-card-spotlight { opacity: 1; }
+
+/* Cosmic hover: a soft accent-colored bloom drifts up from below the fold,
+   plus a couple of dormant "stars" that twinkle awake — one signature
+   move per card, not a pile of simultaneous gimmicks. */
+.hub-card::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  inset: -20% -20% -60%;
+  background: radial-gradient(closest-side, var(--card-glow, rgba(255,255,255,.28)), transparent 72%);
+  opacity: 0;
+  transform: translateY(12%) scale(.92);
+  transition: opacity .5s var(--ease-premium), transform .5s var(--ease-premium);
+  pointer-events: none;
+}
+.hub-card::after {
+  content: "";
+  position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    radial-gradient(1.4px 1.4px at 82% 22%, #fff, transparent),
+    radial-gradient(1.2px 1.2px at 68% 58%, #fff, transparent),
+    radial-gradient(1px 1px at 90% 68%, #fff, transparent);
+  opacity: 0;
+  transition: opacity .5s var(--ease-premium) .05s;
+}
+
+/* Border glows in the card's own accent on hover — same color as the
+   connector line feeding into it (--card-line), so the line visually
+   reads as continuing straight into the now-lit border rather than
+   stopping short of a plain gray edge. */
+a.hub-card:hover, button.hub-card:hover {
+  transform: translateY(-7px) scale(1.015);
+  border-color: var(--card-line, var(--hub-line-strong));
+  background: linear-gradient(180deg, rgba(255,255,255,.065), rgba(255,255,255,.015));
+  box-shadow: 0 24px 48px -22px rgba(0,0,0,.6), 0 0 0 1px var(--card-line, rgba(255,255,255,.03)) inset,
+              0 0 22px -6px var(--card-line, transparent);
+}
+a.hub-card:hover::before, button.hub-card:hover::before { opacity: .55; transform: translateY(0) scale(1); }
+a.hub-card:hover::after, button.hub-card:hover::after { opacity: .9; }
+
+.hub-card h2 { position: relative; z-index: 1; font-size: 18px; font-weight: 700; margin: 4px 0 0; color: #fff; }
+.hub-card p { position: relative; z-index: 1; font-size: 13.5px; line-height: 1.55; color: var(--hub-ink-dim); margin: 0; }
+
+.hub-card-cta {
+  position: relative;
+  z-index: 1;
+  margin-top: auto;
+  padding-top: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px; letter-spacing: .03em;
+  color: var(--hub-ink);
+}
+
+/* --card-line mirrors CARD_ACCENT in Hub.js (same colors, kept in sync by
+   hand — used for the connector line's stroke there, for this card's
+   hover border/glow here). */
+.hub-card-bots  { border-top: 2px solid color-mix(in srgb, var(--hub-amber) 55%, transparent); --card-glow: rgba(255,176,0,.4); --card-line: rgba(255,176,0,.85); }
+.hub-card-web   { border-top: 2px solid color-mix(in srgb, var(--hub-blue) 55%, transparent); --card-glow: rgba(59,130,246,.4); --card-line: rgba(59,130,246,.85); }
+.hub-card-apps  { border-top: 2px solid color-mix(in srgb, var(--hub-emerald) 55%, transparent); --card-glow: rgba(52,211,153,.4); --card-line: rgba(52,211,153,.85); }
+
+.hub-card.is-soon { cursor: default; opacity: .72; }
+.hub-card.is-soon:hover { transform: none; }
+
+.hub-card-badge {
+  position: absolute; z-index: 1; top: 16px; right: 16px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--hub-ink-faint);
+  border: 1px solid var(--hub-line-strong);
+  border-radius: 20px;
+  padding: 3px 8px;
+}
+
+/* ── Card icons ────────────────────────────────────── */
+.hci { position: relative; z-index: 1; width: 40px; height: 28px; flex: none; }
+
+/* Floating icon, no box — same treatment as the ChatWidget corner avatar:
+   the transparent PNG itself reads as the icon, lifted off the surface
+   with a soft glow instead of being cropped into a bordered tile. */
+.hci-bots { overflow: visible; display: flex; align-items: center; justify-content: center; }
+.hci-bots-img {
+  width: 155%; height: 155%;
+  object-fit: contain;
+  filter:
+    drop-shadow(0 0 10px rgba(255,179,71,.35))
+    drop-shadow(0 6px 14px rgba(0,0,0,.5));
+  transition: transform .35s var(--ease-premium);
+}
+a.hub-card:hover .hci-bots-img { transform: scale(1.06); }
+
+.hci-web {
+  border-radius: 6px;
+  border: 1px solid rgba(59,130,246,.4);
+  background: rgba(59,130,246,.06);
+  padding: 4px 5px;
+}
+.hci-web-bar { display: flex; gap: 2px; margin-bottom: 4px; }
+.hci-web-bar span { width: 3px; height: 3px; border-radius: 50%; background: rgba(59,130,246,.55); }
+.hci-web-line { height: 2px; border-radius: 2px; background: rgba(59,130,246,.3); margin-top: 3px; }
+.hci-web-line.w1 { width: 70%; }
+.hci-web-line.w2 { width: 45%; }
+
+.hci-apps {
+  width: 24px; height: 28px;
+  border-radius: 7px;
+  border: 1.5px solid rgba(52,211,153,.5);
+  background: rgba(52,211,153,.06);
+}
+.hci-apps-notch {
+  position: absolute; top: 3px; left: 50%; transform: translateX(-50%);
+  width: 8px; height: 2px; border-radius: 2px; background: rgba(52,211,153,.5);
+}
+.hci-apps-home {
+  position: absolute; bottom: 3px; left: 50%; transform: translateX(-50%);
+  width: 10px; height: 1.5px; border-radius: 2px; background: rgba(52,211,153,.4);
+}
+
+/* ── Social row ────────────────────────────────────── */
+/* Sibling of .hub-main (not part of its vertically-centered content) so it
+   sits on its own, between the hero block and the footer line — rather
+   than clinging to the cards as just another centered item among them. */
+.hub-social {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  /* No explicit width — this project has no box-sizing:border-box reset,
+     so width:100% plus this padding was pushing the box 40px past the
+     viewport (content-box adds padding on top of the 100%), which is
+     exactly what was throwing the icons off-center. The flex column's
+     default align-items:stretch already sizes this correctly (see
+     .hub-footer, which never set a width and never had the bug). */
+  padding: 0 20px 28px;
+}
+.hub-social-btn {
+  display: flex; align-items: center; justify-content: center;
+  width: 40px; height: 40px; border-radius: 12px;
+  border: 1px solid var(--hub-line);
+  background: rgba(255,255,255,.03);
+  color: var(--hub-ink-dim);
+  transition: border-color .25s var(--ease-premium), background .25s var(--ease-premium),
+              color .25s var(--ease-premium), transform .25s var(--ease-premium);
+}
+.hub-social-btn:hover { transform: translateY(-2px); }
+.hub-social-btn.ig:hover { color: #f0a3d8; border-color: rgba(240,163,216,.4); background: rgba(240,163,216,.08); }
+.hub-social-btn.tg:hover { color: #29b6f6; border-color: rgba(41,182,246,.4); background: rgba(41,182,246,.08); }
+.hub-social-btn.wa:hover { color: #34d399; border-color: rgba(52,211,153,.4); background: rgba(52,211,153,.08); }
+
+/* ── Footer ────────────────────────────────────────── */
+.hub-footer {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  color: var(--hub-ink-faint);
+  padding: 20px 20px 26px;
+}
+
+/* ── Responsive ────────────────────────────────────── */
+@media (max-width: 860px) {
+  .hub-cards { grid-template-columns: 1fr; }
+  .hub-main { padding-top: 48px; }
+}

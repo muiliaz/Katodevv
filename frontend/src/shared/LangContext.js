@@ -136,7 +136,7 @@ export const T = {
       cta:       "Start a project",
       secondaryCta: "How it works",
       hudOnline:  "ONLINE",
-      comingSoonBadge: "Kato Bot — in development, launching soon",
+      comingSoonBadge: "Kbot — in development, launching soon",
       flowEyebrow: "HOW IT WORKS",
       flowTitle: "From message to done deal",
       flow: [
@@ -529,7 +529,7 @@ export const T = {
       cta:       "Начать проект",
       secondaryCta: "Как это работает",
       hudOnline:  "НА СВЯЗИ",
-      comingSoonBadge: "Kato Bot — в разработке, скоро на рынке",
+      comingSoonBadge: "Kbot — в разработке, скоро на рынке",
       flowEyebrow: "КАК ЭТО РАБОТАЕТ",
       flowTitle: "От сообщения до сделки",
       flow: [

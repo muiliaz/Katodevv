@@ -14,6 +14,7 @@ import About        from "./About";
 import Contact      from "./Contact";
 import Footer       from "./Footer";
 import ChatWidget   from "../../shared/ChatWidget/ChatWidget";
+import Seo from "../../shared/Seo";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -52,6 +53,11 @@ function WebDev() {
 
   return (
     <>
+      <Seo
+        title="Web & Mobile Development — Kato Devv"
+        description="Custom websites and mobile apps built by Kato Devv: React, Node.js and native development with a focus on performance and design."
+        path="/web"
+      />
       {!loaded && <Loader onDone={() => setLoaded(true)} />}
       <StarField />
       <BlackHole />

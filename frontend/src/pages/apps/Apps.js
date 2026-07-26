@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { useLang } from "../../shared/LangContext";
 import ChatWidget from "../../shared/ChatWidget/ChatWidget";
 import AppBuilderGame from "./AppBuilderGame";
+import Seo from "../../shared/Seo";
 import "./Apps.css";
 
 function Apps() {
@@ -10,6 +11,11 @@ function Apps() {
 
   return (
     <div className="apps-page">
+      <Seo
+        title="App Development — Kato Devv"
+        description="Kato Devv designs and builds custom mobile and web apps, from prototype to launch, tailored to your product."
+        path="/apps"
+      />
       <div className="apps-aurora" />
       <div className="apps-grid" />
       <div className="apps-vignette" />

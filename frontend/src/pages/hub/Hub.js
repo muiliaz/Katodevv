@@ -2,6 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState, lazy, Suspense } from "re
 import { Link } from "react-router-dom";
 import gsap from "gsap";
 import { useLang } from "../../shared/LangContext";
+import Seo from "../../shared/Seo";
 import "./Hub.css";
 
 const LaserShowcase = lazy(() => import("./LaserShowcase"));
@@ -425,6 +426,11 @@ function Hub() {
 
   return (
     <div className="hub-page">
+      <Seo
+        title="Kato Devv — Web & Mobile Development Agency"
+        description="Kato Devv — we build websites, mobile apps, automation systems and AI bots that drive real results for modern businesses."
+        path="/"
+      />
       <HubStars />
       <div className="hub-ambient" />
       <div className="hub-vignette" />

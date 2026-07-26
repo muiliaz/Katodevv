@@ -4,6 +4,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useLang } from "../../shared/LangContext";
 import ChatWidget from "../../shared/ChatWidget/ChatWidget";
+import Seo from "../../shared/Seo";
 import { PORTFOLIO_DATA } from "../web/portfolioData";
 import Katobot from "./Katobot";
 import "./Bots.css";
@@ -127,6 +128,11 @@ function Bots() {
 
   return (
     <div className="bots-page" ref={pageRef}>
+      <Seo
+        title="AI Bots & Telegram Automation — Kato Devv"
+        description="Kato Devv builds AI bots, Telegram bots and mini-apps that automate sales, support and bookings for your business."
+        path="/bots"
+      />
       <div className="bots-aurora" />
       <div className="bots-grid" />
       <div className="bots-vignette" />

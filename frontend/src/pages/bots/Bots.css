@@ -431,6 +431,9 @@
   color: #ffb347; margin-bottom: 6px;
 }
 .bots-modal-title { font-size: 19px; font-weight: 700; color: #fff; margin: 0 0 20px; }
+/* Honeypot — off-screen instead of display:none so bots still fill it in */
+.bots-modal-honeypot { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+
 .bots-modal-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
 .bots-modal-field span { font-size: 12px; color: #9b9ba8; }
 .bots-modal-field input, .bots-modal-field textarea {

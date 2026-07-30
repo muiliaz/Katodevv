@@ -1,4 +1,5 @@
 const { sendMessage, escapeHtml } = require('./lib/telegram');
+const { isHoneypotFilled, validateLead } = require('./lib/validation');
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
@@ -6,10 +7,25 @@ exports.handler = async (event) => {
   }
 
   try {
+    const body = JSON.parse(event.body);
+
+    // Silent success for bots — see contact.js.
+    if (isHoneypotFilled(body)) {
+      return { statusCode: 200, body: JSON.stringify({ success: true }) };
+    }
+
+    const errors = validateLead(body);
+    if (errors.length) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: errors.join(', ') }),
+      };
+    }
+
     const {
       type, projectType, budget, deadline,
       contact, freeText, timestamp, name,
-    } = JSON.parse(event.body);
+    } = body;
 
     const lines = ['🔔 <b>Новая заявка с чат-виджета</b>\n'];
     if (type)        lines.push(`📌 <b>Тип:</b> ${escapeHtml(type)}`);

@@ -36,6 +36,8 @@ function Contact() {
         body:    JSON.stringify({
           name:    fd.get("name"),
           email:   fd.get("email"),
+          // Honeypot — humans never see this field, so a value means a bot.
+          company: fd.get("company"),
           message: preService
             ? `[${preService.icon} ${preService.label}]\n${fd.get("message")}`
             : fd.get("message"),
@@ -148,6 +150,21 @@ function Contact() {
           <div className="contact-form-wrap">
             <div className="contact-form-title">{c.formTitle}</div>
             <form className="contact-form" onSubmit={handleSubmit} ref={formRef}>
+              {/*
+                Honeypot: moved off-screen instead of display:none, since some
+                bots skip hidden inputs. aria-hidden + tabIndex keep it away
+                from screen readers and keyboard users.
+              */}
+              <div className="cform-honeypot" aria-hidden="true">
+                <label htmlFor="cform-company">Company</label>
+                <input
+                  type="text"
+                  id="cform-company"
+                  name="company"
+                  tabIndex={-1}
+                  autoComplete="off"
+                />
+              </div>
               <div className="cform-row">
                 <div className="cform-group">
                   <label>{c.name}</label>

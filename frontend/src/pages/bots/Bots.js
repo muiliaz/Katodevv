@@ -242,6 +242,7 @@ function StartProjectModal({ offer, copy, onClose }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [idea, setIdea] = useState("");
+  const [company, setCompany] = useState(""); // honeypot — stays empty for humans
   const [status, setStatus] = useState("idle"); // idle | sending | done | error
 
   useEffect(() => {
@@ -267,6 +268,7 @@ function StartProjectModal({ offer, copy, onClose }) {
           name: name.trim(),
           contact: email.trim(),
           freeText: idea.trim(),
+          company: company.trim(),
           timestamp: new Date().toLocaleString("ru-RU"),
         }),
       });
@@ -288,6 +290,19 @@ function StartProjectModal({ offer, copy, onClose }) {
           <p className="bots-modal-status is-success">{copy.success}</p>
         ) : (
           <form onSubmit={submit}>
+            {/* Honeypot — off-screen, skipped by keyboard and screen readers */}
+            <div className="bots-modal-honeypot" aria-hidden="true">
+              <label htmlFor="bots-company">Company</label>
+              <input
+                type="text"
+                id="bots-company"
+                name="company"
+                value={company}
+                onChange={(e) => setCompany(e.target.value)}
+                tabIndex={-1}
+                autoComplete="off"
+              />
+            </div>
             <label className="bots-modal-field">
               <span>{copy.nameLabel}</span>
               <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder={copy.namePlaceholder} required />

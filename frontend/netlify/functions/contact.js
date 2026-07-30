@@ -1,4 +1,5 @@
 const { sendMessage, escapeHtml } = require('./lib/telegram');
+const { isHoneypotFilled, validateContact } = require('./lib/validation');
 
 exports.handler = async (event) => {
   if (event.httpMethod !== "POST") {
@@ -6,7 +7,23 @@ exports.handler = async (event) => {
   }
 
   try {
-    const { name, email, message } = JSON.parse(event.body);
+    const body = JSON.parse(event.body);
+
+    // Answer bots with a plain success so they get no signal to retry or
+    // to work out which field gave them away. Nothing is sent to Telegram.
+    if (isHoneypotFilled(body)) {
+      return { statusCode: 200, body: JSON.stringify({ success: true }) };
+    }
+
+    const errors = validateContact(body);
+    if (errors.length) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: errors.join(', ') }),
+      };
+    }
+
+    const { name, email, message } = body;
 
     const text =
       `📩 <b>Новая заявка с сайта katodevv.com</b>\n\n` +

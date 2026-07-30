@@ -7,6 +7,19 @@
 
 const TELEGRAM_API = 'https://api.telegram.org';
 
+// Escape user-supplied text before it goes into a formatted message.
+//
+// We use parse_mode: 'HTML' rather than 'Markdown' because Telegram's legacy
+// Markdown has no documented escape syntax — a stray * or _ in a name or
+// message either breaks the formatting or swallows part of the text. HTML mode
+// only needs these three characters escaped.
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
 // Read the bot credentials and fail loudly if the function is misconfigured.
 // Without this, a missing env var only surfaces as a confusing 404/401 from
 // the Telegram API.
@@ -32,7 +45,7 @@ async function sendMessage(text) {
     body:    JSON.stringify({
       chat_id:    chatId,
       text,
-      parse_mode: 'Markdown',
+      parse_mode: 'HTML',
     }),
   });
 
@@ -42,4 +55,4 @@ async function sendMessage(text) {
   return data;
 }
 
-module.exports = { sendMessage };
+module.exports = { sendMessage, escapeHtml };

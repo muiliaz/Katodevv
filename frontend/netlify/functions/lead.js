@@ -1,4 +1,4 @@
-const { sendMessage } = require('./lib/telegram');
+const { sendMessage, escapeHtml } = require('./lib/telegram');
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
@@ -11,15 +11,15 @@ exports.handler = async (event) => {
       contact, freeText, timestamp, name,
     } = JSON.parse(event.body);
 
-    const lines = ['🔔 *Новая заявка с чат-виджета*\n'];
-    if (type)        lines.push(`📌 *Тип:* ${type}`);
-    if (name)        lines.push(`👤 *Имя:* ${name}`);
-    if (projectType) lines.push(`🛠 *Что нужно:* ${projectType}`);
-    if (budget)      lines.push(`💰 *Бюджет:* ${budget}`);
-    if (deadline)    lines.push(`⏱ *Срок:* ${deadline}`);
-    if (contact)     lines.push(`📱 *Контакт:* ${contact}`);
-    if (freeText)    lines.push(`\n💬 *Сообщение:* ${freeText}`);
-    if (timestamp)   lines.push(`\n🕐 ${timestamp}`);
+    const lines = ['🔔 <b>Новая заявка с чат-виджета</b>\n'];
+    if (type)        lines.push(`📌 <b>Тип:</b> ${escapeHtml(type)}`);
+    if (name)        lines.push(`👤 <b>Имя:</b> ${escapeHtml(name)}`);
+    if (projectType) lines.push(`🛠 <b>Что нужно:</b> ${escapeHtml(projectType)}`);
+    if (budget)      lines.push(`💰 <b>Бюджет:</b> ${escapeHtml(budget)}`);
+    if (deadline)    lines.push(`⏱ <b>Срок:</b> ${escapeHtml(deadline)}`);
+    if (contact)     lines.push(`📱 <b>Контакт:</b> ${escapeHtml(contact)}`);
+    if (freeText)    lines.push(`\n💬 <b>Сообщение:</b> ${escapeHtml(freeText)}`);
+    if (timestamp)   lines.push(`\n🕐 ${escapeHtml(timestamp)}`);
 
     await sendMessage(lines.join('\n'));
 

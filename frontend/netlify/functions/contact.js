@@ -1,4 +1,4 @@
-const { sendMessage } = require('./lib/telegram');
+const { sendMessage, escapeHtml } = require('./lib/telegram');
 
 exports.handler = async (event) => {
   if (event.httpMethod !== "POST") {
@@ -9,10 +9,10 @@ exports.handler = async (event) => {
     const { name, email, message } = JSON.parse(event.body);
 
     const text =
-      `📩 *Новая заявка с сайта katodevv.com*\n\n` +
-      `👤 *Имя:* ${name}\n` +
-      `📧 *Email:* ${email}\n` +
-      `💬 *Сообщение:*\n${message}`;
+      `📩 <b>Новая заявка с сайта katodevv.com</b>\n\n` +
+      `👤 <b>Имя:</b> ${escapeHtml(name)}\n` +
+      `📧 <b>Email:</b> ${escapeHtml(email)}\n` +
+      `💬 <b>Сообщение:</b>\n${escapeHtml(message)}`;
 
     await sendMessage(text);
 

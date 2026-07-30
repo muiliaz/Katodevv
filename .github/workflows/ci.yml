@@ -18,7 +18,9 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          # Node 24 ships npm 11, the version package-lock.json was generated
+          # with. On npm 10 `npm ci` rejects the lockfile as out of sync.
+          node-version: 24
           cache: npm
           cache-dependency-path: frontend/package-lock.json
 

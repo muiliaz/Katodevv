@@ -279,6 +279,7 @@ export const T = {
       send:          "Send Request",
       sent:          "Sent!",
       errorMsg:      "Something went wrong. Please try again.",
+      requiredMsg:   "Please fill in all fields.",
     },
     footer: {
       tagline: "Building the future, one line at a time.",
@@ -672,6 +673,7 @@ export const T = {
       send:          "Отправить заявку",
       sent:          "Отправлено!",
       errorMsg:      "Что-то пошло не так. Попробуйте ещё раз.",
+      requiredMsg:   "Заполните, пожалуйста, все поля.",
     },
     footer: {
       tagline: "Строим будущее — строчка за строчкой.",

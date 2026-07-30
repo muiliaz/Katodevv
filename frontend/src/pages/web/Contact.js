@@ -26,21 +26,33 @@ function Contact() {
 
   async function handleSubmit(e) {
     e.preventDefault();
+    const fd = new FormData(e.target);
+    const name    = (fd.get("name")    || "").trim();
+    const email   = (fd.get("email")   || "").trim();
+    const message = (fd.get("message") || "").trim();
+
+    // The `required` attributes only stop a genuinely empty field — a browser
+    // happily submits a name of three spaces. Check the trimmed values before
+    // spending a request.
+    if (!name || !email || !message) {
+      setError(c.requiredMsg || "Please fill in all fields.");
+      return;
+    }
+
     setLoading(true);
     setError(null);
-    const fd = new FormData(e.target);
     try {
       const res = await fetch("/.netlify/functions/contact", {
         method:  "POST",
         headers: { "Content-Type": "application/json" },
         body:    JSON.stringify({
-          name:    fd.get("name"),
-          email:   fd.get("email"),
+          name,
+          email,
           // Honeypot — humans never see this field, so a value means a bot.
           company: fd.get("company"),
           message: preService
-            ? `[${preService.icon} ${preService.label}]\n${fd.get("message")}`
-            : fd.get("message"),
+            ? `[${preService.icon} ${preService.label}]\n${message}`
+            : message,
         }),
       });
       if (!res.ok) throw new Error();

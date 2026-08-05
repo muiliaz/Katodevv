@@ -1,15 +1,31 @@
 const { sendMessage, escapeHtml } = require('./lib/telegram');
 const { isHoneypotFilled, validateLead } = require('./lib/validation');
-const { GENERIC_ERROR } = require('./lib/responses');
+const { checkRateLimit } = require('./lib/rateLimit');
+const { GENERIC_ERROR, INVALID_JSON, TOO_MANY_REQUESTS } = require('./lib/responses');
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
 
-  try {
-    const body = JSON.parse(event.body);
+  // Own budget, separate from contact's — see rateLimit.js.
+  const limit = checkRateLimit(event, 'lead');
+  if (!limit.allowed) {
+    return {
+      statusCode: 429,
+      headers: { 'Retry-After': String(limit.retryAfterSeconds) },
+      body: JSON.stringify({ error: TOO_MANY_REQUESTS }),
+    };
+  }
 
+  let body;
+  try {
+    body = JSON.parse(event.body);
+  } catch {
+    return { statusCode: 400, body: JSON.stringify({ error: INVALID_JSON }) };
+  }
+
+  try {
     // Silent success for bots — see contact.js.
     if (isHoneypotFilled(body)) {
       return { statusCode: 200, body: JSON.stringify({ success: true }) };

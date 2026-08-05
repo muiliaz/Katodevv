@@ -7,7 +7,9 @@ jest.mock("../../netlify/functions/lib/telegram", () => {
 });
 
 const { sendMessage } = require("../../netlify/functions/lib/telegram");
-const { GENERIC_ERROR } = require("../../netlify/functions/lib/responses");
+const { GENERIC_ERROR, INVALID_JSON, TOO_MANY_REQUESTS } = require("../../netlify/functions/lib/responses");
+const { resetRateLimit, MAX_REQUESTS } = require("../../netlify/functions/lib/rateLimit");
+const { handler: contactHandler } = require("../../netlify/functions/contact");
 const { handler } = require("../../netlify/functions/lead");
 
 // Shaped like what ChatWidget actually collects: see chatScenarios.js.
@@ -20,9 +22,10 @@ const validLead = {
   timestamp:   "05.08.2026, 12:00",
 };
 
-function post(body) {
+function post(body, ip = "203.0.113.1") {
   return handler({
     httpMethod: "POST",
+    headers:    { "x-nf-client-connection-ip": ip },
     body:       typeof body === "string" ? body : JSON.stringify(body),
   });
 }
@@ -32,6 +35,7 @@ const sentText = () => sendMessage.mock.calls[0][0];
 beforeEach(() => {
   sendMessage.mockReset();
   sendMessage.mockResolvedValue({ ok: true });
+  resetRateLimit();
   jest.spyOn(console, "error").mockImplementation(() => {});
 });
 
@@ -121,6 +125,37 @@ describe("rejected requests", () => {
   });
 });
 
+describe("rate limiting", () => {
+  test("blocks the request after the budget runs out and sends nothing more", async () => {
+    for (let i = 0; i < MAX_REQUESTS; i++) await post(validLead);
+    sendMessage.mockClear();
+
+    const res = await post(validLead);
+
+    expect(res.statusCode).toBe(429);
+    expect(JSON.parse(res.body)).toEqual({ error: TOO_MANY_REQUESTS });
+    expect(sendMessage).not.toHaveBeenCalled();
+  });
+
+  test("keeps its own budget, separate from the contact form", async () => {
+    // A visitor who used the contact form must still be able to open the chat
+    // widget — the two are different journeys, so they must not share a counter.
+    for (let i = 0; i < MAX_REQUESTS; i++) {
+      await contactHandler({
+        httpMethod: "POST",
+        headers:    { "x-nf-client-connection-ip": "203.0.113.77" },
+        body:       JSON.stringify({
+          name: "Ada", email: "ada@example.com", message: "I need a landing page for my shop.",
+        }),
+      });
+    }
+
+    const res = await post(validLead, "203.0.113.77");
+
+    expect(res.statusCode).toBe(200);
+  });
+});
+
 describe("failures stay opaque to the caller", () => {
   test("does not echo a Telegram rejection back to the client", async () => {
     sendMessage.mockRejectedValue(new Error("Forbidden: bot was blocked by the user"));
@@ -132,12 +167,11 @@ describe("failures stay opaque to the caller", () => {
     expect(res.body).not.toContain("blocked");
   });
 
-  test("survives a malformed JSON body", async () => {
+  test("reports a malformed JSON body as the caller's mistake", async () => {
     const res = await post("not-json");
 
-    // Same documented quirk as contact.js: a bad body reads as a 500, not a 400.
-    expect(res.statusCode).toBe(500);
-    expect(JSON.parse(res.body)).toEqual({ error: GENERIC_ERROR });
+    expect(res.statusCode).toBe(400);
+    expect(JSON.parse(res.body)).toEqual({ error: INVALID_JSON });
     expect(sendMessage).not.toHaveBeenCalled();
   });
 

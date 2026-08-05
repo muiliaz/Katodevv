@@ -1,15 +1,33 @@
 const { sendMessage, escapeHtml } = require('./lib/telegram');
 const { isHoneypotFilled, validateContact } = require('./lib/validation');
-const { GENERIC_ERROR } = require('./lib/responses');
+const { checkRateLimit } = require('./lib/rateLimit');
+const { GENERIC_ERROR, INVALID_JSON, TOO_MANY_REQUESTS } = require('./lib/responses');
 
 exports.handler = async (event) => {
   if (event.httpMethod !== "POST") {
     return { statusCode: 405, body: "Method Not Allowed" };
   }
 
-  try {
-    const body = JSON.parse(event.body);
+  // Before parsing, so a flood costs us as little work as possible.
+  const limit = checkRateLimit(event, 'contact');
+  if (!limit.allowed) {
+    return {
+      statusCode: 429,
+      headers: { 'Retry-After': String(limit.retryAfterSeconds) },
+      body: JSON.stringify({ error: TOO_MANY_REQUESTS }),
+    };
+  }
 
+  // Parsed outside the try below so a bad body reads as the caller's 400 rather
+  // than being swallowed by the catch that reports internal failures as a 500.
+  let body;
+  try {
+    body = JSON.parse(event.body);
+  } catch {
+    return { statusCode: 400, body: JSON.stringify({ error: INVALID_JSON }) };
+  }
+
+  try {
     // Answer bots with a plain success so they get no signal to retry or
     // to work out which field gave them away. Nothing is sent to Telegram.
     if (isHoneypotFilled(body)) {

@@ -13,7 +13,8 @@ jest.mock("../../netlify/functions/lib/telegram", () => {
 });
 
 const { sendMessage } = require("../../netlify/functions/lib/telegram");
-const { GENERIC_ERROR } = require("../../netlify/functions/lib/responses");
+const { GENERIC_ERROR, INVALID_JSON, TOO_MANY_REQUESTS } = require("../../netlify/functions/lib/responses");
+const { resetRateLimit, MAX_REQUESTS } = require("../../netlify/functions/lib/rateLimit");
 const { handler } = require("../../netlify/functions/contact");
 
 const validContact = {
@@ -23,9 +24,12 @@ const validContact = {
 };
 
 // Netlify hands the handler a raw string body, never an object.
-function post(body) {
+// The IP is the one the rate limiter keys on: give each test its own so cases
+// stay independent of each other's request budget.
+function post(body, ip = "203.0.113.1") {
   return handler({
     httpMethod: "POST",
+    headers:    { "x-nf-client-connection-ip": ip },
     body:       typeof body === "string" ? body : JSON.stringify(body),
   });
 }
@@ -35,6 +39,8 @@ const sentText = () => sendMessage.mock.calls[0][0];
 beforeEach(() => {
   sendMessage.mockReset();
   sendMessage.mockResolvedValue({ ok: true });
+  // Rate-limit state is module-level and survives between tests by design.
+  resetRateLimit();
   // The handler logs failures on purpose; keep them out of the test output.
   jest.spyOn(console, "error").mockImplementation(() => {});
 });
@@ -104,6 +110,74 @@ describe("rejected requests", () => {
   });
 });
 
+describe("rate limiting", () => {
+  test("lets a normal run of submissions through", async () => {
+    for (let i = 0; i < MAX_REQUESTS; i++) {
+      const res = await post(validContact);
+      expect(res.statusCode).toBe(200);
+    }
+
+    expect(sendMessage).toHaveBeenCalledTimes(MAX_REQUESTS);
+  });
+
+  test("blocks the request after the budget runs out and sends nothing more", async () => {
+    for (let i = 0; i < MAX_REQUESTS; i++) await post(validContact);
+    sendMessage.mockClear();
+
+    const res = await post(validContact);
+
+    expect(res.statusCode).toBe(429);
+    expect(JSON.parse(res.body)).toEqual({ error: TOO_MANY_REQUESTS });
+    // The whole point: a flood must not reach the Telegram chat.
+    expect(sendMessage).not.toHaveBeenCalled();
+  });
+
+  test("tells the caller how long to wait", async () => {
+    for (let i = 0; i < MAX_REQUESTS; i++) await post(validContact);
+
+    const res = await post(validContact);
+
+    expect(Number(res.headers["Retry-After"])).toBeGreaterThan(0);
+    expect(Number(res.headers["Retry-After"])).toBeLessThanOrEqual(60);
+  });
+
+  test("throttles per IP, so one flooder cannot lock everyone out", async () => {
+    for (let i = 0; i < MAX_REQUESTS; i++) await post(validContact, "203.0.113.99");
+
+    const flooder = await post(validContact, "203.0.113.99");
+    const bystander = await post(validContact, "198.51.100.7");
+
+    expect(flooder.statusCode).toBe(429);
+    expect(bystander.statusCode).toBe(200);
+  });
+
+  test("counts rejected submissions too, so retrying junk is not free", async () => {
+    // Otherwise a flooder just posts invalid payloads and pays nothing.
+    for (let i = 0; i < MAX_REQUESTS; i++) await post({ ...validContact, email: "nope" });
+
+    const res = await post(validContact);
+
+    expect(res.statusCode).toBe(429);
+  });
+
+  test("keys on the header Netlify sets, not on a client-supplied one", async () => {
+    // x-forwarded-for is caller-controlled: if it outranked the edge header,
+    // rotating it would defeat the limiter outright.
+    const spoofed = (i) => handler({
+      httpMethod: "POST",
+      headers: {
+        "x-nf-client-connection-ip": "203.0.113.50",
+        "x-forwarded-for":           `10.0.0.${i}`,
+      },
+      body: JSON.stringify(validContact),
+    });
+
+    for (let i = 0; i < MAX_REQUESTS; i++) await spoofed(i);
+
+    expect((await spoofed(99)).statusCode).toBe(429);
+  });
+});
+
 describe("failures stay opaque to the caller", () => {
   test("does not echo a Telegram rejection back to the client", async () => {
     sendMessage.mockRejectedValue(new Error("Bad Request: chat not found"));
@@ -125,13 +199,11 @@ describe("failures stay opaque to the caller", () => {
     expect(res.body).not.toContain("credentials");
   });
 
-  test("survives a malformed JSON body", async () => {
+  test("reports a malformed JSON body as the caller's mistake", async () => {
     const res = await post("not-json");
 
-    // Documents current behaviour: the JSON.parse sits inside the same try as
-    // the rest, so a bad body is reported as a server error rather than a 400.
-    expect(res.statusCode).toBe(500);
-    expect(JSON.parse(res.body)).toEqual({ error: GENERIC_ERROR });
+    expect(res.statusCode).toBe(400);
+    expect(JSON.parse(res.body)).toEqual({ error: INVALID_JSON });
     expect(sendMessage).not.toHaveBeenCalled();
   });
 

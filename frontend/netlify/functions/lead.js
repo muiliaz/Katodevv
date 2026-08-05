@@ -1,5 +1,6 @@
 const { sendMessage, escapeHtml } = require('./lib/telegram');
 const { isHoneypotFilled, validateLead } = require('./lib/validation');
+const { GENERIC_ERROR } = require('./lib/responses');
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
@@ -41,7 +42,8 @@ exports.handler = async (event) => {
 
     return { statusCode: 200, body: JSON.stringify({ success: true }) };
   } catch (err) {
-    console.error('lead function error:', err.message);
-    return { statusCode: 500, body: JSON.stringify({ error: err.message }) };
+    // Generic on the wire, detailed in the logs — see contact.js.
+    console.error('lead function error:', err);
+    return { statusCode: 500, body: JSON.stringify({ error: GENERIC_ERROR }) };
   }
 };

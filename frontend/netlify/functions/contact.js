@@ -1,5 +1,6 @@
 const { sendMessage, escapeHtml } = require('./lib/telegram');
 const { isHoneypotFilled, validateContact } = require('./lib/validation');
+const { GENERIC_ERROR } = require('./lib/responses');
 
 exports.handler = async (event) => {
   if (event.httpMethod !== "POST") {
@@ -35,7 +36,12 @@ exports.handler = async (event) => {
 
     return { statusCode: 200, body: JSON.stringify({ success: true }) };
   } catch (err) {
-    console.error('contact function error:', err.message);
-    return { statusCode: 500, body: JSON.stringify({ error: err.message }) };
+    // Keep the detail server-side only. The message can name a missing env var
+    // or quote Telegram's own error, which tells an outside caller whether the
+    // function is misconfigured or the bot rejected the payload — free recon.
+    // Validation errors above are still returned verbatim: those describe the
+    // caller's own input, not our internals.
+    console.error('contact function error:', err);
+    return { statusCode: 500, body: JSON.stringify({ error: GENERIC_ERROR }) };
   }
 };

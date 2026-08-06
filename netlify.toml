@@ -3,5 +3,11 @@
   command = "npm run build"
   publish = "build"
 
+[build.environment]
+  # Same major as .github/workflows/ci.yml. Netlify otherwise picks its own
+  # default, and a different npm reads package-lock.json differently — which is
+  # exactly how CI broke once before (commit dc5dea2).
+  NODE_VERSION = "24"
+
 [functions]
   directory = "netlify/functions"

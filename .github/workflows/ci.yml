@@ -22,13 +22,13 @@ jobs:
         working-directory: frontend
 
     steps:
-      # NOTE: these two are still on floating major tags. Pinning them to
-      # commit SHAs is the remaining half of this hardening — it needs the
-      # current digests looked up online, so it is written up as an owner
-      # step in audit-fixes/07-config-hygiene.md rather than guessed at here.
-      - uses: actions/checkout@v4
+      # Pinned to commit SHAs, not tags: a tag can be moved to point at
+      # different code, and a floating major silently changes what runs here.
+      # The trailing comment is the human-readable version — keep it in step
+      # with the SHA when bumping. Both resolved from the v4 tags on 2026-08-06.
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           # Node 24 ships npm 11, the version package-lock.json was generated
           # with. On npm 10 `npm ci` rejects the lockfile as out of sync.

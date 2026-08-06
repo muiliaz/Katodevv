@@ -1,3 +1,5 @@
+import { formatPrice, RESPONSE_SLA_HOURS } from '../pricing';
+
 export const TG_HANDLE = '@katodevv';
 
 export const STEPS = {
@@ -55,14 +57,32 @@ export const STEPS = {
   },
 
   ask_contact: {
-    msgs: ['Супер. Оставьте ваш контакт — Telegram или email — и я передам бриф команде. Свяжемся в течение часа.'],
+    // The promise has to match the one the forms make — it used to say "within
+    // the hour" here while six other places said 24 hours.
+    msgs: [`Супер. Оставьте ваш контакт — Telegram или email — и я передам бриф команде. Свяжемся в течение ${RESPONSE_SLA_HOURS} часов.`],
     replies: [],
     input: true,
   },
 
   prices: {
+    // Every amount comes from shared/pricing.js — never hard-code one here.
     msgs: [
-      '🌐 Сайты\n  • Лендинг — от $400\n  • Бизнес-сайт — от $800\n  • Интернет-магазин — от $1500\n\n🤖 Боты\n  • Telegram-бот — от $100\n  • AI-консультант — от $800\n  • Mini App — от $1500\n\n📱 Мобильные приложения — от $3000\n⚙️ Автоматизация — от $300\n\nФинальная цена зависит от задач. Обсудим?',
+      [
+        '🌐 Сайты',
+        `  • Лендинг — ${formatPrice('landing')}`,
+        `  • Бизнес-сайт — ${formatPrice('business-site')}`,
+        `  • Интернет-магазин — ${formatPrice('ecommerce')}`,
+        '',
+        '🤖 Боты',
+        `  • Telegram-бот — ${formatPrice('tg-bot')}`,
+        `  • AI-консультант — ${formatPrice('ai-bot')}`,
+        `  • Mini App — ${formatPrice('mini-app')}`,
+        '',
+        `📱 Мобильные приложения — ${formatPrice('mobile-app')}`,
+        `⚙️ Автоматизация — ${formatPrice('automation')}`,
+        '',
+        'Финальная цена зависит от задач. Обсудим?',
+      ].join('\n'),
     ],
     replies: [
       { label: 'Обсудить проект',    next: 'ask_project_type', data: { type: 'project' } },

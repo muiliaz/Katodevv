@@ -1,4 +1,9 @@
 import { createContext, useContext, useState } from "react";
+// Prices come from one place so the surfaces cannot drift apart again.
+// The response-time copy stays literal here — Russian numeral agreement makes
+// templating it fragile — and pricing.test.js checks it against
+// RESPONSE_SLA_HOURS instead.
+import { formatPrice } from "./pricing";
 
 export const LangContext = createContext();
 
@@ -147,11 +152,11 @@ export const T = {
       offersEyebrow: "PRICING",
       offersTitle: "What we offer",
       offers: [
-        { id: "tg-bot",         name: "Telegram Bot",     price: "from $100",       desc: "Menu, replies, one channel — a fast start without AI." },
-        { id: "ai-bot",         name: "AI Consultant",    price: "from $600–800",   desc: "AI-powered dialogue on Claude/GPT — answers and sells 24/7.", featured: true },
-        { id: "mini-app",       name: "Mini App",         price: "from $400–600",   desc: "Telegram Mini App: catalog, payments, personal cabinet inside Telegram." },
-        { id: "booking-bot",    name: "Booking Bot",      price: "from $300–400",   desc: "Client booking, reminders, calendar sync." },
-        { id: "automation-pro", name: "Custom Automation", price: "from $1500–2000", desc: "Multi-channel (Telegram / WhatsApp / site), custom workflows, analytics." },
+        { id: "tg-bot",         name: "Telegram Bot",     price: formatPrice("tg-bot", "en"),         desc: "Menu, replies, one channel — a fast start without AI." },
+        { id: "ai-bot",         name: "AI Consultant",    price: formatPrice("ai-bot", "en"),         desc: "AI-powered dialogue on Claude/GPT — answers and sells 24/7.", featured: true },
+        { id: "mini-app",       name: "Mini App",         price: formatPrice("mini-app", "en"),       desc: "Telegram Mini App: catalog, payments, personal cabinet inside Telegram." },
+        { id: "booking-bot",    name: "Booking Bot",      price: formatPrice("booking-bot", "en"),    desc: "Client booking, reminders, calendar sync." },
+        { id: "automation-pro", name: "Custom Automation", price: formatPrice("automation-pro", "en"), desc: "Multi-channel (Telegram / WhatsApp / site), custom workflows, analytics." },
       ],
       modal: {
         title: "Start a project",
@@ -399,11 +404,11 @@ export const T = {
       offersEyebrow: "ТАРИФЫ",
       offersTitle: "Что мы предлагаем",
       offers: [
-        { id: "tg-bot",         name: "Telegram-бот",       price: "от $100",       desc: "Меню, ответы, один канал — быстрый старт без ИИ." },
-        { id: "ai-bot",         name: "AI-консультант",     price: "от $600–800",   desc: "Умный диалог на базе Claude/GPT — отвечает и продаёт 24/7.", featured: true },
-        { id: "mini-app",       name: "Mini App",           price: "от $400–600",   desc: "Telegram Mini App: каталог, оплата, личный кабинет внутри Telegram." },
-        { id: "booking-bot",    name: "Бот записи",         price: "от $300–400",   desc: "Запись клиентов, напоминания, синхронизация с календарём." },
-        { id: "automation-pro", name: "Кастомная автоматизация", price: "от $1500–2000", desc: "Мультиканальность (Telegram / WhatsApp / сайт), кастомные workflow, аналитика." },
+        { id: "tg-bot",         name: "Telegram-бот",       price: formatPrice("tg-bot", "ru"),         desc: "Меню, ответы, один канал — быстрый старт без ИИ." },
+        { id: "ai-bot",         name: "AI-консультант",     price: formatPrice("ai-bot", "ru"),         desc: "Умный диалог на базе Claude/GPT — отвечает и продаёт 24/7.", featured: true },
+        { id: "mini-app",       name: "Mini App",           price: formatPrice("mini-app", "ru"),       desc: "Telegram Mini App: каталог, оплата, личный кабинет внутри Telegram." },
+        { id: "booking-bot",    name: "Бот записи",         price: formatPrice("booking-bot", "ru"),    desc: "Запись клиентов, напоминания, синхронизация с календарём." },
+        { id: "automation-pro", name: "Кастомная автоматизация", price: formatPrice("automation-pro", "ru"), desc: "Мультиканальность (Telegram / WhatsApp / сайт), кастомные workflow, аналитика." },
       ],
       modal: {
         title: "Начать проект",

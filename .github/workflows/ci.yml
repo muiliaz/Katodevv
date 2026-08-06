@@ -5,15 +5,27 @@ on:
     branches: [main]
   pull_request:
 
+# The job only reads the repository. Without this block the token carries
+# whatever the repository defaults grant, which is usually more.
+permissions:
+  contents: read
+
 jobs:
   build:
-    runs-on: ubuntu-latest
+    # Pinned rather than ubuntu-latest: that label moves to a new image on
+    # GitHub's schedule, so a build can start failing without a commit and
+    # a past failure cannot be reproduced.
+    runs-on: ubuntu-24.04
 
     defaults:
       run:
         working-directory: frontend
 
     steps:
+      # NOTE: these two are still on floating major tags. Pinning them to
+      # commit SHAs is the remaining half of this hardening — it needs the
+      # current digests looked up online, so it is written up as an owner
+      # step in audit-fixes/07-config-hygiene.md rather than guessed at here.
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
@@ -26,6 +38,12 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Check env contract
+        # Cheap and needs no secrets: fails if a function reads a variable
+        # .env.example does not declare. Runs before the tests so a broken
+        # contract is reported in seconds rather than after the build.
+        run: npm run check:env
 
       - name: Test
         run: npm run test:ci

@@ -1,5 +1,3 @@
-export const CATEGORY_KEYS = ['web', 'mobile', 'automation', 'bots']
-
 export const PORTFOLIO_DATA = {
   web: {
     items: [

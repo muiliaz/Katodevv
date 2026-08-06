@@ -16,9 +16,10 @@ const CASE_VISUAL_KIND = { "tg-bot": "chat", "ai-bot": "pulse", "mini-app": "gri
 // Language-agnostic glyphs for the "how it works" pipeline, in order.
 const FLOW_ICONS = ["💬", "⚡", "📋", "🔁"];
 
-// Visuals (icon/tag) for offers with no counterpart in the shared
-// portfolioData.js — that file stays untouched since /web's own Portfolio
-// tab still reads it as "bots we've built", unrelated to this page's pricing.
+// Visuals (icon/tag) for offers with no counterpart in portfolioData.js.
+// This page is that file's only reader now — /web's Portfolio section, which
+// used to render its other categories, was removed as unreachable code. Its
+// `bots` entries mean "bots we've built" and are unrelated to the pricing below.
 const EXTRA_VISUALS = {
   "automation-pro": { icon: "⚙️", tagEn: "PRO", tagRu: "PRO" },
 };

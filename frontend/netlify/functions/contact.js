@@ -53,6 +53,10 @@ exports.handler = async (event) => {
     const { name, email, message } = body;
 
     const text =
+      // Domain is duplicated here on purpose: requiring src/shared/site.js would
+      // make the deployed function depend on Netlify bundling a file from outside
+      // netlify/functions, and this is the enquiry path. contracts.test.js fails
+      // if this string and SITE_URL ever disagree.
       `📩 <b>Новая заявка с сайта katodevv.com</b>\n\n` +
       `👤 <b>Имя:</b> ${escapeHtml(name)}\n` +
       `📧 <b>Email:</b> ${escapeHtml(email)}\n` +

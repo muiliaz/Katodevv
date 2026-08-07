@@ -1,0 +1,13 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "entry": [
+    "netlify/functions/*.js",
+    "scripts/*.js"
+  ],
+  "project": [
+    "src/**/*.{js,jsx}",
+    "netlify/**/*.js",
+    "scripts/**/*.js"
+  ],
+  "ignoreExportsUsedInFile": true
+}

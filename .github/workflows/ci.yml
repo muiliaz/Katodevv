@@ -52,8 +52,16 @@ jobs:
         # what the CI/CD audit asked for in item 5.
         run: npm run lint
 
+      - name: Check for dead code
+        # dead-code audit, MEDIUM: "Добавить автоматическую проверку
+        # недостижимых модулей и лишних зависимостей" — so the Portfolio
+        # cluster cannot quietly accumulate again.
+        run: npm run check:dead
+
       - name: Test
-        run: npm run test:ci
+        # With coverage: the thresholds in vite.config.mjs are a ratchet, so a
+        # change that drops coverage below where it stands today fails here.
+        run: npm run test:coverage
 
       - name: Build
         # Netlify builds with the same command, so a red build here means a

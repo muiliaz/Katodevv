@@ -45,6 +45,26 @@ export default defineConfig({
       // audit's complaint was that the functions were never measured at all.
       include: ['src/**/*.{js,jsx}', 'netlify/functions/**/*.js'],
       exclude: ['src/**/*.test.{js,jsx}', 'src/setupTests.js'],
+
+      // A ratchet, not a target. Set just under what the suite currently
+      // reaches, so the numbers cannot quietly slide backwards; raise them when
+      // coverage genuinely improves.
+      //
+      // The server side is held to a much higher bar than the React side: it
+      // handles every enquiry, it is cheap to test, and it has no WebGL or
+      // scroll animation standing in the way.
+      thresholds: {
+        statements: 32,
+        branches:   25,
+        functions:  22,
+        lines:      33,
+        'netlify/functions/**': {
+          statements: 95,
+          branches:   78,
+          functions:  90,
+          lines:      95,
+        },
+      },
     },
     // create-react-app reset mocks between tests; several suites were written
     // against that, so keep the behaviour rather than rewrite them.

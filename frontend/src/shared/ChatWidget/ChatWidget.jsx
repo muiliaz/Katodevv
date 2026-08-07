@@ -37,7 +37,12 @@ function initState() {
       const p = JSON.parse(saved);
       return { ...BLANK, messages: p.messages || [], step: p.step || 'idle', collectedData: p.collectedData || {} };
     }
-  } catch {}
+  } catch {
+    // Deliberately silent. sessionStorage throws in private mode and on
+    // quota errors, and the stored value can be stale JSON from an older
+    // shape — none of which the visitor can act on. Falling back to a blank
+    // conversation is the correct outcome in every one of those cases.
+  }
   return { ...BLANK };
 }
 
@@ -199,7 +204,7 @@ export default function ChatWidget() {
       dispatch({ type: 'SET_STEP', step: stepKey });
     }, 800);
     timers.current.push(t);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, []);
 
   // ── Open / Close ──────────────────────────────────────────────────────────
@@ -211,7 +216,7 @@ export default function ChatWidget() {
       const t = setTimeout(() => runStep('welcome'), 600);
       timers.current.push(t);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [step, runStep]);
 
   // External open trigger — any page can do
@@ -257,7 +262,7 @@ export default function ChatWidget() {
       return;
     }
     runStep(reply.next);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [runStep]);
 
   // ── Free text / contact input handler ────────────────────────────────────
@@ -284,7 +289,7 @@ export default function ChatWidget() {
       dispatch({ type: 'MERGE_DATA', data: { freeText: trimmed } });
       runStep('ask_free_contact');
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [step, collectedData, runStep]);
 
   // ── Button hover ─────────────────────────────────────────────────────────

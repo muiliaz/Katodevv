@@ -246,7 +246,7 @@ function HubConnector({ cardsWrapRef, cardKeys, hideToken, revealToken, hoveredK
   // deferred to the reveal cue — otherwise a replay, e.g. a language
   // switch, would leave the connector sitting fully-drawn while the text
   // resets, then have it snap to hidden only once reveal fires).
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   useLayoutEffect(() => {
     const pathEls = Object.values(pathRefs.current).filter(Boolean);
     if (!pathEls.length) return;
@@ -277,7 +277,7 @@ function HubConnector({ cardsWrapRef, cardKeys, hideToken, revealToken, hoveredK
     tl.to(nodeRef.current, { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(2)" })
       .to(pathEls, { strokeDashoffset: 0, duration: 0.7, stagger: 0.08, ease: "power2.inOut" }, "-=0.15");
     return () => tl.kill();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [revealToken]);
 
   return (
@@ -421,7 +421,7 @@ function Hub() {
       .to(cards, { opacity: 1, y: 0, scale: 1, filter: "blur(0px)", duration: 0.65, stagger: 0.09 }, "-=0.1");
 
     return () => tl.kill();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [lang]);
 
   return (

@@ -19,3 +19,11 @@ a {
 button {
   cursor: pointer;
 }
+/* Turnstile holder.
+   In interaction-only mode Cloudflare inserts just a hidden input when it can
+   decide on its own, but the wrapper still takes up a line — which left a gap
+   (and, before this mode, a "Success!" panel) sitting in the chat after every
+   send. Collapse it unless an actual challenge iframe is present. */
+[data-testid="turnstile"]:not(:has(iframe)) {
+  display: none;
+}

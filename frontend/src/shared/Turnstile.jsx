@@ -43,7 +43,7 @@ function loadScript() {
  * onToken is called with a string when a token is issued, and with null when it
  * expires or the check fails — so the parent can disable submit if it wants to.
  */
-export default function Turnstile({ onToken, theme = 'dark' }) {
+export default function Turnstile({ onToken, theme = 'dark', appearance = 'interaction-only' }) {
   const holder = useRef(null);
   const widgetId = useRef(null);
   // Kept in a ref so re-renders of the parent never re-create the widget:
@@ -61,6 +61,14 @@ export default function Turnstile({ onToken, theme = 'dark' }) {
         widgetId.current = turnstile.render(holder.current, {
           sitekey: TURNSTILE_SITE_KEY,
           theme,
+          // interaction-only: the widget stays invisible while Cloudflare can
+          // decide on its own, and appears only if it actually needs the
+          // visitor to do something. Without this it leaves a "Success!" panel
+          // with Cloudflare branding sitting in the chat after every send.
+          //
+          // It is a display mode, not a weaker check: the token is issued and
+          // verified exactly the same way.
+          appearance,
           callback:         (token) => cb.current?.(token),
           'expired-callback': () => cb.current?.(null),
           'error-callback':   () => cb.current?.(null),
@@ -79,7 +87,7 @@ export default function Turnstile({ onToken, theme = 'dark' }) {
         widgetId.current = null;
       }
     };
-  }, [theme]);
+  }, [theme, appearance]);
 
   return <div ref={holder} data-testid="turnstile" />;
 }

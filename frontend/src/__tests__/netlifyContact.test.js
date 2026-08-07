@@ -1,21 +1,15 @@
+import { vi } from "vitest";
 // Tests for the public contact endpoint, exercised through its exported
 // handler(event) the same way Netlify invokes it.
 //
-// Like netlifyValidation.test.js, this lives under src/ because create-react-app's
-// Jest setup only picks up test files there; the handler itself is imported from
-// the functions folder.
-//
-// Only sendMessage is mocked. escapeHtml stays real, so the assertions about the
-// outgoing message text prove the actual escaping the endpoint performs.
-jest.mock("../../netlify/functions/lib/telegram", () => {
-  const actual = jest.requireActual("../../netlify/functions/lib/telegram");
-  return { ...actual, sendMessage: jest.fn() };
-});
-
-const { sendMessage } = require("../../netlify/functions/lib/telegram");
-const { GENERIC_ERROR, INVALID_JSON, TOO_MANY_REQUESTS } = require("../../netlify/functions/lib/responses");
-const { resetRateLimit, MAX_REQUESTS } = require("../../netlify/functions/lib/rateLimit");
-const { handler } = require("../../netlify/functions/contact");
+// Nothing is stubbed except global fetch — the outermost edge of the system.
+// Everything inside runs for real: validation, the honeypot, the throttle, the
+// HTML escaping and the Telegram request itself. That is deliberate. Mocking
+// sendMessage would have left lib/telegram.js untested, and it is the module
+// that builds the request we actually depend on.
+import { GENERIC_ERROR, INVALID_JSON, TOO_MANY_REQUESTS } from "../../netlify/functions/lib/responses";
+import { MAX_REQUESTS } from "../../netlify/functions/lib/rateLimit";
+import { handler } from "../../netlify/functions/contact";
 
 const validContact = {
   name:    "Ada",
@@ -23,10 +17,19 @@ const validContact = {
   message: "I need a landing page for my shop.",
 };
 
+// The throttle keys on the caller's address and its counters live in module
+// scope, so tests would otherwise spend each other's budget. Giving every test
+// its own address is simpler and stricter than resetting shared state — and it
+// survives the fact that the CommonJS handler and this ESM test each hold their
+// own copy of the limiter module.
+let testNo = 0;
+beforeEach(() => { testNo += 1; });
+const currentIp = () => `203.0.113.${testNo}`;
+
 // Netlify hands the handler a raw string body, never an object.
 // The IP is the one the rate limiter keys on: give each test its own so cases
 // stay independent of each other's request budget.
-function post(body, ip = "203.0.113.1") {
+function post(body, ip = currentIp()) {
   return handler({
     httpMethod: "POST",
     headers:    { "x-nf-client-connection-ip": ip },
@@ -34,19 +37,27 @@ function post(body, ip = "203.0.113.1") {
   });
 }
 
-const sentText = () => sendMessage.mock.calls[0][0];
+// Telegram accepted the message.
+const telegramOk = () => Promise.resolve({ json: () => Promise.resolve({ ok: true, result: {} }) });
+// Telegram rejected it — this is how a real API-level failure looks.
+const telegramFails = (description) => () =>
+  Promise.resolve({ json: () => Promise.resolve({ ok: false, description }) });
+
+// The text that actually went out on the wire.
+const sentText = () => JSON.parse(global.fetch.mock.calls[0][1].body).text;
+const sentToTelegram = () => global.fetch;
 
 beforeEach(() => {
-  sendMessage.mockReset();
-  sendMessage.mockResolvedValue({ ok: true });
-  // Rate-limit state is module-level and survives between tests by design.
-  resetRateLimit();
+  process.env.TELEGRAM_TOKEN = "test-token";
+  process.env.TELEGRAM_CHAT_ID = "-1001234567890";
+  global.fetch = vi.fn(telegramOk);
   // The handler logs failures on purpose; keep them out of the test output.
-  jest.spyOn(console, "error").mockImplementation(() => {});
+  vi.spyOn(console, "error").mockImplementation(() => {});
 });
 
 afterEach(() => {
-  jest.restoreAllMocks();
+  vi.restoreAllMocks();
+  delete global.fetch;
 });
 
 describe("happy path", () => {
@@ -55,7 +66,7 @@ describe("happy path", () => {
 
     expect(res.statusCode).toBe(200);
     expect(JSON.parse(res.body)).toEqual({ success: true });
-    expect(sendMessage).toHaveBeenCalledTimes(1);
+    expect(sentToTelegram()).toHaveBeenCalledTimes(1);
   });
 
   test("passes every submitted field on to Telegram", async () => {
@@ -81,7 +92,7 @@ describe("rejected requests", () => {
     const res = await handler({ httpMethod: "GET" });
 
     expect(res.statusCode).toBe(405);
-    expect(sendMessage).not.toHaveBeenCalled();
+    expect(sentToTelegram()).not.toHaveBeenCalled();
   });
 
   test("rejects an invalid payload with 400 and sends nothing", async () => {
@@ -89,14 +100,14 @@ describe("rejected requests", () => {
 
     expect(res.statusCode).toBe(400);
     expect(JSON.parse(res.body).error).toMatch(/email/);
-    expect(sendMessage).not.toHaveBeenCalled();
+    expect(sentToTelegram()).not.toHaveBeenCalled();
   });
 
   test("rejects an empty payload without throwing", async () => {
     const res = await post({});
 
     expect(res.statusCode).toBe(400);
-    expect(sendMessage).not.toHaveBeenCalled();
+    expect(sentToTelegram()).not.toHaveBeenCalled();
   });
 
   test("answers a honeypot hit with a plain success and sends nothing", async () => {
@@ -106,7 +117,7 @@ describe("rejected requests", () => {
 
     expect(res.statusCode).toBe(200);
     expect(JSON.parse(res.body)).toEqual({ success: true });
-    expect(sendMessage).not.toHaveBeenCalled();
+    expect(sentToTelegram()).not.toHaveBeenCalled();
   });
 });
 
@@ -117,19 +128,19 @@ describe("rate limiting", () => {
       expect(res.statusCode).toBe(200);
     }
 
-    expect(sendMessage).toHaveBeenCalledTimes(MAX_REQUESTS);
+    expect(sentToTelegram()).toHaveBeenCalledTimes(MAX_REQUESTS);
   });
 
   test("blocks the request after the budget runs out and sends nothing more", async () => {
     for (let i = 0; i < MAX_REQUESTS; i++) await post(validContact);
-    sendMessage.mockClear();
+    global.fetch.mockClear();
 
     const res = await post(validContact);
 
     expect(res.statusCode).toBe(429);
     expect(JSON.parse(res.body)).toEqual({ error: TOO_MANY_REQUESTS });
     // The whole point: a flood must not reach the Telegram chat.
-    expect(sendMessage).not.toHaveBeenCalled();
+    expect(sentToTelegram()).not.toHaveBeenCalled();
   });
 
   test("tells the caller how long to wait", async () => {
@@ -180,7 +191,7 @@ describe("rate limiting", () => {
 
 describe("failures stay opaque to the caller", () => {
   test("does not echo a Telegram rejection back to the client", async () => {
-    sendMessage.mockRejectedValue(new Error("Bad Request: chat not found"));
+    global.fetch.mockImplementation(telegramFails("Bad Request: chat not found"));
 
     const res = await post(validContact);
 
@@ -190,13 +201,19 @@ describe("failures stay opaque to the caller", () => {
   });
 
   test("does not reveal that the function is missing its credentials", async () => {
-    sendMessage.mockRejectedValue(new Error("Telegram credentials not configured"));
+    // The real misconfiguration, not a simulated one: no env vars at all. This
+    // is the case that used to leak "Telegram credentials not configured" to
+    // anyone who posted the form.
+    delete process.env.TELEGRAM_TOKEN;
+    delete process.env.TELEGRAM_CHAT_ID;
 
     const res = await post(validContact);
 
     expect(res.statusCode).toBe(500);
     expect(JSON.parse(res.body)).toEqual({ error: GENERIC_ERROR });
     expect(res.body).not.toContain("credentials");
+    // It must fail before reaching the network, not after.
+    expect(sentToTelegram()).not.toHaveBeenCalled();
   });
 
   test("reports a malformed JSON body as the caller's mistake", async () => {
@@ -204,11 +221,11 @@ describe("failures stay opaque to the caller", () => {
 
     expect(res.statusCode).toBe(400);
     expect(JSON.parse(res.body)).toEqual({ error: INVALID_JSON });
-    expect(sendMessage).not.toHaveBeenCalled();
+    expect(sentToTelegram()).not.toHaveBeenCalled();
   });
 
   test("still logs the detail server-side", async () => {
-    sendMessage.mockRejectedValue(new Error("Bad Request: chat not found"));
+    global.fetch.mockImplementation(telegramFails("Bad Request: chat not found"));
 
     await post(validContact);
 

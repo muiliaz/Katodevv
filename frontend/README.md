@@ -22,7 +22,7 @@ npm start       # http://localhost:3000
 Требуется **Node ≥ 24** и **npm ≥ 11** (закреплено в `engines`). Более старый npm отклонит
 `package-lock.json` как рассинхронизированный — на этом однажды уже падал CI.
 
-Формы в таком режиме работать не будут: они ходят в Netlify Functions, которых у dev-сервера CRA
+Формы в таком режиме работать не будут: они ходят в Netlify Functions, которых у dev-сервера Vite
 нет. Как поднять их локально — ниже, в разделе «Формы и Telegram».
 
 ---
@@ -35,10 +35,10 @@ npm start       # http://localhost:3000
 
 | Маршрут | Компонент | Что это |
 |---|---|---|
-| `/` | `src/pages/hub/Hub.js` | Выбор направления: 3 карточки + `LaserShowcase` (CSS-3D коверфлоу кейсов) |
-| `/web` | `src/pages/web/WebDev.js` | Основная страница-визитка: WebGL-чёрная дыра, скролл-джорни, услуги, о нас, контакты |
-| `/bots` | `src/pages/bots/Bots.js` | Продуктовая страница Katobot: маскот, тарифы, кейсы |
-| `/apps` | `src/pages/apps/Apps.js` | Интерактивная игра «собери приложение» вместо статичной страницы услуг |
+| `/` | `src/pages/hub/Hub.jsx` | Выбор направления: 3 карточки + `LaserShowcase` (CSS-3D коверфлоу кейсов) |
+| `/web` | `src/pages/web/WebDev.jsx` | Основная страница-визитка: WebGL-чёрная дыра, скролл-джорни, услуги, о нас, контакты |
+| `/bots` | `src/pages/bots/Bots.jsx` | Продуктовая страница Katobot: маскот, тарифы, кейсы |
+| `/apps` | `src/pages/apps/Apps.jsx` | Интерактивная игра «собери приложение» вместо статичной страницы услуг |
 
 ```
 frontend/
@@ -53,18 +53,20 @@ frontend/
 ├── scripts/
 │   └── check-env-contract.js  # CI-проверка: все process.env объявлены в .env.example
 ├── src/
-│   ├── app/App.js           # BrowserRouter + Routes, lazy-загрузка страниц
+│   ├── app/App.jsx          # BrowserRouter + Routes, lazy-загрузка страниц
 │   ├── shared/              # используется двумя и более страницами
-│   │   ├── LangContext.js   #   EN/RU и весь копирайт сайта
+│   │   ├── LangContext.jsx  #   EN/RU и весь копирайт сайта
 │   │   ├── pricing.js       #   ЕДИНСТВЕННЫЙ источник цен и срока ответа
-│   │   ├── Seo.js           #   per-page title/meta/OG
+│   │   ├── Seo.jsx          #   per-page title/meta/OG
 │   │   └── ChatWidget/      #   плавающий виджет заявки, есть на всех страницах
 │   ├── pages/               # hub / web / bots / apps
 │   └── __tests__/           # тесты серверной части и роутинга
+├── index.html               # точка входа Vite (в CRA лежала в public/)
+├── vite.config.mjs          # сборка, тесты, CSS-модули
 └── public/                  # статика, robots.txt, sitemap.xml, _redirects
 ```
 
-**Весь текст сайта живёт в `src/shared/LangContext.js`** — это самый частый ответ на вопрос
+**Весь текст сайта живёт в `src/shared/LangContext.jsx`** — это самый частый ответ на вопрос
 «где поменять надпись». Исключение — **цены и срок ответа: они в `src/shared/pricing.js`**, и
 только там. Раньше одни и те же цифры лежали в трёх местах и разъехались; теперь все носители
 рендерят их из одного источника, а тест не даст вписать цену в UI-файл руками.
@@ -85,11 +87,11 @@ CI (`.github/workflows/ci.yml`) выполняет ровно четыре ша�
 локально:
 
 ```bash
-npm ci && npm run check:env && npm run test:ci && CI=true npm run build
+npm ci && npm run check:env && npm run test:ci && npm run build
 ```
 
-`CI=true` для сборки существенно: в этом режиме react-scripts считает предупреждения ESLint
-ошибками, как это и происходит в CI.
+Раньше сборка запускалась с `CI=true`, потому что react-scripts в этом режиме считал
+предупреждения ESLint ошибками. У Vite такого поведения нет, и переменная больше не нужна.
 
 ---
 
@@ -97,14 +99,13 @@ npm ci && npm run check:env && npm run test:ci && CI=true npm run build
 
 ```bash
 npm run test:ci                      # весь набор
-npx react-scripts test --watchAll=false --testPathPattern=netlify   # только серверная часть
+npx vitest run netlify                  # только серверная часть
 ```
 
-Покрытие серверной части измеряется отдельно, потому что функции лежат вне `src/`:
+Покрытие (и React-части, и функций — они настроены в `vite.config.mjs`):
 
 ```bash
-npx react-scripts test --watchAll=false --coverage \
-  --collectCoverageFrom='netlify/functions/**/*.js' --testPathPattern='netlify'
+npx vitest run --coverage
 ```
 
 Что покрыто:
@@ -115,17 +116,19 @@ npx react-scripts test --watchAll=false --coverage \
 | `src/__tests__/netlifyLead.test.js` | то же для `lead.handler` + необязательные поля чат-виджета |
 | `src/__tests__/netlifyRateLimit.test.js` | окно лимитера, изоляция по IP и маршруту, защита памяти |
 | `src/__tests__/netlifyValidation.test.js` | правила валидации как чистые функции |
-| `src/__tests__/routing.test.js` | таблица маршрутов `App.js`, `Link`, `useNavigate` |
+| `src/__tests__/routing.test.jsx` | таблица маршрутов `App.js`, `Link`, `useNavigate` |
 | `src/__tests__/pricing.test.js` | цены и срок ответа: формат, и что ни один UI-файл не содержит цену литералом |
-| `src/pages/web/Contact.test.js` | контактная форма в браузерном окружении |
+| `src/pages/web/Contact.test.jsx` | контактная форма в браузерном окружении |
 
 **Чего тестов нет** (чтобы не создавать ложного ощущения покрытия): страницы `/`, `/web`, `/bots`,
 `/apps` не рендерятся в тестах — им нужны заглушки для WebGL, canvas 2D, `ResizeObserver`,
-`matchMedia` и `scrollIntoView`. Реальная доставка в Telegram тоже не проверяется: `sendMessage`
-замокан. E2E нет.
+`matchMedia` и `scrollIntoView`. Сквозного браузерного сценария (e2e) нет.
 
-Тесты серверной части лежат в `src/__tests__/`, а не рядом с функциями, потому что Jest от
-create-react-app подхватывает файлы только внутри `src/`.
+Зато доставка в Telegram проверяется почти целиком: тесты подменяют только `fetch`, а сборка
+запроса, экранирование и разбор ответа выполняются по-настоящему.
+
+Тесты серверной части лежат в `src/__tests__/`, а не рядом с функциями: так сложилось при CRA,
+чей Jest видел только `src/`. Vitest настроен так же (`vite.config.mjs`), менять не стали.
 
 ---
 
@@ -159,7 +162,7 @@ variables, scope **Functions**.
 
 ### Локальный запуск функций
 
-Dev-сервер CRA функции не обслуживает. Нужен Netlify CLI:
+Dev-сервер Vite функции не обслуживает. Нужен Netlify CLI:
 
 ```bash
 npm i -g netlify-cli
@@ -201,11 +204,23 @@ netlify dev               # поднимет и сайт, и функции
 
 | Что | Подробности |
 |---|---|
-| `react-scripts@5.0.1` не сопровождается | Даёт 16 из 18 предупреждений `npm audit`. Все — инструменты сборки, в браузер не попадают. См. [`DEPENDENCIES.md`](DEPENDENCIES.md) |
-| Обходные пути под react-router v7 | `jest.moduleNameMapper` в `package.json` и полифилл `TextEncoder` в `setupTests.js` — нужны только из-за старого Jest внутри react-scripts |
+| JSX лежит в файлах `.jsx` | При переходе с CRA пришлось переименовать 17 файлов: Vite считает JSX только в `.jsx`, CRA разрешал и в `.js` |
 | Нет lint/format | Нет `.editorconfig`, Prettier и команды `lint`; в коде 13 подавлений `react-hooks/exhaustive-deps` вокруг GSAP/Three.js-таймлайнов |
 | «Кастомный AI-агент» и «Кастомная автоматизация» | Две отдельные позиции с пересекающимися ценами ($2000 и $1500–2000). Один это продукт или два — из кода не следует |
 | `LangContext.js` и `Services.js` крупные | Смешивают словари, данные и компоненты |
+
+---
+
+## Лицензия и использование
+
+**Лицензии нет, и это намеренно.** Репозиторий публичный, потому что так удобнее работать, но это
+коммерческий сайт агентства, а не open-source проект. Без явной лицензии по умолчанию действует
+авторское право: копировать, использовать или переиспользовать код нельзя.
+
+Смотреть, учиться и обсуждать — пожалуйста. Нужно что-то из кода — напишите в Telegram
+[@katodevv](https://t.me/katodevv).
+
+Об уязвимостях — в [`../SECURITY.md`](../SECURITY.md), не через публичные обсуждения.
 
 ---
 

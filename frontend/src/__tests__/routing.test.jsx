@@ -1,3 +1,4 @@
+import { vi } from "vitest";
 // Smoke tests for the router wiring in App.js.
 //
 // Added while upgrading react-router-dom from v6 to v7: the suite had no test
@@ -9,10 +10,10 @@
 // routing table, not what a page renders; and mounting the real pages in jsdom
 // needs stand-ins for WebGL, canvas 2D, ResizeObserver, matchMedia and
 // scrollIntoView, which is a separate job (see audit-fixes/05-dependency-hygiene.md).
-jest.mock("../pages/hub/Hub",    () => () => <p>hub page</p>);
-jest.mock("../pages/web/WebDev", () => () => <p>web page</p>);
-jest.mock("../pages/bots/Bots",  () => () => <p>bots page</p>);
-jest.mock("../pages/apps/Apps",  () => () => <p>apps page</p>);
+vi.mock("../pages/hub/Hub", () => ({ default: () => <p>hub page</p> }));
+vi.mock("../pages/web/WebDev", () => ({ default: () => <p>web page</p> }));
+vi.mock("../pages/bots/Bots", () => ({ default: () => <p>bots page</p> }));
+vi.mock("../pages/apps/Apps", () => ({ default: () => <p>apps page</p> }));
 
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";

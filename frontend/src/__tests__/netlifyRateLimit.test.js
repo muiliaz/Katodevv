@@ -1,11 +1,12 @@
+import { vi } from "vitest";
 // Tests for the throttle itself, separate from the handlers that use it.
 // See netlifyValidation.test.js for why these live under src/.
-const {
+import {
   checkRateLimit,
   resetRateLimit,
   WINDOW_MS,
   MAX_REQUESTS,
-} = require("../../netlify/functions/lib/rateLimit");
+} from "../../netlify/functions/lib/rateLimit";
 
 const from = (ip) => ({ headers: { "x-nf-client-connection-ip": ip } });
 
@@ -14,11 +15,10 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-  // Several cases below freeze Date.now. create-react-app runs Jest with
-  // resetMocks: true, which blanks a spy's implementation but does not put the
-  // original back — leaving Date.now() returning undefined for every later
-  // test. Restoring explicitly is what keeps these cases independent.
-  jest.restoreAllMocks();
+  // Several cases below freeze Date.now. Restoring explicitly is what keeps
+  // them independent — a leaked spy makes Date.now() return undefined for
+  // every later test, and the window maths then silently never expires.
+  vi.restoreAllMocks();
 });
 
 describe("the budget", () => {
@@ -55,7 +55,7 @@ describe("the budget", () => {
 describe("the window slides", () => {
   test("lets the caller back in once the window has passed", () => {
     const start = Date.now();
-    jest.spyOn(Date, "now").mockReturnValue(start);
+    vi.spyOn(Date, "now").mockReturnValue(start);
 
     for (let i = 0; i < MAX_REQUESTS; i++) checkRateLimit(from("1.1.1.1"), "contact");
     expect(checkRateLimit(from("1.1.1.1"), "contact").allowed).toBe(false);
@@ -67,7 +67,7 @@ describe("the window slides", () => {
 
   test("expires hits one by one rather than clearing the whole bucket", () => {
     const start = Date.now();
-    jest.spyOn(Date, "now").mockReturnValue(start);
+    vi.spyOn(Date, "now").mockReturnValue(start);
 
     // Spend the whole budget, but spread the first hit far from the rest.
     checkRateLimit(from("1.1.1.1"), "contact");
@@ -120,7 +120,7 @@ describe("memory safety", () => {
     // A spray of forged addresses must not be able to exhaust the container's
     // memory — that would turn the throttle into the problem it prevents.
     const start = Date.now();
-    jest.spyOn(Date, "now").mockReturnValue(start);
+    vi.spyOn(Date, "now").mockReturnValue(start);
 
     for (let i = 0; i < 6000; i++) checkRateLimit(from(`10.1.${i >> 8}.${i & 255}`), "contact");
 

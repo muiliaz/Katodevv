@@ -1,16 +1,10 @@
+import { vi } from "vitest";
 // Tests for the public lead endpoint — the one the chat widget and the /bots
-// modal post to. See netlifyContact.test.js for why these live under src/ and
-// why only sendMessage is mocked.
-jest.mock("../../netlify/functions/lib/telegram", () => {
-  const actual = jest.requireActual("../../netlify/functions/lib/telegram");
-  return { ...actual, sendMessage: jest.fn() };
-});
-
-const { sendMessage } = require("../../netlify/functions/lib/telegram");
-const { GENERIC_ERROR, INVALID_JSON, TOO_MANY_REQUESTS } = require("../../netlify/functions/lib/responses");
-const { resetRateLimit, MAX_REQUESTS } = require("../../netlify/functions/lib/rateLimit");
-const { handler: contactHandler } = require("../../netlify/functions/contact");
-const { handler } = require("../../netlify/functions/lead");
+// modal post to. See netlifyContact.test.js for why only fetch is stubbed.
+import { GENERIC_ERROR, INVALID_JSON, TOO_MANY_REQUESTS } from "../../netlify/functions/lib/responses";
+import { MAX_REQUESTS } from "../../netlify/functions/lib/rateLimit";
+import { handler as contactHandler } from "../../netlify/functions/contact";
+import { handler } from "../../netlify/functions/lead";
 
 // Shaped like what ChatWidget actually collects: see chatScenarios.js.
 const validLead = {
@@ -22,7 +16,13 @@ const validLead = {
   timestamp:   "05.08.2026, 12:00",
 };
 
-function post(body, ip = "203.0.113.1") {
+// Own address per test — see netlifyContact.test.js for why resetting the
+// limiter's shared state is not enough here.
+let testNo = 100;
+beforeEach(() => { testNo += 1; });
+const currentIp = () => `198.51.100.${testNo - 100}`;
+
+function post(body, ip = currentIp()) {
   return handler({
     httpMethod: "POST",
     headers:    { "x-nf-client-connection-ip": ip },
@@ -30,17 +30,23 @@ function post(body, ip = "203.0.113.1") {
   });
 }
 
-const sentText = () => sendMessage.mock.calls[0][0];
+const telegramOk = () => Promise.resolve({ json: () => Promise.resolve({ ok: true, result: {} }) });
+const telegramFails = (description) => () =>
+  Promise.resolve({ json: () => Promise.resolve({ ok: false, description }) });
+
+const sentText = () => JSON.parse(global.fetch.mock.calls[0][1].body).text;
+const sentToTelegram = () => global.fetch;
 
 beforeEach(() => {
-  sendMessage.mockReset();
-  sendMessage.mockResolvedValue({ ok: true });
-  resetRateLimit();
-  jest.spyOn(console, "error").mockImplementation(() => {});
+  process.env.TELEGRAM_TOKEN = "test-token";
+  process.env.TELEGRAM_CHAT_ID = "-1001234567890";
+  global.fetch = vi.fn(telegramOk);
+  vi.spyOn(console, "error").mockImplementation(() => {});
 });
 
 afterEach(() => {
-  jest.restoreAllMocks();
+  vi.restoreAllMocks();
+  delete global.fetch;
 });
 
 describe("happy path", () => {
@@ -49,7 +55,7 @@ describe("happy path", () => {
 
     expect(res.statusCode).toBe(200);
     expect(JSON.parse(res.body)).toEqual({ success: true });
-    expect(sendMessage).toHaveBeenCalledTimes(1);
+    expect(sentToTelegram()).toHaveBeenCalledTimes(1);
   });
 
   test("passes every collected answer on to Telegram", async () => {
@@ -72,7 +78,7 @@ describe("happy path", () => {
     const res = await post({ contact: "ada@example.com" });
 
     expect(res.statusCode).toBe(200);
-    expect(sendMessage).toHaveBeenCalledTimes(1);
+    expect(sentToTelegram()).toHaveBeenCalledTimes(1);
     expect(sentText()).toContain("ada@example.com");
   });
 
@@ -98,7 +104,7 @@ describe("rejected requests", () => {
     const res = await handler({ httpMethod: "GET" });
 
     expect(res.statusCode).toBe(405);
-    expect(sendMessage).not.toHaveBeenCalled();
+    expect(sentToTelegram()).not.toHaveBeenCalled();
   });
 
   test("rejects a lead with no contact — it would be unusable", async () => {
@@ -106,14 +112,14 @@ describe("rejected requests", () => {
 
     expect(res.statusCode).toBe(400);
     expect(JSON.parse(res.body).error).toMatch(/contact/);
-    expect(sendMessage).not.toHaveBeenCalled();
+    expect(sentToTelegram()).not.toHaveBeenCalled();
   });
 
   test("rejects an oversized free-text field", async () => {
     const res = await post({ contact: "@ada", freeText: "x".repeat(5001) });
 
     expect(res.statusCode).toBe(400);
-    expect(sendMessage).not.toHaveBeenCalled();
+    expect(sentToTelegram()).not.toHaveBeenCalled();
   });
 
   test("answers a honeypot hit with a plain success and sends nothing", async () => {
@@ -121,20 +127,20 @@ describe("rejected requests", () => {
 
     expect(res.statusCode).toBe(200);
     expect(JSON.parse(res.body)).toEqual({ success: true });
-    expect(sendMessage).not.toHaveBeenCalled();
+    expect(sentToTelegram()).not.toHaveBeenCalled();
   });
 });
 
 describe("rate limiting", () => {
   test("blocks the request after the budget runs out and sends nothing more", async () => {
     for (let i = 0; i < MAX_REQUESTS; i++) await post(validLead);
-    sendMessage.mockClear();
+    global.fetch.mockClear();
 
     const res = await post(validLead);
 
     expect(res.statusCode).toBe(429);
     expect(JSON.parse(res.body)).toEqual({ error: TOO_MANY_REQUESTS });
-    expect(sendMessage).not.toHaveBeenCalled();
+    expect(sentToTelegram()).not.toHaveBeenCalled();
   });
 
   test("keeps its own budget, separate from the contact form", async () => {
@@ -158,7 +164,7 @@ describe("rate limiting", () => {
 
 describe("failures stay opaque to the caller", () => {
   test("does not echo a Telegram rejection back to the client", async () => {
-    sendMessage.mockRejectedValue(new Error("Forbidden: bot was blocked by the user"));
+    global.fetch.mockImplementation(telegramFails("Forbidden: bot was blocked by the user"));
 
     const res = await post(validLead);
 
@@ -172,11 +178,11 @@ describe("failures stay opaque to the caller", () => {
 
     expect(res.statusCode).toBe(400);
     expect(JSON.parse(res.body)).toEqual({ error: INVALID_JSON });
-    expect(sendMessage).not.toHaveBeenCalled();
+    expect(sentToTelegram()).not.toHaveBeenCalled();
   });
 
   test("still logs the detail server-side", async () => {
-    sendMessage.mockRejectedValue(new Error("Forbidden: bot was blocked by the user"));
+    global.fetch.mockImplementation(telegramFails("Forbidden: bot was blocked by the user"));
 
     await post(validLead);
 

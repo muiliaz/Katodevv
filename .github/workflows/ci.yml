@@ -33,6 +33,7 @@ jobs:
           # Node 24 ships npm 11, the version package-lock.json was generated
           # with. On npm 10 `npm ci` rejects the lockfile as out of sync.
           node-version: 24
+          # Same major as netlify.toml's NODE_VERSION.
           cache: npm
           cache-dependency-path: frontend/package-lock.json
 
@@ -51,6 +52,8 @@ jobs:
       - name: Build
         # Netlify builds with the same command, so a red build here means a
         # broken deploy.
-        env:
-          CI: true
+        #
+        # CI=true used to make react-scripts treat lint warnings as errors.
+        # Vite has no such behaviour — a real lint gate would be a separate
+        # step, and there is no lint config in the project yet.
         run: npm run build

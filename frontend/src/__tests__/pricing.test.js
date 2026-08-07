@@ -5,18 +5,20 @@
 // again. That is how the surfaces drifted apart in the first place: the /bots
 // tariff card said Mini App "from $400–600" while the chat widget, reachable
 // from that same page, said "from $1500".
-const fs = require("fs");
-const path = require("path");
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 
-const { PRICING, RESPONSE_SLA_HOURS, formatPrice, priceOnly } = require("../shared/pricing");
+import { PRICING, RESPONSE_SLA_HOURS, formatPrice, priceOnly } from "../shared/pricing";
 
-const SRC = path.join(__dirname, "..");
+// __dirname does not exist in ESM; Vitest exposes the module URL instead.
+const SRC = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 
 // Files that render prices or the response-time promise to a visitor.
 const SURFACES = [
-  "shared/LangContext.js",
+  "shared/LangContext.jsx",
   "shared/ChatWidget/chatScenarios.js",
-  "pages/web/Services.js",
+  "pages/web/Services.jsx",
 ];
 
 const read = (rel) => fs.readFileSync(path.join(SRC, rel), "utf8");

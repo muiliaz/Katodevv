@@ -1,70 +1,232 @@
-# Getting Started with Create React App
+# Kato Devv — сайт агентства
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Маркетинговый сайт студии разработки Kato Devv (сайты, мобильные приложения, Telegram-боты и AI,
+автоматизация). Задача сайта одна: **довести посетителя до заявки** — через контактную форму или
+чат-виджет — и доставить её в Telegram-чат команды.
 
-## Available Scripts
+Продакшен: **https://katodevv.com** — деплоится автоматически из ветки `main`.
 
-In the project directory, you can run:
+> Этот файл — точка входа для человека. Для AI-агента точка входа — [`../AGENTS.md`](../AGENTS.md)
+> в корне репозитория.
 
-### `npm start`
+---
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Быстрый старт
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+```bash
+cd frontend
+npm ci          # именно ci, не install — ставит ровно то, что в lockfile
+npm start       # http://localhost:3000
+```
 
-### `npm test`
+Требуется **Node ≥ 24** и **npm ≥ 11** (закреплено в `engines`). Более старый npm отклонит
+`package-lock.json` как рассинхронизированный — на этом однажды уже падал CI.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Формы в таком режиме работать не будут: они ходят в Netlify Functions, которых у dev-сервера Vite
+нет. Как поднять их локально — ниже, в разделе «Формы и Telegram».
 
-### `npm run build`
+---
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Что где лежит
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+Сайт **мульти-страничный**: хаб на `/` предлагает выбрать направление, каждое — отдельная страница
+со своим оформлением. Все маршруты подключены через `React.lazy`, поэтому тяжёлый Three.js-бандл
+`/web` не попадает в остальные страницы.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+| Маршрут | Компонент | Что это |
+|---|---|---|
+| `/` | `src/pages/hub/Hub.jsx` | Выбор направления: 3 карточки + `LaserShowcase` (CSS-3D коверфлоу кейсов) |
+| `/web` | `src/pages/web/WebDev.jsx` | Основная страница-визитка: WebGL-чёрная дыра, скролл-джорни, услуги, о нас, контакты |
+| `/bots` | `src/pages/bots/Bots.jsx` | Продуктовая страница Katobot: маскот, тарифы, кейсы |
+| `/apps` | `src/pages/apps/Apps.jsx` | Интерактивная игра «собери приложение» вместо статичной страницы услуг |
 
-### `npm run eject`
+```
+frontend/
+├── netlify/functions/       # серверная часть — приём заявок
+│   ├── contact.js           #   POST /.netlify/functions/contact  (форма на /web)
+│   ├── lead.js              #   POST /.netlify/functions/lead     (чат-виджет и модалка /bots)
+│   └── lib/
+│       ├── validation.js    #   серверная валидация + honeypot
+│       ├── rateLimit.js     #   ограничение частоты по IP
+│       ├── telegram.js      #   отправка в Telegram, экранирование HTML
+│       └── responses.js     #   тексты публичных ответов
+├── scripts/
+│   └── check-env-contract.js  # CI-проверка: все process.env объявлены в .env.example
+├── src/
+│   ├── app/App.jsx          # BrowserRouter + Routes, lazy-загрузка страниц
+│   ├── shared/              # используется двумя и более страницами
+│   │   ├── LangContext.jsx  #   EN/RU и весь копирайт сайта
+│   │   ├── pricing.js       #   ЕДИНСТВЕННЫЙ источник цен и срока ответа
+│   │   ├── Seo.jsx          #   per-page title/meta/OG
+│   │   └── ChatWidget/      #   плавающий виджет заявки, есть на всех страницах
+│   ├── pages/               # hub / web / bots / apps
+│   └── __tests__/           # тесты серверной части и роутинга
+├── index.html               # точка входа Vite (в CRA лежала в public/)
+├── vite.config.mjs          # сборка, тесты, CSS-модули
+└── public/                  # статика, robots.txt, sitemap.xml, _redirects
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+**Весь текст сайта живёт в `src/shared/LangContext.jsx`** — это самый частый ответ на вопрос
+«где поменять надпись». Исключение — **цены и срок ответа: они в `src/shared/pricing.js`**, и
+только там. Раньше одни и те же цифры лежали в трёх местах и разъехались; теперь все носители
+рендерят их из одного источника, а тест не даст вписать цену в UI-файл руками.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+---
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## Команды
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+| Команда | Что делает |
+|---|---|
+| `npm start` | Dev-сервер на :3000 |
+| `npm run build` | Production-сборка в `build/`. Той же командой собирает Netlify |
+| `npm test` | Тесты в watch-режиме |
+| `npm run test:ci` | Тесты один раз, без watch — **эта команда идёт в CI** |
+| `npm run check:env` | Проверяет, что все `process.env` в функциях объявлены в `.env.example` |
 
-## Learn More
+CI (`.github/workflows/ci.yml`) выполняет ровно четыре шага, и их можно полностью воспроизвести
+локально:
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+```bash
+npm ci && npm run check:env && npm run test:ci && npm run build
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+Раньше сборка запускалась с `CI=true`, потому что react-scripts в этом режиме считал
+предупреждения ESLint ошибками. У Vite такого поведения нет, и переменная больше не нужна.
 
-### Code Splitting
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+## Тесты
 
-### Analyzing the Bundle Size
+```bash
+npm run test:ci                      # весь набор
+npx vitest run netlify                  # только серверная часть
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+Покрытие (и React-части, и функций — они настроены в `vite.config.mjs`):
 
-### Making a Progressive Web App
+```bash
+npx vitest run --coverage
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+Что покрыто:
 
-### Advanced Configuration
+| Файл | Что проверяет |
+|---|---|
+| `src/__tests__/netlifyContact.test.js` | `contact.handler`: успех, экранирование, не-POST, валидация, honeypot, отказ Telegram, лимит частоты |
+| `src/__tests__/netlifyLead.test.js` | то же для `lead.handler` + необязательные поля чат-виджета |
+| `src/__tests__/netlifyRateLimit.test.js` | окно лимитера, изоляция по IP и маршруту, защита памяти |
+| `src/__tests__/netlifyValidation.test.js` | правила валидации как чистые функции |
+| `src/__tests__/routing.test.jsx` | таблица маршрутов `App.js`, `Link`, `useNavigate` |
+| `src/__tests__/pricing.test.js` | цены и срок ответа: формат, и что ни один UI-файл не содержит цену литералом |
+| `src/pages/web/Contact.test.jsx` | контактная форма в браузерном окружении |
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+**Чего тестов нет** (чтобы не создавать ложного ощущения покрытия): страницы `/`, `/web`, `/bots`,
+`/apps` не рендерятся в тестах — им нужны заглушки для WebGL, canvas 2D, `ResizeObserver`,
+`matchMedia` и `scrollIntoView`. Сквозного браузерного сценария (e2e) нет.
 
-### Deployment
+Зато доставка в Telegram проверяется почти целиком: тесты подменяют только `fetch`, а сборка
+запроса, экранирование и разбор ответа выполняются по-настоящему.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+Тесты серверной части лежат в `src/__tests__/`, а не рядом с функциями: так сложилось при CRA,
+чей Jest видел только `src/`. Vitest настроен так же (`vite.config.mjs`), менять не стали.
 
-### `npm run build` fails to minify
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## Формы и Telegram
+
+Обе формы отправляют POST в Netlify Functions, функция валидирует payload и шлёт сообщение в
+Telegram-чат.
+
+```
+Contact.js  ──POST──> /.netlify/functions/contact ──┐
+ChatWidget  ──POST──> /.netlify/functions/lead   ──┼──> validation -> rateLimit -> telegram -> чат
+Bots.js     ──POST──> /.netlify/functions/lead   ──┘
+```
+
+### Переменные окружения
+
+Обе обязательны, обе читает `netlify/functions/lib/telegram.js`. Полное описание — в
+[`.env.example`](.env.example).
+
+| Переменная | Что это |
+|---|---|
+| `TELEGRAM_TOKEN` | Токен бота от @BotFather |
+| `TELEGRAM_CHAT_ID` | Id чата-получателя (для групп — отрицательный) |
+
+**В продакшене они задаются не файлом, а в панели Netlify:** Site configuration → Environment
+variables, scope **Functions**.
+
+Если их не задать, сайт всё равно соберётся и форма будет выглядеть рабочей — а заявка молча
+потеряется с ответом 500. Ни сборка, ни CI это не поймают: переменные нужны в рантайме. Проверять
+только вживую или в логах функций Netlify.
+
+### Локальный запуск функций
+
+Dev-сервер Vite функции не обслуживает. Нужен Netlify CLI:
+
+```bash
+npm i -g netlify-cli
+cp .env.example .env      # заполнить своими значениями; .env в git не попадёт
+netlify dev               # поднимет и сайт, и функции
+```
+
+### Защита эндпоинтов
+
+Оба публичны, поэтому защищены на сервере, а не в браузере:
+
+1. **Honeypot** — скрытое поле `company`. Если заполнено, ответ 200 «успех», но в Telegram ничего
+   не уходит: бот не должен понять, что его распознали.
+2. **Валидация** — длины и формат email; ошибки возвращаются дословно, они про ввод вызывающего.
+3. **Ограничение частоты** — 5 запросов в минуту на IP и маршрут, иначе 429.
+   ⚠️ Состояние живёт в памяти одного Lambda-контейнера: холодный старт его сбрасывает,
+   параллельные контейнеры считают отдельно. Против распределённого флуда не помогает —
+   подробности в `netlify/functions/lib/rateLimit.js`.
+4. **Внутренние ошибки обезличены** — наружу идёт один и тот же текст, детали только в логах, чтобы
+   по ответу нельзя было отличить проблему конфигурации от ответа Telegram.
+
+---
+
+## Деплой
+
+Автоматический: пуш в `main` → сборка Netlify → https://katodevv.com. Настройки — в
+[`../netlify.toml`](../netlify.toml): база `frontend`, команда `npm run build`, публикуется `build/`,
+функции из `netlify/functions`, Node 24 (тот же мажор, что в CI).
+
+`public/_redirects` содержит `/* /index.html 200` — без этого прямой заход на `/bots` дал бы 404,
+потому что маршрутизация клиентская.
+
+**Откат неудачного деплоя:** Netlify → Deploys → выбрать последний рабочий → ⋯ → **Publish deploy**.
+Пересборка не нужна, переключение мгновенное.
+
+---
+
+## Известные ограничения
+
+| Что | Подробности |
+|---|---|
+| JSX лежит в файлах `.jsx` | При переходе с CRA пришлось переименовать 17 файлов: Vite считает JSX только в `.jsx`, CRA разрешал и в `.js` |
+| Нет lint/format | Нет `.editorconfig`, Prettier и команды `lint`; в коде 13 подавлений `react-hooks/exhaustive-deps` вокруг GSAP/Three.js-таймлайнов |
+| «Кастомный AI-агент» и «Кастомная автоматизация» | Две отдельные позиции с пересекающимися ценами ($2000 и $1500–2000). Один это продукт или два — из кода не следует |
+| `LangContext.js` и `Services.js` крупные | Смешивают словари, данные и компоненты |
+
+---
+
+## Лицензия и использование
+
+**Лицензии нет, и это намеренно.** Репозиторий публичный, потому что так удобнее работать, но это
+коммерческий сайт агентства, а не open-source проект. Без явной лицензии по умолчанию действует
+авторское право: копировать, использовать или переиспользовать код нельзя.
+
+Смотреть, учиться и обсуждать — пожалуйста. Нужно что-то из кода — напишите в Telegram
+[@katodevv](https://t.me/katodevv).
+
+Об уязвимостях — в [`../SECURITY.md`](../SECURITY.md), не через публичные обсуждения.
+
+---
+
+## Куда смотреть дальше
+
+- [`../AGENTS.md`](../AGENTS.md) — контекст и границы безопасных изменений для агентов
+- [`DEPENDENCIES.md`](DEPENDENCIES.md) — принятые предупреждения по зависимостям, с владельцем и сроком
+- [`../audit-fixes/`](../audit-fixes/) — что и почему менялось по результатам аудитов
+- [`../auditfiles/`](../auditfiles/) — сами отчёты аудитов (состояние на 2026-08-04)

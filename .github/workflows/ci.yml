@@ -5,27 +5,46 @@ on:
     branches: [main]
   pull_request:
 
+# The job only reads the repository. Without this block the token carries
+# whatever the repository defaults grant, which is usually more.
+permissions:
+  contents: read
+
 jobs:
   build:
-    runs-on: ubuntu-latest
+    # Pinned rather than ubuntu-latest: that label moves to a new image on
+    # GitHub's schedule, so a build can start failing without a commit and
+    # a past failure cannot be reproduced.
+    runs-on: ubuntu-24.04
 
     defaults:
       run:
         working-directory: frontend
 
     steps:
-      - uses: actions/checkout@v4
+      # Pinned to commit SHAs, not tags: a tag can be moved to point at
+      # different code, and a floating major silently changes what runs here.
+      # The trailing comment is the human-readable version — keep it in step
+      # with the SHA when bumping. Both resolved from the v4 tags on 2026-08-06.
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           # Node 24 ships npm 11, the version package-lock.json was generated
           # with. On npm 10 `npm ci` rejects the lockfile as out of sync.
           node-version: 24
+          # Same major as netlify.toml's NODE_VERSION.
           cache: npm
           cache-dependency-path: frontend/package-lock.json
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Check env contract
+        # Cheap and needs no secrets: fails if a function reads a variable
+        # .env.example does not declare. Runs before the tests so a broken
+        # contract is reported in seconds rather than after the build.
+        run: npm run check:env
 
       - name: Test
         run: npm run test:ci
@@ -33,6 +52,8 @@ jobs:
       - name: Build
         # Netlify builds with the same command, so a red build here means a
         # broken deploy.
-        env:
-          CI: true
+        #
+        # CI=true used to make react-scripts treat lint warnings as errors.
+        # Vite has no such behaviour — a real lint gate would be a separate
+        # step, and there is no lint config in the project yet.
         run: npm run build

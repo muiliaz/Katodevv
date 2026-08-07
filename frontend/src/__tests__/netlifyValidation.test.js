@@ -1,11 +1,11 @@
 // Tests for the Netlify functions' shared input validation.
 // The test lives under src/ because create-react-app's Jest setup only picks up
 // test files there; the module itself is imported from the functions folder.
-const {
+import {
   isHoneypotFilled,
   validateContact,
   validateLead,
-} = require("../../netlify/functions/lib/validation");
+} from "../../netlify/functions/lib/validation";
 
 const validContact = {
   name:    "Ada",

@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef, Fragment } from "react";
 import gsap from "gsap";
 import { useLang } from "../../shared/LangContext";
+import { formatPrice } from "../../shared/pricing";
 import "./Services.css";
 
 /* ── Card ids (fixed, not translated) ── */
@@ -312,24 +313,31 @@ function BotServiceCard({ card, onClick }) {
     if (!termEl) return
     termEl.innerHTML = ''
 
+    // Prices come from shared/pricing.js — never hard-code an amount here.
+    // The label column is padded to a fixed width so the prices line up in the
+    // monospaced terminal.
+    const LABEL_WIDTH = 28
+    const row = (label, id) =>
+      `- ${label.padEnd(LABEL_WIDTH)}${formatPrice(id, lang === 'ru' ? 'ru' : 'en')}`
+
     const lines = lang === 'ru' ? [
       '> bot_types.exe',
       '> loading...',
-      '- Telegram-бот               от $100',
-      '- Бот записи / заявки        от $400',
-      '- AI-консультант             от $800',
-      '- Бот для магазина           от $600',
-      '- Mini App + оплата          от $1500',
-      '- Кастомный AI-агент         от $2000',
+      row('Telegram-бот',        'tg-bot'),
+      row('Бот записи / заявки', 'booking-bot'),
+      row('AI-консультант',      'ai-bot'),
+      row('Бот для магазина',    'shop-bot'),
+      row('Mini App + оплата',   'mini-app'),
+      row('Кастомный AI-агент',  'custom-ai'),
     ] : [
       '> bot_types.exe',
       '> loading...',
-      '- Telegram bot               from $100',
-      '- Booking / lead bot         from $400',
-      '- AI consultant              from $800',
-      '- E-commerce bot             from $600',
-      '- Mini App + payments        from $1500',
-      '- Custom AI agent            from $2000',
+      row('Telegram bot',        'tg-bot'),
+      row('Booking / lead bot',  'booking-bot'),
+      row('AI consultant',       'ai-bot'),
+      row('E-commerce bot',      'shop-bot'),
+      row('Mini App + payments', 'mini-app'),
+      row('Custom AI agent',     'custom-ai'),
     ]
 
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {

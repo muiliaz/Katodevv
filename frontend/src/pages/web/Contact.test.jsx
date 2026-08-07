@@ -1,3 +1,4 @@
+import { vi } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { LangProvider } from "../../shared/LangContext";
@@ -21,13 +22,13 @@ function fillForm({ name = "Ada", email = "ada@example.com", message = "I need a
 const submitButton = () => screen.getByRole("button", { name: /send request/i });
 
 beforeEach(() => {
-  global.fetch = jest.fn(() =>
+  global.fetch = vi.fn(() =>
     Promise.resolve({ ok: true, json: () => Promise.resolve({ success: true }) })
   );
 });
 
 afterEach(() => {
-  jest.restoreAllMocks();
+  vi.restoreAllMocks();
   delete global.fetch;
 });
 
@@ -48,16 +49,30 @@ test("marks name, email and message as required", () => {
   expect(screen.getByPlaceholderText("Tell us about your project")).toBeRequired();
 });
 
-test("does not submit a blank or whitespace-only form", async () => {
+test("does not submit a whitespace-only form", async () => {
   renderContact();
 
-  // Whitespace satisfies the browser's `required` check, so the component has
-  // to reject it itself.
-  fillForm({ name: "   ", email: "  ", message: "   " });
+  // The email has to be syntactically valid, otherwise type="email" makes the
+  // browser block the submit and the component's own check never runs — which
+  // is exactly what this test is here to exercise. Whitespace satisfies
+  // `required`, so trimming is the component's job.
+  fillForm({ name: "   ", email: "ada@example.com", message: "   " });
   userEvent.click(submitButton());
 
   expect(await screen.findByText("Please fill in all fields.")).toBeInTheDocument();
   expect(global.fetch).not.toHaveBeenCalled();
+});
+
+test("lets the browser stop a submit with a malformed email", async () => {
+  renderContact();
+
+  // Documents the other half: constraint validation on type="email" fires
+  // before onSubmit, so nothing is posted and no component error appears.
+  fillForm({ name: "Ada", email: "not-an-email", message: "Build me a shop." });
+  userEvent.click(submitButton());
+
+  expect(global.fetch).not.toHaveBeenCalled();
+  expect(screen.queryByText("Please fill in all fields.")).not.toBeInTheDocument();
 });
 
 test("posts the form values and shows the sent state", async () => {

@@ -12,7 +12,7 @@
  * Content sections (after journey):
  *   services h2   — scrubbed reveal y:80→0 on viewport entry
  *   service cards  — stagger 0.12 s, fade up on entry
- *   portfolio/other — same
+ *   about/contact h2 — same
  *
  * Renders nothing — pure side-effect component.
  */
@@ -171,7 +171,7 @@ export default function ScrollJourney() {
 
       // Other section headings
       document.querySelectorAll(
-        '#content-sections .portfolio h2, #content-sections .about h2, #content-sections .contact h2'
+        '#content-sections .about h2, #content-sections .contact h2'
       ).forEach(el => {
         gsap.fromTo(el,
           { opacity: 0, y: 36 },
@@ -199,22 +199,6 @@ export default function ScrollJourney() {
         )
       }
 
-      // Portfolio cards
-      const portfolioCards = document.querySelectorAll('.portfolio-card')
-      if (portfolioCards.length) {
-        gsap.fromTo(portfolioCards,
-          { opacity: 0, y: 50 },
-          {
-            opacity: 1, y: 0, duration: 0.75, stagger: 0.12, ease: 'power2.out',
-            clearProps: 'transform,opacity',
-            scrollTrigger: {
-              trigger: '.portfolio-grid',
-              start: 'top 80%',
-              once:  true,
-            },
-          }
-        )
-      }
     })
 
     return () => {

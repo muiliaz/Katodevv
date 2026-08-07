@@ -7,7 +7,7 @@ import { vi } from "vitest";
 // HTML escaping and the Telegram request itself. That is deliberate. Mocking
 // sendMessage would have left lib/telegram.js untested, and it is the module
 // that builds the request we actually depend on.
-import { GENERIC_ERROR, INVALID_JSON, TOO_MANY_REQUESTS } from "../../netlify/functions/lib/responses";
+import { GENERIC_ERROR, INVALID_JSON, TOO_MANY_REQUESTS, CHALLENGE_FAILED } from "../../netlify/functions/lib/responses";
 import { MAX_REQUESTS } from "../../netlify/functions/lib/rateLimit";
 import { handler } from "../../netlify/functions/contact";
 
@@ -118,6 +118,41 @@ describe("rejected requests", () => {
     expect(res.statusCode).toBe(200);
     expect(JSON.parse(res.body)).toEqual({ success: true });
     expect(sentToTelegram()).not.toHaveBeenCalled();
+  });
+});
+
+describe("the Turnstile challenge", () => {
+  // Unconfigured by default in these tests, which is why every other case here
+  // gets through without a token — see lib/turnstile.js on failing open.
+  test("lets submissions through while no secret is configured", async () => {
+    const res = await post(validContact);
+
+    expect(res.statusCode).toBe(200);
+  });
+
+  test("refuses a submission with no token once a secret is configured", async () => {
+    process.env.TURNSTILE_SECRET_KEY = "0x-test-secret";
+
+    const res = await post(validContact);
+
+    expect(res.statusCode).toBe(403);
+    expect(JSON.parse(res.body)).toEqual({ error: CHALLENGE_FAILED });
+    // Rejected before anything is sent anywhere.
+    expect(sentToTelegram()).not.toHaveBeenCalled();
+
+    delete process.env.TURNSTILE_SECRET_KEY;
+  });
+
+  test("a honeypot hit never reaches the challenge", async () => {
+    // A caught bot must not learn that a challenge exists.
+    process.env.TURNSTILE_SECRET_KEY = "0x-test-secret";
+
+    const res = await post({ ...validContact, company: "spam-co" });
+
+    expect(res.statusCode).toBe(200);
+    expect(JSON.parse(res.body)).toEqual({ success: true });
+
+    delete process.env.TURNSTILE_SECRET_KEY;
   });
 });
 

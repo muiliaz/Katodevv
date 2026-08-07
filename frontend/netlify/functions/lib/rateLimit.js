@@ -92,6 +92,7 @@ function resetRateLimit() {
 
 module.exports = {
   checkRateLimit,
+  clientIp,
   resetRateLimit,
   WINDOW_MS,
   MAX_REQUESTS,

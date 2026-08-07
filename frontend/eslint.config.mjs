@@ -1,0 +1,77 @@
+import js from '@eslint/js';
+import reactHooks from 'eslint-plugin-react-hooks';
+import globals from 'globals';
+
+// Lint only. No formatter, no style rules.
+//
+// create-react-app used to run ESLint on every build, and the Vite migration
+// removed it along with the rest of react-scripts — so for a while the project
+// had no linting at all. This restores the part that catches bugs.
+//
+// tech-health TH-005 also asks for a formatter. Deliberately not here: adding
+// Prettier rewrites nearly every file and buries real changes in whitespace
+// diffs. That is a separate decision, and it should be its own commit.
+export default [
+  {
+    ignores: ['build/**', 'coverage/**', 'node_modules/**'],
+  },
+
+  js.configs.recommended,
+
+  // ── Browser code ───────────────────────────────────────────────────────────
+  {
+    files: ['src/**/*.{js,jsx}'],
+    languageOptions: {
+      ecmaVersion: 2024,
+      sourceType: 'module',
+      globals: globals.browser,
+      parserOptions: {
+        ecmaFeatures: { jsx: true },
+      },
+    },
+    plugins: { 'react-hooks': reactHooks },
+    rules: {
+      // Only the two classic rules, which is what create-react-app enforced.
+      //
+      // The plugin's "recommended" set now also pulls in React Compiler rules
+      // (immutability, preserve-manual-memoization, set-state-in-effect). Those
+      // flag working code because it cannot be auto-optimized — an optimisation
+      // hint, not a defect. Adopting them means refactoring the GSAP and
+      // Three.js components, which is its own project.
+      'react-hooks/rules-of-hooks': 'error',
+
+      // The GSAP and Three.js timelines legitimately capture values once on
+      // mount; the codebase carries deliberate suppressions of this rule.
+      // Warning keeps them visible without turning existing code red.
+      'react-hooks/exhaustive-deps': 'warn',
+
+      // JSX compiles to references the base config cannot see.
+      'no-unused-vars': ['error', {
+        varsIgnorePattern: '^[A-Z]',      // components referenced only in JSX
+        argsIgnorePattern: '^_',
+        ignoreRestSiblings: true,
+      }],
+    },
+  },
+
+  // ── Netlify functions and build scripts: CommonJS, Node globals ────────────
+  {
+    files: ['netlify/**/*.js', 'scripts/**/*.js'],
+    languageOptions: {
+      ecmaVersion: 2024,
+      sourceType: 'commonjs',
+      globals: { ...globals.node },
+    },
+    rules: {
+      'no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+    },
+  },
+
+  // ── Tests ──────────────────────────────────────────────────────────────────
+  {
+    files: ['src/**/*.test.{js,jsx}', 'src/setupTests.js'],
+    languageOptions: {
+      globals: { ...globals.browser, ...globals.node, ...globals.vitest },
+    },
+  },
+];

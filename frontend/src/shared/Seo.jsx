@@ -1,6 +1,6 @@
 import { Helmet } from "react-helmet-async";
 
-const SITE_URL = "https://katodevv.com";
+import { SITE_URL } from "./site";
 const DEFAULT_IMAGE = `${SITE_URL}/og-image.png`;
 
 /* Per-page <title>/meta/OG/Twitter tags, rendered client-side over the

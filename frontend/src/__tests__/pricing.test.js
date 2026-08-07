@@ -89,7 +89,7 @@ describe("the response-time promise agrees everywhere", () => {
 
 describe("the price table itself", () => {
   test("every entry has a numeric floor, and a range that goes upward", () => {
-    for (const [id, entry] of Object.entries(PRICING)) {
+    for (const entry of Object.values(PRICING)) {
       expect(typeof entry.from).toBe("number");
       expect(entry.from).toBeGreaterThan(0);
       if (entry.to !== undefined) expect(entry.to).toBeGreaterThan(entry.from);

@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import Turnstile from "../../shared/Turnstile";
 import { useLang } from "../../shared/LangContext";
 import "./Contact.css";
 
@@ -9,6 +10,9 @@ function Contact() {
   const [loading, setLoading]       = useState(false);
   const [error, setError]           = useState(null);
   const [preService, setPreService] = useState(null);
+  // Null until Cloudflare issues one. The server decides what an absent token
+  // means, so the form stays submittable either way.
+  const [turnstileToken, setTurnstileToken] = useState(null);
   const formRef                     = useRef(null);
 
   // Listen for service selection from Hero picker
@@ -50,6 +54,7 @@ function Contact() {
           email,
           // Honeypot — humans never see this field, so a value means a bot.
           company: fd.get("company"),
+          turnstileToken,
           message: preService
             ? `[${preService.icon} ${preService.label}]\n${message}`
             : message,
@@ -209,6 +214,8 @@ function Contact() {
                 <textarea name="message" placeholder={c.message} rows={5} required />
               </div>
               {error && <div className="cform-error">{error}</div>}
+              <Turnstile onToken={setTurnstileToken} />
+
               <button type="submit" className={`cform-btn ${sent ? "sent" : ""}`} disabled={loading}>
                 {sent ? "✓ " + (c.sent || "Sent!") : loading ? "..." : c.send}
               </button>

@@ -1,0 +1,10 @@
+# Issues в репозитории отключены намеренно. Если их когда-нибудь включат,
+# этот файл уводит два потока обращений туда, где им место.
+blank_issues_enabled: true
+contact_links:
+  - name: Уязвимость в безопасности
+    url: https://github.com/muiliaz/Katodevv/blob/main/SECURITY.md
+    about: Не создавайте публичное обсуждение. Напишите в Telegram или на почту — см. SECURITY.md.
+  - name: Вопрос о проекте или заказ разработки
+    url: https://t.me/katodevv
+    about: Быстрее написать напрямую в Telegram.

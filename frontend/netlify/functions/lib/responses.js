@@ -21,4 +21,9 @@ const INVALID_JSON = 'Request body is not valid JSON.';
 // real enquiry.
 const TOO_MANY_REQUESTS = 'Too many requests. Please wait a moment and try again.';
 
-module.exports = { GENERIC_ERROR, INVALID_JSON, TOO_MANY_REQUESTS };
+// Says what happened without saying how the check works. A visitor who sees
+// this can retry — the widget re-issues a token — which is the only useful
+// action available to them.
+const CHALLENGE_FAILED = 'Could not verify the request. Please reload the page and try again.';
+
+module.exports = { GENERIC_ERROR, INVALID_JSON, TOO_MANY_REQUESTS, CHALLENGE_FAILED };

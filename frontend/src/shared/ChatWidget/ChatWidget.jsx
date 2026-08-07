@@ -3,6 +3,7 @@ import React, {
 } from 'react';
 import gsap from 'gsap';
 import { STEPS } from './chatScenarios';
+import Turnstile from '../Turnstile';
 import styles from './ChatWidget.module.css';
 
 // ─── State ────────────────────────────────────────────────────────────────────
@@ -37,7 +38,12 @@ function initState() {
       const p = JSON.parse(saved);
       return { ...BLANK, messages: p.messages || [], step: p.step || 'idle', collectedData: p.collectedData || {} };
     }
-  } catch {}
+  } catch {
+    // Deliberately silent. sessionStorage throws in private mode and on
+    // quota errors, and the stored value can be stale JSON from an older
+    // shape — none of which the visitor can act on. Falling back to a blank
+    // conversation is the correct outcome in every one of those cases.
+  }
   return { ...BLANK };
 }
 
@@ -46,12 +52,12 @@ const makeMsg = (sender, text) => ({ id: ++_msgId, sender, text });
 
 // ─── Lead submission (module-level to avoid recreation) ───────────────────────
 
-async function postLead(data) {
+async function postLead(data, turnstileToken) {
   try {
     const res = await fetch('/.netlify/functions/lead', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...data, timestamp: new Date().toLocaleString('ru-RU') }),
+      body: JSON.stringify({ ...data, turnstileToken, timestamp: new Date().toLocaleString('ru-RU') }),
     });
     const json = await res.json();
     return !!json.success;
@@ -93,6 +99,8 @@ export default function ChatWidget() {
   const breathRef = useRef(null);
   const timers    = useRef([]);
   const wasOpen   = useRef(false);
+  // Held in a ref, not state: re-rendering the widget would burn the token.
+  const turnstileTokenRef = useRef(null);
 
   // ── Persist to sessionStorage ─────────────────────────────────────────────
   useEffect(() => {
@@ -199,7 +207,7 @@ export default function ChatWidget() {
       dispatch({ type: 'SET_STEP', step: stepKey });
     }, 800);
     timers.current.push(t);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, []);
 
   // ── Open / Close ──────────────────────────────────────────────────────────
@@ -211,7 +219,7 @@ export default function ChatWidget() {
       const t = setTimeout(() => runStep('welcome'), 600);
       timers.current.push(t);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [step, runStep]);
 
   // External open trigger — any page can do
@@ -257,7 +265,7 @@ export default function ChatWidget() {
       return;
     }
     runStep(reply.next);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [runStep]);
 
   // ── Free text / contact input handler ────────────────────────────────────
@@ -276,7 +284,7 @@ export default function ChatWidget() {
       const ok = await postLead({
         ...merged,
         type: merged.type || (isDirectOrFree ? 'direct' : 'project'),
-      });
+      }, turnstileTokenRef.current);
 
       dispatch({ type: 'SET_SENDING', v: false });
       runStep(ok ? (isDirectOrFree ? 'done_direct' : 'done') : 'error');
@@ -284,7 +292,7 @@ export default function ChatWidget() {
       dispatch({ type: 'MERGE_DATA', data: { freeText: trimmed } });
       runStep('ask_free_contact');
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [step, collectedData, runStep]);
 
   // ── Button hover ─────────────────────────────────────────────────────────
@@ -378,6 +386,10 @@ export default function ChatWidget() {
             ))}
           </div>
         )}
+
+        {/* Cloudflare challenge. Rendered inside the chat window so it only
+            loads for visitors who actually open the widget. */}
+        <Turnstile onToken={(t) => { turnstileTokenRef.current = t; }} />
 
         {/* Input */}
         <ChatInput

@@ -496,7 +496,12 @@ function ScrollEffects(){
     camera.lookAt(Math.sin(t*0.15)*0.2, 0, 0)
 
     if(_vignetteInst.current){
-      try{ _vignetteInst.current.darkness = 0.90+e*0.10 }catch(_){}
+      // Silent by design: this runs every frame. The vignette effect may not
+      // have finished initialising, and postprocessing has changed where
+      // `darkness` lives between versions. A missing knob means the frame
+      // renders without the tweak — logging it would spam the console 60
+      // times a second for a purely cosmetic detail.
+      try{ _vignetteInst.current.darkness = 0.90+e*0.10 }catch{ /* effect not ready */ }
     }
   })
   return null

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import Turnstile from "../../shared/Turnstile";
 import { Link } from "react-router-dom";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -245,6 +246,7 @@ function StartProjectModal({ offer, copy, onClose }) {
   const [idea, setIdea] = useState("");
   const [company, setCompany] = useState(""); // honeypot — stays empty for humans
   const [status, setStatus] = useState("idle"); // idle | sending | done | error
+  const [turnstileToken, setTurnstileToken] = useState(null);
 
   useEffect(() => {
     const onKey = (e) => { if (e.key === "Escape") onClose(); };
@@ -270,6 +272,7 @@ function StartProjectModal({ offer, copy, onClose }) {
           contact: email.trim(),
           freeText: idea.trim(),
           company: company.trim(),
+          turnstileToken,
           timestamp: new Date().toLocaleString("ru-RU"),
         }),
       });
@@ -317,6 +320,8 @@ function StartProjectModal({ offer, copy, onClose }) {
               <textarea value={idea} onChange={(e) => setIdea(e.target.value)} placeholder={copy.ideaPlaceholder} rows={3} />
             </label>
             {status === "error" && <p className="bots-modal-status is-error">{copy.error}</p>}
+            <Turnstile onToken={setTurnstileToken} />
+
             <button className="bots-modal-submit" type="submit" disabled={status === "sending"}>
               {status === "sending" ? copy.sending : copy.submit}
             </button>

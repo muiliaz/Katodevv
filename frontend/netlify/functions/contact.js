@@ -1,7 +1,8 @@
 const { sendMessage, escapeHtml } = require('./lib/telegram');
 const { isHoneypotFilled, validateContact } = require('./lib/validation');
-const { checkRateLimit } = require('./lib/rateLimit');
-const { GENERIC_ERROR, INVALID_JSON, TOO_MANY_REQUESTS } = require('./lib/responses');
+const { checkRateLimit, clientIp } = require('./lib/rateLimit');
+const { verifyTurnstile } = require('./lib/turnstile');
+const { GENERIC_ERROR, INVALID_JSON, TOO_MANY_REQUESTS, CHALLENGE_FAILED } = require('./lib/responses');
 
 exports.handler = async (event) => {
   if (event.httpMethod !== "POST") {
@@ -34,6 +35,13 @@ exports.handler = async (event) => {
       return { statusCode: 200, body: JSON.stringify({ success: true }) };
     }
 
+    // After the honeypot — a caught bot should not learn that a challenge
+    // exists — and before validation, so a failed challenge costs nothing.
+    const challenge = await verifyTurnstile(body.turnstileToken, clientIp(event?.headers));
+    if (!challenge.ok) {
+      return { statusCode: 403, body: JSON.stringify({ error: CHALLENGE_FAILED }) };
+    }
+
     const errors = validateContact(body);
     if (errors.length) {
       return {
@@ -45,6 +53,10 @@ exports.handler = async (event) => {
     const { name, email, message } = body;
 
     const text =
+      // Domain is duplicated here on purpose: requiring src/shared/site.js would
+      // make the deployed function depend on Netlify bundling a file from outside
+      // netlify/functions, and this is the enquiry path. contracts.test.js fails
+      // if this string and SITE_URL ever disagree.
       `📩 <b>Новая заявка с сайта katodevv.com</b>\n\n` +
       `👤 <b>Имя:</b> ${escapeHtml(name)}\n` +
       `📧 <b>Email:</b> ${escapeHtml(email)}\n` +

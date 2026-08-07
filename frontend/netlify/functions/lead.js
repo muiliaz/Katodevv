@@ -1,7 +1,8 @@
 const { sendMessage, escapeHtml } = require('./lib/telegram');
 const { isHoneypotFilled, validateLead } = require('./lib/validation');
-const { checkRateLimit } = require('./lib/rateLimit');
-const { GENERIC_ERROR, INVALID_JSON, TOO_MANY_REQUESTS } = require('./lib/responses');
+const { checkRateLimit, clientIp } = require('./lib/rateLimit');
+const { verifyTurnstile } = require('./lib/turnstile');
+const { GENERIC_ERROR, INVALID_JSON, TOO_MANY_REQUESTS, CHALLENGE_FAILED } = require('./lib/responses');
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
@@ -29,6 +30,12 @@ exports.handler = async (event) => {
     // Silent success for bots — see contact.js.
     if (isHoneypotFilled(body)) {
       return { statusCode: 200, body: JSON.stringify({ success: true }) };
+    }
+
+    // Order and reasoning as in contact.js.
+    const challenge = await verifyTurnstile(body.turnstileToken, clientIp(event?.headers));
+    if (!challenge.ok) {
+      return { statusCode: 403, body: JSON.stringify({ error: CHALLENGE_FAILED }) };
     }
 
     const errors = validateLead(body);

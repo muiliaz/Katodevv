@@ -56,7 +56,8 @@ npm ci && npm run check:env && npm run test:ci && CI=true npm run build
 
 | Задача | Файл |
 |---|---|
-| Изменить любой текст, цену, обещание срока | `frontend/src/shared/LangContext.js` — там весь копирайт, EN и RU |
+| Изменить любой текст сайта | `frontend/src/shared/LangContext.js` — там весь копирайт, EN и RU |
+| Изменить цену или срок ответа | `frontend/src/shared/pricing.js` — единственное место. Все три носителя рендерят оттуда |
 | Сценарий чат-квалификации | `frontend/src/shared/ChatWidget/chatScenarios.js` |
 | Маршруты | `frontend/src/app/App.js` |
 | Приём заявок, валидация, антиспам | `frontend/netlify/functions/` |
@@ -91,7 +92,7 @@ npm ci && npm run check:env && npm run test:ci && CI=true npm run build
 
 | Что | Почему |
 |---|---|
-| **Цены и обещания по срокам** | Расходятся между `LangContext.js`, `chatScenarios.js` и `Services.js`. Какое значение верное — из репозитория **не выводится**. Не угадывать. Разбор: `audit-fixes/09-prices-sla-divergence.md` |
+| **Цены и срок ответа** | Живут в одном месте — `frontend/src/shared/pricing.js`. Значения выбрал владелец; менять их — его решение, не твоё. Правь только там: `pricing.test.js` уронит сборку, если цена окажется вписана в UI-файл руками |
 | Ослабление защиты функций | Honeypot, валидация, лимит частоты и обезличивание ошибок — результат аудита безопасности. Не «упрощать» |
 | `public/robots.txt`, `sitemap.xml`, `yandex_*.html` | Обслуживают поисковики и верификацию домена, ссылок из кода нет |
 | `public/favicon-kd.svg` | Внутренних ссылок нет, но может запрашиваться по прямому URL. Требует проверки журналов |
@@ -143,12 +144,12 @@ npm ci && npm run check:env && npm run test:ci && CI=true npm run build
 
 ## Текущее состояние и открытые вопросы
 
-Актуальный срез — `audit-fixes/99-summary.md`. Коротко на 2026-08-05:
+Актуальный срез — `audit-fixes/99-summary.md`. Коротко на 2026-08-07:
 
 - ✅ Безопасность функций: лимит частоты, обезличенные ошибки, 100% покрытие handler-ов
 - ✅ Зависимости: `npm audit` 51 → 18, critical и low — ноль
 - ✅ Мёртвый код: удалено ~2800 строк
+- ✅ Цены и срок ответа сведены в `pricing.js`, расхождений больше нет
 - ⚠️ **Требует владельца:** включить обязательную проверку CI для `main` (`audit-fixes/04-ci-gate.md`)
 - ⚠️ **Требует владельца:** решение по замене `react-scripts` (`audit-fixes/05-dependency-hygiene.md`)
-- ⚠️ **Требует владельца:** какие цены и сроки верные (`audit-fixes/09-prices-sla-divergence.md`)
 - ❌ Нет e2e и smoke-тестов страниц — главный оставшийся пробел в проверяемости

@@ -56,6 +56,7 @@ frontend/
 │   ├── app/App.js           # BrowserRouter + Routes, lazy-загрузка страниц
 │   ├── shared/              # используется двумя и более страницами
 │   │   ├── LangContext.js   #   EN/RU и весь копирайт сайта
+│   │   ├── pricing.js       #   ЕДИНСТВЕННЫЙ источник цен и срока ответа
 │   │   ├── Seo.js           #   per-page title/meta/OG
 │   │   └── ChatWidget/      #   плавающий виджет заявки, есть на всех страницах
 │   ├── pages/               # hub / web / bots / apps
@@ -63,8 +64,10 @@ frontend/
 └── public/                  # статика, robots.txt, sitemap.xml, _redirects
 ```
 
-**Весь текст сайта живёт в `src/shared/LangContext.js`** — включая цены и обещания по срокам.
-Это самый частый ответ на вопрос «где поменять надпись».
+**Весь текст сайта живёт в `src/shared/LangContext.js`** — это самый частый ответ на вопрос
+«где поменять надпись». Исключение — **цены и срок ответа: они в `src/shared/pricing.js`**, и
+только там. Раньше одни и те же цифры лежали в трёх местах и разъехались; теперь все носители
+рендерят их из одного источника, а тест не даст вписать цену в UI-файл руками.
 
 ---
 
@@ -113,6 +116,7 @@ npx react-scripts test --watchAll=false --coverage \
 | `src/__tests__/netlifyRateLimit.test.js` | окно лимитера, изоляция по IP и маршруту, защита памяти |
 | `src/__tests__/netlifyValidation.test.js` | правила валидации как чистые функции |
 | `src/__tests__/routing.test.js` | таблица маршрутов `App.js`, `Link`, `useNavigate` |
+| `src/__tests__/pricing.test.js` | цены и срок ответа: формат, и что ни один UI-файл не содержит цену литералом |
 | `src/pages/web/Contact.test.js` | контактная форма в браузерном окружении |
 
 **Чего тестов нет** (чтобы не создавать ложного ощущения покрытия): страницы `/`, `/web`, `/bots`,
@@ -200,7 +204,7 @@ netlify dev               # поднимет и сайт, и функции
 | `react-scripts@5.0.1` не сопровождается | Даёт 16 из 18 предупреждений `npm audit`. Все — инструменты сборки, в браузер не попадают. См. [`DEPENDENCIES.md`](DEPENDENCIES.md) |
 | Обходные пути под react-router v7 | `jest.moduleNameMapper` в `package.json` и полифилл `TextEncoder` в `setupTests.js` — нужны только из-за старого Jest внутри react-scripts |
 | Нет lint/format | Нет `.editorconfig`, Prettier и команды `lint`; в коде 13 подавлений `react-hooks/exhaustive-deps` вокруг GSAP/Three.js-таймлайнов |
-| Цены и SLA расходятся между носителями | `LangContext.js`, `chatScenarios.js` и `Services.js` называют разные цифры. Разбор — в `audit-fixes/09-prices-sla-divergence.md` |
+| «Кастомный AI-агент» и «Кастомная автоматизация» | Две отдельные позиции с пересекающимися ценами ($2000 и $1500–2000). Один это продукт или два — из кода не следует |
 | `LangContext.js` и `Services.js` крупные | Смешивают словари, данные и компоненты |
 
 ---

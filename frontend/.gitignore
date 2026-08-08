@@ -7,6 +7,12 @@
 
 # testing
 /coverage
+# Playwright: the HTML report, and the traces/screenshots kept from failures.
+/playwright-report
+/test-results
+# Browser binaries live outside the repo, but this is where Playwright caches
+# its per-project state if a run is interrupted.
+/.playwright
 
 # production
 /build

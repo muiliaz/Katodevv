@@ -43,13 +43,13 @@ WebGL-сцена и скролл-анимации GSAP, которые `npm run 
 
 ```bash
 cd frontend
-npm ci && npm run check:env && npm run test:ci && npm run build
+npm ci && npm run check:env && npm run lint && npm run check:dead && npm run test:coverage && npm run build
 ```
 
 Это ровно то, что выполняет CI. Если хоть одна команда красная — работа не закончена.
 
-Раньше сборка требовала `CI=true` (react-scripts делал предупреждения ESLint ошибками). После
-перехода на Vite переменная не нужна, и lint-гейта в проекте сейчас нет вовсе.
+Шесть шагов: контракт переменных, линтер, поиск мёртвого кода, тесты с порогом покрытия, сборка.
+`CI=true` больше не нужна — это было поведение react-scripts.
 
 ---
 
@@ -66,6 +66,8 @@ npm ci && npm run check:env && npm run test:ci && npm run build
 | Сборка и деплой | `frontend/vite.config.mjs`, `netlify.toml`, `.github/workflows/ci.yml` |
 | Принятые предупреждения зависимостей | `frontend/DEPENDENCIES.md` |
 | История правок по аудитам | `audit-fixes/` |
+| Что не доделано | `docs/handoff.md` |
+| Принятые архитектурные решения | `docs/adr/` |
 
 ---
 
@@ -73,7 +75,7 @@ npm ci && npm run check:env && npm run test:ci && npm run build
 
 ### 🟢 Обычная работа
 
-- Тексты и переводы в `LangContext.js` — **кроме** цен и сроков ответа (см. красную зону)
+- Тексты и переводы в `LangContext.jsx` — **кроме** цен и сроков ответа (см. красную зону)
 - Стили отдельных компонентов
 - Тесты в `frontend/src/__tests__/`
 - Логика Netlify Functions — она покрыта тестами на 100% statements, регрессия будет поймана
@@ -87,7 +89,7 @@ npm ci && npm run check:env && npm run test:ci && npm run build
 | `ScrollJourney.jsx`, таймлайны GSAP | Связаны с CSS-классами через строковые селекторы. Переименование класса в CSS тихо ломает анимацию |
 | `LangContext.jsx` — структура ключей | Читается многими компонентами; обращение к несуществующему ключу — падение в рантайме, а не ошибка сборки |
 | `vite.config.mjs` | Держит три неочевидных решения: вывод в `build/` (этого ждёт Netlify), формат имён CSS-модулей и настройку Vitest. Менять — только понимая, что сломается |
-| 13 подавлений `react-hooks/exhaustive-deps` | Скорее всего осознанные, вокруг GSAP/Three.js-таймлайнов. Снятие «на автомате» даёт бесконечные ре-рендеры |
+| 5 подавлений `react-hooks/exhaustive-deps` | Осознанные, вокруг GSAP/Three.js-таймлайнов. Снятие «на автомате» даёт бесконечные ре-рендеры. Ещё 8 были мёртвыми и убраны |
 
 ### 🔴 Не менять без явного решения владельца
 
@@ -96,8 +98,7 @@ npm ci && npm run check:env && npm run test:ci && npm run build
 | **Цены и срок ответа** | Живут в одном месте — `frontend/src/shared/pricing.js`. Значения выбрал владелец; менять их — его решение, не твоё. Правь только там: `pricing.test.js` уронит сборку, если цена окажется вписана в UI-файл руками |
 | Ослабление защиты функций | Honeypot, валидация, лимит частоты и обезличивание ошибок — результат аудита безопасности. Не «упрощать» |
 | `public/robots.txt`, `sitemap.xml`, `yandex_*.html` | Обслуживают поисковики и верификацию домена, ссылок из кода нет |
-| `public/favicon-kd.svg` | Внутренних ссылок нет, но может запрашиваться по прямому URL. Требует проверки журналов |
-| Домен `katodevv.com` | Продублирован в пяти местах (`index.html`, `sitemap.xml`, `robots.txt`, `Seo.js`, `contact.js`). Менять — только все пять сразу |
+| Домен `katodevv.com` | В пяти местах; `Seo.jsx` берёт его из `shared/site.js`, остальные — литералом. `contracts.test.js` падает, если они разойдутся |
 
 ---
 
@@ -144,6 +145,9 @@ npm ci && npm run check:env && npm run test:ci && npm run build
 ---
 
 ## Текущее состояние и открытые вопросы
+
+**Что не доделано и с чего продолжать — [`docs/handoff.md`](docs/handoff.md).** Читать первым, если
+подхватываешь работу.
 
 Актуальный срез — `audit-fixes/99-summary.md`. Коротко на 2026-08-07:
 

@@ -53,11 +53,13 @@ export default defineConfig({
       // The server side is held to a much higher bar than the React side: it
       // handles every enquiry, it is cheap to test, and it has no WebGL or
       // scroll animation standing in the way.
+      // Raised on 2026-08-08 (from 32/25/22/33) after the Services section was
+      // split up and covered — see docs/handoff.md.
       thresholds: {
-        statements: 32,
-        branches:   25,
-        functions:  22,
-        lines:      33,
+        statements: 43,
+        branches:   33,
+        functions:  34,
+        lines:      45,
         'netlify/functions/**': {
           statements: 95,
           branches:   78,

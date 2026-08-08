@@ -14,12 +14,28 @@ import { PRICING, RESPONSE_SLA_HOURS, formatPrice, priceOnly } from "../shared/p
 // __dirname does not exist in ESM; Vitest exposes the module URL instead.
 const SRC = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 
-// Files that render prices or the response-time promise to a visitor.
-const SURFACES = [
-  "shared/LangContext.jsx",
-  "shared/ChatWidget/chatScenarios.js",
-  "pages/web/Services.jsx",
-];
+// Every source file under src/, rather than a hand-written list of the three
+// that carried prices in August 2026. A list goes stale the moment a file is
+// split or renamed — and it goes stale silently, which is the one thing this
+// guard must not do. Walking the tree means a new surface is covered the day it
+// is written.
+//
+// pricing.js itself is the exception: its header quotes the amounts that used
+// to disagree ("from $400–600" / "from $1500") to explain why the file exists.
+const EXCLUDED = new Set(["shared/pricing.js"]);
+
+function sourceFiles(dir = SRC, prefix = "") {
+  return fs.readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
+    const rel = prefix ? `${prefix}/${entry.name}` : entry.name;
+    if (entry.isDirectory()) {
+      return entry.name === "__tests__" ? [] : sourceFiles(path.join(dir, entry.name), rel);
+    }
+    if (!/\.jsx?$/.test(entry.name) || /\.test\.jsx?$/.test(entry.name)) return [];
+    return EXCLUDED.has(rel) ? [] : [rel];
+  });
+}
+
+const SURFACES = sourceFiles();
 
 const read = (rel) => fs.readFileSync(path.join(SRC, rel), "utf8");
 
@@ -63,20 +79,35 @@ const slaHoursIn = (src) =>
   [...src.matchAll(SLA_MENTION)].map((m) => Number(m[1] ?? m[2] ?? m[3] ?? m[4]));
 
 describe("no surface hard-codes a quoted price", () => {
-  test.each(SURFACES)("%s", (rel) => {
+  test("the walk found the source tree, so the checks below mean something", () => {
+    expect(SURFACES.length).toBeGreaterThan(20);
+    expect(SURFACES).toContain("shared/lang/en.js");
+    expect(SURFACES).toContain("shared/ChatWidget/chatScenarios.js");
+  });
+
+  test("every file goes through formatPrice instead", () => {
     // This is the guard that matters: the surfaces drifted apart because each
-    // one carried its own literal. Every one must now go through formatPrice.
-    expect(read(rel).match(QUOTED_PRICE) ?? []).toEqual([]);
+    // one carried its own literal.
+    const offenders = SURFACES.flatMap((rel) => {
+      const hits = read(rel).match(QUOTED_PRICE) ?? [];
+      return hits.map((hit) => `${rel}: ${hit.trim()}`);
+    });
+
+    expect(offenders).toEqual([]);
   });
 });
 
 describe("the response-time promise agrees everywhere", () => {
   // Kept as plain copy rather than templated, because Russian numeral
   // agreement makes interpolation fragile — so it is checked here instead.
-  test.each(SURFACES)("%s", (rel) => {
-    for (const hours of slaHoursIn(read(rel))) {
-      expect(hours).toBe(RESPONSE_SLA_HOURS);
-    }
+  test("every file that states it states the same number", () => {
+    const wrong = SURFACES.flatMap((rel) =>
+      slaHoursIn(read(rel))
+        .filter((hours) => hours !== RESPONSE_SLA_HOURS)
+        .map((hours) => `${rel}: ${hours}h`)
+    );
+
+    expect(wrong).toEqual([]);
   });
 
   test("the copy actually states it, so the check cannot pass vacuously", () => {

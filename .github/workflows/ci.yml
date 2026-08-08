@@ -71,3 +71,52 @@ jobs:
         # Vite has no such behaviour — a real lint gate would be a separate
         # step, and there is no lint config in the project yet.
         run: npm run build
+
+  # ── End-to-end ──────────────────────────────────────────────────────────────
+  #
+  # Its own job, not another step in `build`: it downloads a browser binary and
+  # renders WebGL in software, so it takes minutes where the rest takes seconds.
+  # Keeping it separate means a lint or unit failure is still reported quickly,
+  # and the two run in parallel.
+  #
+  # It needs no secrets. The Netlify function is intercepted in the test and
+  # Turnstile is stubbed — see the header of frontend/e2e/enquiry.spec.js.
+  e2e:
+    runs-on: ubuntu-24.04
+
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install the browser
+        # Chromium only — the suite declares one project, and the other two
+        # engines would triple the download for nothing. --with-deps pulls the
+        # system libraries the runner image does not ship.
+        run: npx playwright install --with-deps chromium
+
+      - name: Run end-to-end tests
+        # playwright.config.js builds the site and serves it with `vite preview`
+        # before the first test, so there is no separate build step here.
+        run: npm run test:e2e
+
+      - name: Upload the report when it fails
+        # The traces and screenshots the config keeps on failure. Without this
+        # a red run in CI can only be reproduced by guessing.
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: playwright-report
+          path: frontend/playwright-report/
+          retention-days: 7

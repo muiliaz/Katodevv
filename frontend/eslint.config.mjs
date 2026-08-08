@@ -13,7 +13,7 @@ import globals from 'globals';
 // diffs. That is a separate decision, and it should be its own commit.
 export default [
   {
-    ignores: ['build/**', 'coverage/**', 'node_modules/**'],
+    ignores: ['build/**', 'coverage/**', 'node_modules/**', 'playwright-report/**', 'test-results/**'],
   },
 
   js.configs.recommended,
@@ -72,6 +72,18 @@ export default [
     files: ['src/**/*.test.{js,jsx}', 'src/setupTests.js'],
     languageOptions: {
       globals: { ...globals.browser, ...globals.node, ...globals.vitest },
+    },
+  },
+
+  // ── Playwright: Node modules that also evaluate code inside the browser ────
+  {
+    files: ['e2e/**/*.js', 'playwright.config.js'],
+    languageOptions: {
+      ecmaVersion: 2024,
+      sourceType: 'module',
+      // page.evaluate() callbacks run in the page, so they legitimately touch
+      // window and document from inside a file that is otherwise Node.
+      globals: { ...globals.node, ...globals.browser },
     },
   },
 ];

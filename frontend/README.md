@@ -81,17 +81,16 @@ frontend/
 | `npm run build` | Production-сборка в `build/`. Той же командой собирает Netlify |
 | `npm test` | Тесты в watch-режиме |
 | `npm run test:ci` | Тесты один раз, без watch — **эта команда идёт в CI** |
+| `npm run lint` | ESLint |
+| `npm run check:dead` | Knip: недостижимые модули и лишние зависимости |
+| `npm run test:coverage` | Тесты с покрытием и порогом — **эта команда идёт в CI** |
 | `npm run check:env` | Проверяет, что все `process.env` в функциях объявлены в `.env.example` |
 
-CI (`.github/workflows/ci.yml`) выполняет ровно четыре шага, и их можно полностью воспроизвести
-локально:
+CI (`.github/workflows/ci.yml`) выполняет шесть шагов, и их можно воспроизвести локально:
 
 ```bash
-npm ci && npm run check:env && npm run test:ci && npm run build
+npm ci && npm run check:env && npm run lint && npm run check:dead && npm run test:coverage && npm run build
 ```
-
-Раньше сборка запускалась с `CI=true`, потому что react-scripts в этом режиме считал
-предупреждения ESLint ошибками. У Vite такого поведения нет, и переменная больше не нужна.
 
 ---
 
@@ -116,13 +115,16 @@ npx vitest run --coverage
 | `src/__tests__/netlifyLead.test.js` | то же для `lead.handler` + необязательные поля чат-виджета |
 | `src/__tests__/netlifyRateLimit.test.js` | окно лимитера, изоляция по IP и маршруту, защита памяти |
 | `src/__tests__/netlifyValidation.test.js` | правила валидации как чистые функции |
-| `src/__tests__/routing.test.jsx` | таблица маршрутов `App.js`, `Link`, `useNavigate` |
+| `src/__tests__/routing.test.jsx` | таблица маршрутов `App.jsx`, `Link`, `useNavigate` |
+| `src/__tests__/pages.smoke.test.jsx` | `/`, `/bots`, `/apps` рендерятся: карточки, тарифы, фичи, чат-виджет |
+| `src/__tests__/contracts.test.js` | honeypot и домен согласованы между формами, функцией и статикой |
+| `src/__tests__/netlifyTurnstile.test.js` | проверка челленджа, включая обе ветки fail-open |
 | `src/__tests__/pricing.test.js` | цены и срок ответа: формат, и что ни один UI-файл не содержит цену литералом |
 | `src/pages/web/Contact.test.jsx` | контактная форма в браузерном окружении |
 
-**Чего тестов нет** (чтобы не создавать ложного ощущения покрытия): страницы `/`, `/web`, `/bots`,
-`/apps` не рендерятся в тестах — им нужны заглушки для WebGL, canvas 2D, `ResizeObserver`,
-`matchMedia` и `scrollIntoView`. Сквозного браузерного сценария (e2e) нет.
+**Чего тестов нет** (чтобы не создавать ложного ощущения покрытия): **`/web` не рендерится** — он
+монтирует WebGL, который jsdom не даёт, а поддельный контекст прошёл бы, ничего не доказав.
+Сквозного браузерного сценария (e2e) нет.
 
 Зато доставка в Telegram проверяется почти целиком: тесты подменяют только `fetch`, а сборка
 запроса, экранирование и разбор ответа выполняются по-настоящему.
@@ -227,6 +229,8 @@ netlify dev               # поднимет и сайт, и функции
 ## Куда смотреть дальше
 
 - [`../AGENTS.md`](../AGENTS.md) — контекст и границы безопасных изменений для агентов
+- [`../docs/handoff.md`](../docs/handoff.md) — что не доделано и с чего продолжать
+- [`../docs/adr/`](../docs/adr/) — почему приняты ключевые технические решения
 - [`DEPENDENCIES.md`](DEPENDENCIES.md) — принятые предупреждения по зависимостям, с владельцем и сроком
 - [`../audit-fixes/`](../audit-fixes/) — что и почему менялось по результатам аудитов
 - [`../auditfiles/`](../auditfiles/) — сами отчёты аудитов (состояние на 2026-08-04)

@@ -1,5 +1,5 @@
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
 
 // Replaces react-scripts (create-react-app), which is unmaintained and was the
 // source of 16 of the 18 remaining npm audit findings — see DEPENDENCIES.md.
@@ -15,15 +15,15 @@ export default defineConfig({
       // Vite's default is "_button_r5200_2", which says nothing about where the
       // class came from. This keeps create-react-app's readable shape —
       // "ChatWidget_button__aB3xY" — so devtools stays as navigable as before.
-      generateScopedName: '[name]_[local]__[hash:base64:5]',
+      generateScopedName: "[name]_[local]__[hash:base64:5]",
     },
   },
 
   build: {
-    outDir: 'build',
+    outDir: "build",
     // CRA emitted these; keeping them means the Netlify deploy and any
     // bookmarked asset paths behave the same way.
-    assetsDir: 'static',
+    assetsDir: "static",
     sourcemap: false,
   },
 
@@ -33,18 +33,18 @@ export default defineConfig({
   },
 
   test: {
-    environment: 'jsdom',
+    environment: "jsdom",
     globals: true,
-    setupFiles: './src/setupTests.js',
+    setupFiles: "./src/setupTests.js",
     // The Netlify functions live outside src/, so they are not picked up by
     // the default include. Both are listed explicitly.
-    include: ['src/**/*.{test,spec}.{js,jsx}'],
+    include: ["src/**/*.{test,spec}.{js,jsx}"],
     coverage: {
-      provider: 'v8',
+      provider: "v8",
       // Covers the server-side handlers as well as the React code — the test
       // audit's complaint was that the functions were never measured at all.
-      include: ['src/**/*.{js,jsx}', 'netlify/functions/**/*.js'],
-      exclude: ['src/**/*.test.{js,jsx}', 'src/setupTests.js'],
+      include: ["src/**/*.{js,jsx}", "netlify/functions/**/*.js"],
+      exclude: ["src/**/*.test.{js,jsx}", "src/setupTests.js"],
 
       // A ratchet, not a target. Set just under what the suite currently
       // reaches, so the numbers cannot quietly slide backwards; raise them when
@@ -53,18 +53,19 @@ export default defineConfig({
       // The server side is held to a much higher bar than the React side: it
       // handles every enquiry, it is cheap to test, and it has no WebGL or
       // scroll animation standing in the way.
-      // Raised on 2026-08-08 (from 32/25/22/33) after the Services section was
-      // split up and covered — see docs/handoff.md.
+      // Raised on 2026-08-08: 32/25/22/33 -> 43/33/34/45 when the Services
+      // section was split up and covered, then again to these after the chat
+      // widget — the second path to a lead — went from 36% to 84%.
       thresholds: {
-        statements: 43,
-        branches:   33,
-        functions:  34,
-        lines:      45,
-        'netlify/functions/**': {
+        statements: 48,
+        branches: 40,
+        functions: 40,
+        lines: 50,
+        "netlify/functions/**": {
           statements: 95,
-          branches:   78,
-          functions:  90,
-          lines:      95,
+          branches: 78,
+          functions: 90,
+          lines: 95,
         },
       },
     },

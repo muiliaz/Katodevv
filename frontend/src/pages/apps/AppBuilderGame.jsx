@@ -58,7 +58,13 @@ function AppBuilderGame() {
       const el = slotRefs.current[i];
       if (!el || placed[i]) continue;
       const r = el.getBoundingClientRect();
-      if (x >= r.left - HIT_PAD && x <= r.right + HIT_PAD && y >= r.top - HIT_PAD && y <= r.bottom + HIT_PAD) return i;
+      if (
+        x >= r.left - HIT_PAD &&
+        x <= r.right + HIT_PAD &&
+        y >= r.top - HIT_PAD &&
+        y <= r.bottom + HIT_PAD
+      )
+        return i;
     }
     return null;
   };
@@ -99,7 +105,8 @@ function AppBuilderGame() {
       // Mostly sideways → browsing the strip. Mostly upward → carrying
       // the chip toward a slot (slots sit above the tray).
       dragMode.current = Math.abs(dy) < Math.abs(dx) * 0.6 ? "scroll" : "place";
-      if (dragMode.current === "place" && followerRef.current) followerRef.current.style.opacity = "1";
+      if (dragMode.current === "place" && followerRef.current)
+        followerRef.current.style.opacity = "1";
     }
 
     if (dragMode.current === "scroll") {
@@ -192,12 +199,16 @@ function AppBuilderGame() {
         {feature ? (
           <div className={`abg-filled abg-filled--${feature.key}`}>
             <span className="abg-filled-icon">{feature.icon}</span>
-            <span className="abg-filled-label">{lang === "ru" ? feature.titleRu : feature.titleEn}</span>
+            <span className="abg-filled-label">
+              {lang === "ru" ? feature.titleRu : feature.titleEn}
+            </span>
           </div>
         ) : (
           <div className="abg-slot-hint">
             <span className="abg-slot-hint-icon">{hintFeature.icon}</span>
-            <span className="abg-slot-hint-label">{lang === "ru" ? hintFeature.titleRu : hintFeature.titleEn}</span>
+            <span className="abg-slot-hint-label">
+              {lang === "ru" ? hintFeature.titleRu : hintFeature.titleEn}
+            </span>
           </div>
         )}
       </div>
@@ -206,7 +217,11 @@ function AppBuilderGame() {
 
   return (
     <div className="abg">
-      <div className={`abg-follower ${draggingKey ? "is-active" : ""}`} ref={followerRef} aria-hidden="true">
+      <div
+        className={`abg-follower ${draggingKey ? "is-active" : ""}`}
+        ref={followerRef}
+        aria-hidden="true"
+      >
         {draggingFeature ? draggingFeature.icon : ""}
       </div>
 
@@ -222,7 +237,9 @@ function AppBuilderGame() {
               {launched && result ? (
                 <>
                   <div className="abg-dash-header">
-                    {lang === "ru" ? ARCHETYPES[result.primary].titleRu : ARCHETYPES[result.primary].titleEn}
+                    {lang === "ru"
+                      ? ARCHETYPES[result.primary].titleRu
+                      : ARCHETYPES[result.primary].titleEn}
                   </div>
                   <ArchetypeDashboard archetypeKey={result.primary} />
                 </>
@@ -240,7 +257,9 @@ function AppBuilderGame() {
                       return (
                         <div key={i} className="abg-preview-row">
                           <span className="abg-preview-icon">{feature.icon}</span>
-                          <span className="abg-preview-label">{lang === "ru" ? feature.titleRu : feature.titleEn}</span>
+                          <span className="abg-preview-label">
+                            {lang === "ru" ? feature.titleRu : feature.titleEn}
+                          </span>
                         </div>
                       );
                     })}
@@ -253,10 +272,18 @@ function AppBuilderGame() {
           {!launched && (
             <div className="abg-progress">
               <div className="abg-progress-track">
-                <div className="abg-progress-fill" style={{ width: `${(filledCount / SLOTS.length) * 100}%` }} />
-                <div className="abg-progress-marker" style={{ left: `${(MIN_TO_LAUNCH / SLOTS.length) * 100}%` }} />
+                <div
+                  className="abg-progress-fill"
+                  style={{ width: `${(filledCount / SLOTS.length) * 100}%` }}
+                />
+                <div
+                  className="abg-progress-marker"
+                  style={{ left: `${(MIN_TO_LAUNCH / SLOTS.length) * 100}%` }}
+                />
               </div>
-              <span className="abg-progress-label">{filledCount}/{SLOTS.length}</span>
+              <span className="abg-progress-label">
+                {filledCount}/{SLOTS.length}
+              </span>
             </div>
           )}
         </div>
@@ -270,7 +297,13 @@ function AppBuilderGame() {
         <div className="abg-tray">
           <div className="abg-tray-hint">{armedKey ? a.armedHint : a.dragHint}</div>
           <div className="abg-chips-row">
-            <button className="abg-chips-nav abg-chips-nav--prev" onClick={() => scrollChips(-1)} aria-label="Previous">‹</button>
+            <button
+              className="abg-chips-nav abg-chips-nav--prev"
+              onClick={() => scrollChips(-1)}
+              aria-label="Previous"
+            >
+              ‹
+            </button>
             <div className="abg-chips" ref={chipsRef}>
               {availableFeatures.map((feature) => (
                 <div
@@ -282,11 +315,19 @@ function AppBuilderGame() {
                   onPointerCancel={endDrag}
                 >
                   <span className="abg-chip-icon">{feature.icon}</span>
-                  <span className="abg-chip-label">{lang === "ru" ? feature.titleRu : feature.titleEn}</span>
+                  <span className="abg-chip-label">
+                    {lang === "ru" ? feature.titleRu : feature.titleEn}
+                  </span>
                 </div>
               ))}
             </div>
-            <button className="abg-chips-nav abg-chips-nav--next" onClick={() => scrollChips(1)} aria-label="Next">›</button>
+            <button
+              className="abg-chips-nav abg-chips-nav--next"
+              onClick={() => scrollChips(1)}
+              aria-label="Next"
+            >
+              ›
+            </button>
           </div>
 
           <button className="abg-launch" disabled={!canLaunch} onClick={handleLaunch}>
@@ -300,10 +341,15 @@ function AppBuilderGame() {
           <div className="abg-result-eyebrow">{a.resultEyebrow}</div>
           <div className="abg-result-icon">{ARCHETYPES[result.primary].icon}</div>
           <h3 className="abg-result-title">
-            {lang === "ru" ? ARCHETYPES[result.primary].titleRu : ARCHETYPES[result.primary].titleEn}
+            {lang === "ru"
+              ? ARCHETYPES[result.primary].titleRu
+              : ARCHETYPES[result.primary].titleEn}
             {result.secondary && (
               <span className="abg-result-hybrid">
-                {" × "}{lang === "ru" ? ARCHETYPES[result.secondary].titleRu : ARCHETYPES[result.secondary].titleEn}
+                {" × "}
+                {lang === "ru"
+                  ? ARCHETYPES[result.secondary].titleRu
+                  : ARCHETYPES[result.secondary].titleEn}
               </span>
             )}
           </h3>
@@ -320,7 +366,9 @@ function AppBuilderGame() {
             >
               {a.cta} →
             </button>
-            <button className="abg-result-reset" onClick={handleReset}>{a.resetBtn}</button>
+            <button className="abg-result-reset" onClick={handleReset}>
+              {a.resetBtn}
+            </button>
           </div>
         </div>
       )}

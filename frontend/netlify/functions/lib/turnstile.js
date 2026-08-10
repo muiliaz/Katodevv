@@ -19,15 +19,15 @@
 // The trade is: a config mistake costs protection, not revenue. It is logged
 // loudly so the mistake is visible in the function logs.
 
-const VERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
+const VERIFY_URL = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
 
 // Cloudflare's own testing keys. If one of these is configured we are on a
 // staging setup that always passes; worth saying so in the logs rather than
 // letting someone believe the real thing is running.
 const TEST_SECRETS = new Set([
-  '1x0000000000000000000000000000000AA',
-  '2x0000000000000000000000000000000AA',
-  '3x0000000000000000000000000000000AA',
+  "1x0000000000000000000000000000000AA",
+  "2x0000000000000000000000000000000AA",
+  "3x0000000000000000000000000000000AA",
 ]);
 
 /**
@@ -43,42 +43,42 @@ async function verifyTurnstile(token, ip) {
 
   if (!secret) {
     console.warn(
-      'turnstile: TURNSTILE_SECRET_KEY is not set — skipping verification. ' +
-      'The forms are protected only by validation, the honeypot and the rate limiter.'
+      "turnstile: TURNSTILE_SECRET_KEY is not set — skipping verification. " +
+        "The forms are protected only by validation, the honeypot and the rate limiter."
     );
-    return { ok: true, reason: 'not-configured' };
+    return { ok: true, reason: "not-configured" };
   }
 
   if (TEST_SECRETS.has(secret)) {
-    console.warn('turnstile: a Cloudflare test secret is configured; every token will pass.');
+    console.warn("turnstile: a Cloudflare test secret is configured; every token will pass.");
   }
 
-  if (!token) return { ok: false, reason: 'missing-token' };
+  if (!token) return { ok: false, reason: "missing-token" };
 
   const body = new URLSearchParams({ secret, response: token });
-  if (ip) body.append('remoteip', ip);
+  if (ip) body.append("remoteip", ip);
 
   let data;
   try {
     const res = await fetch(VERIFY_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body,
     });
     data = await res.json();
   } catch (err) {
     // Cloudflare unreachable. Same reasoning as the unconfigured case: an
     // outage on their side must not take the enquiry form down with it.
-    console.error('turnstile: verification request failed, letting the request through:', err);
-    return { ok: true, reason: 'verify-unreachable' };
+    console.error("turnstile: verification request failed, letting the request through:", err);
+    return { ok: true, reason: "verify-unreachable" };
   }
 
   if (data?.success) return { ok: true };
 
   // error-codes is Cloudflare's own vocabulary, e.g. invalid-input-response,
   // timeout-or-duplicate. Useful in the logs, never returned to the caller.
-  const codes = Array.isArray(data?.['error-codes']) ? data['error-codes'].join(', ') : 'unknown';
-  console.warn('turnstile: token rejected —', codes);
+  const codes = Array.isArray(data?.["error-codes"]) ? data["error-codes"].join(", ") : "unknown";
+  console.warn("turnstile: token rejected —", codes);
   return { ok: false, reason: codes };
 }
 

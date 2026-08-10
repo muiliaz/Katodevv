@@ -73,7 +73,8 @@ const QUOTED_PRICE = /(?:^|[^\p{L}])(?:от|from)\s*\$\s*\d/giu;
 
 // The promise, in the four shapes the copy uses: "within 24 hours",
 // "24h response time", "в течение 24 часов", "за 24 часа".
-const SLA_MENTION = /(?:within\s+(\d+)\s*hours?|(\d+)\s*h\s+response|в течение\s+(\d+)\s*час|за\s+(\d+)\s*час)/gi;
+const SLA_MENTION =
+  /(?:within\s+(\d+)\s*hours?|(\d+)\s*h\s+response|в течение\s+(\d+)\s*час|за\s+(\d+)\s*час)/gi;
 
 const slaHoursIn = (src) =>
   [...src.matchAll(SLA_MENTION)].map((m) => Number(m[1] ?? m[2] ?? m[3] ?? m[4]));

@@ -1,32 +1,38 @@
 import { vi } from "vitest";
 // Tests for the public lead endpoint — the one the chat widget and the /bots
 // modal post to. See netlifyContact.test.js for why only fetch is stubbed.
-import { GENERIC_ERROR, INVALID_JSON, TOO_MANY_REQUESTS } from "../../netlify/functions/lib/responses";
+import {
+  GENERIC_ERROR,
+  INVALID_JSON,
+  TOO_MANY_REQUESTS,
+} from "../../netlify/functions/lib/responses";
 import { MAX_REQUESTS } from "../../netlify/functions/lib/rateLimit";
 import { handler as contactHandler } from "../../netlify/functions/contact";
 import { handler } from "../../netlify/functions/lead";
 
 // Shaped like what ChatWidget actually collects: see chatScenarios.js.
 const validLead = {
-  type:        "project",
+  type: "project",
   projectType: "Сайт",
-  budget:      "$1000–3000",
-  deadline:    "Месяц",
-  contact:     "@ada",
-  timestamp:   "05.08.2026, 12:00",
+  budget: "$1000–3000",
+  deadline: "Месяц",
+  contact: "@ada",
+  timestamp: "05.08.2026, 12:00",
 };
 
 // Own address per test — see netlifyContact.test.js for why resetting the
 // limiter's shared state is not enough here.
 let testNo = 100;
-beforeEach(() => { testNo += 1; });
+beforeEach(() => {
+  testNo += 1;
+});
 const currentIp = () => `198.51.100.${testNo - 100}`;
 
 function post(body, ip = currentIp()) {
   return handler({
     httpMethod: "POST",
-    headers:    { "x-nf-client-connection-ip": ip },
-    body:       typeof body === "string" ? body : JSON.stringify(body),
+    headers: { "x-nf-client-connection-ip": ip },
+    body: typeof body === "string" ? body : JSON.stringify(body),
   });
 }
 
@@ -149,9 +155,11 @@ describe("rate limiting", () => {
     for (let i = 0; i < MAX_REQUESTS; i++) {
       await contactHandler({
         httpMethod: "POST",
-        headers:    { "x-nf-client-connection-ip": "203.0.113.77" },
-        body:       JSON.stringify({
-          name: "Ada", email: "ada@example.com", message: "I need a landing page for my shop.",
+        headers: { "x-nf-client-connection-ip": "203.0.113.77" },
+        body: JSON.stringify({
+          name: "Ada",
+          email: "ada@example.com",
+          message: "I need a landing page for my shop.",
         }),
       });
     }

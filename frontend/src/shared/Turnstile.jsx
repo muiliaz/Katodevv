@@ -1,12 +1,12 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef } from "react";
 
 // Cloudflare Turnstile widget.
 //
 // The site key is public by design — it ships in the HTML of every page that
 // renders the widget. The secret half lives only in Netlify's environment.
-export const TURNSTILE_SITE_KEY = '0x4AAAAAAEJJzvmQ68Iwf0jI';
+export const TURNSTILE_SITE_KEY = "0x4AAAAAAEJJzvmQ68Iwf0jI";
 
-const SCRIPT_SRC = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+const SCRIPT_SRC = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
 
 // One script for the whole page, however many widgets ask for it. Kept as a
 // module-level promise so simultaneous mounts share a single load.
@@ -18,7 +18,7 @@ function loadScript() {
   scriptPromise = new Promise((resolve, reject) => {
     if (window.turnstile) return resolve(window.turnstile);
 
-    const el = document.createElement('script');
+    const el = document.createElement("script");
     el.src = SCRIPT_SRC;
     el.async = true;
     el.defer = true;
@@ -26,7 +26,7 @@ function loadScript() {
     el.onerror = () => {
       // Let a later mount try again rather than caching the failure forever.
       scriptPromise = null;
-      reject(new Error('Turnstile script failed to load'));
+      reject(new Error("Turnstile script failed to load"));
     };
     document.head.appendChild(el);
   });
@@ -43,7 +43,7 @@ function loadScript() {
  * onToken is called with a string when a token is issued, and with null when it
  * expires or the check fails — so the parent can disable submit if it wants to.
  */
-export default function Turnstile({ onToken, theme = 'dark', appearance = 'interaction-only' }) {
+export default function Turnstile({ onToken, theme = "dark", appearance = "interaction-only" }) {
   const holder = useRef(null);
   const widgetId = useRef(null);
   // Kept in a ref so re-renders of the parent never re-create the widget:
@@ -69,9 +69,9 @@ export default function Turnstile({ onToken, theme = 'dark', appearance = 'inter
           // It is a display mode, not a weaker check: the token is issued and
           // verified exactly the same way.
           appearance,
-          callback:         (token) => cb.current?.(token),
-          'expired-callback': () => cb.current?.(null),
-          'error-callback':   () => cb.current?.(null),
+          callback: (token) => cb.current?.(token),
+          "expired-callback": () => cb.current?.(null),
+          "error-callback": () => cb.current?.(null),
         });
       })
       .catch(() => {

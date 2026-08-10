@@ -10,9 +10,9 @@
 // They are deliberately behavioural rather than structural: not one of them
 // names a module path, so they keep meaning after the move.
 import { vi } from "vitest";
-import { render, screen, within, act } from "@testing-library/react";
+import { render, screen, within, act, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { LangProvider, T } from "../../shared/LangContext";
+import { LangProvider, T, useLang } from "../../shared/LangContext";
 import { formatPrice } from "../../shared/pricing";
 import Services from "./Services";
 
@@ -164,8 +164,57 @@ describe("the bot card's hover terminal", () => {
     await userEvent.unhover(card);
     // The teardown runs inside a GSAP tween's onComplete, so it lands a frame
     // or two later rather than synchronously with the mouseleave.
-    await act(() => vi.waitFor(() =>
-      expect(container.querySelector(".bot-terminal").textContent).toBe("")
-    ));
+    await act(() =>
+      vi.waitFor(() => expect(container.querySelector(".bot-terminal").textContent).toBe(""))
+    );
+  });
+});
+
+// Last in the file on purpose: this block runs on fake timers, and GSAP's
+// ticker does not come back in step for whatever runs after it.
+describe("the bot demo's scripted conversation", () => {
+  test("restarts in the new language instead of interleaving the two", async () => {
+    vi.useFakeTimers();
+    try {
+      // A LangProvider with the switch exposed, so the test can do what a
+      // visitor does from the navbar.
+      function Harness() {
+        const { setLang } = useLang();
+        return (
+          <>
+            <button onClick={() => setLang("ru")}>switch</button>
+            <Services />
+          </>
+        );
+      }
+
+      render(
+        <LangProvider>
+          <Harness />
+        </LangProvider>
+      );
+
+      await act(async () => {
+        fireEvent.click(cardTitled("Bots / AI Bots"));
+      });
+      // Far enough in for the first two English lines to have landed.
+      await act(async () => {
+        vi.advanceTimersByTime(2100);
+      });
+      expect(screen.getByText(T.en.services.botScript[0].text)).toBeInTheDocument();
+
+      await act(async () => {
+        fireEvent.click(screen.getByRole("button", { name: "switch" }));
+      });
+      await act(async () => {
+        vi.advanceTimersByTime(2100);
+      });
+
+      // The English lines are gone rather than sitting above the Russian ones.
+      expect(screen.queryByText(T.en.services.botScript[0].text)).not.toBeInTheDocument();
+      expect(screen.getByText(T.ru.services.botScript[0].text)).toBeInTheDocument();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });

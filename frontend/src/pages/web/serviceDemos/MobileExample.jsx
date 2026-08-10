@@ -12,10 +12,16 @@ function MobileExample() {
   return (
     <div className="mobile-demo-wrap">
       <div className="platform-tabs">
-        <button className={`platform-tab ${platform === "ios" ? "active" : ""}`} onClick={() => setPlatform("ios")}>
+        <button
+          className={`platform-tab ${platform === "ios" ? "active" : ""}`}
+          onClick={() => setPlatform("ios")}
+        >
           {d.tabs[0]}
         </button>
-        <button className={`platform-tab ${platform === "android" ? "active" : ""}`} onClick={() => setPlatform("android")}>
+        <button
+          className={`platform-tab ${platform === "android" ? "active" : ""}`}
+          onClick={() => setPlatform("android")}
+        >
           {d.tabs[1]}
         </button>
       </div>
@@ -37,7 +43,7 @@ function MobileExample() {
                   <div className="ios-balance-change">{d.balanceChange}</div>
                 </div>
                 <div className="ios-actions">
-                  {d.actions.map(a => (
+                  {d.actions.map((a) => (
                     <div className="ios-action" key={a}>
                       <span className="ios-action-icon">{a.split(" ")[0]}</span>
                       <span className="ios-action-label">{a.split(" ").slice(1).join(" ")}</span>
@@ -45,7 +51,7 @@ function MobileExample() {
                   ))}
                 </div>
                 <div className="ios-section-title">{d.txTitle}</div>
-                {d.txItems.map(tx => (
+                {d.txItems.map((tx) => (
                   <div className="ios-tx" key={tx.name}>
                     <div className="ios-tx-icon">{tx.icon}</div>
                     <div className="ios-tx-name">{tx.name}</div>
@@ -72,25 +78,31 @@ function MobileExample() {
                     <div className="android-delivery-badge">{d.deliveryBadge}</div>
                     <div className="android-delivery-title">{d.deliveryTitle}</div>
                     <div className="android-delivery-eta">{d.deliveryEta}</div>
-                    <div className="android-progress-bar"><div className="android-progress-fill" /></div>
+                    <div className="android-progress-bar">
+                      <div className="android-progress-fill" />
+                    </div>
                   </div>
                 </div>
                 <div className="android-cats">
-                  {d.cats.map(c => (
-                    <div className="android-cat" key={c}>{c}</div>
+                  {d.cats.map((c) => (
+                    <div className="android-cat" key={c}>
+                      {c}
+                    </div>
                   ))}
                 </div>
                 <div className="android-section-title">{d.popularTitle}</div>
                 <div className="android-restaurants">
                   {[
-                    { icon:"🍕", name:"Napoli Pizza", rating:"4.8", time:"20 min" },
-                    { icon:"🍣", name:"Tokyo Rolls",  rating:"4.9", time:"30 min" },
-                  ].map(r => (
+                    { icon: "🍕", name: "Napoli Pizza", rating: "4.8", time: "20 min" },
+                    { icon: "🍣", name: "Tokyo Rolls", rating: "4.9", time: "30 min" },
+                  ].map((r) => (
                     <div className="android-rest" key={r.name}>
                       <div className="android-rest-icon">{r.icon}</div>
                       <div className="android-rest-info">
                         <div className="android-rest-name">{r.name}</div>
-                        <div className="android-rest-meta">⭐{r.rating} · {r.time}</div>
+                        <div className="android-rest-meta">
+                          ⭐{r.rating} · {r.time}
+                        </div>
                       </div>
                       <div className="android-rest-order">{d.orderBtn}</div>
                     </div>
@@ -99,7 +111,10 @@ function MobileExample() {
               </div>
             </div>
             <div className="android-nav-bar">
-              <span>🏠</span><span>🔍</span><span>📦</span><span>👤</span>
+              <span>🏠</span>
+              <span>🔍</span>
+              <span>📦</span>
+              <span>👤</span>
             </div>
           </div>
         )}

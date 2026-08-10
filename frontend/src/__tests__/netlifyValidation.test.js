@@ -8,8 +8,8 @@ import {
 } from "../../netlify/functions/lib/validation";
 
 const validContact = {
-  name:    "Ada",
-  email:   "ada@example.com",
+  name: "Ada",
+  email: "ada@example.com",
   message: "I need a landing page for my shop.",
 };
 
@@ -49,11 +49,11 @@ describe("validateLead", () => {
   test("accepts a lead from the chat widget", () => {
     expect(
       validateLead({
-        type:        "project",
+        type: "project",
         projectType: "Сайт",
-        budget:      "$1000–3000",
-        deadline:    "Месяц",
-        contact:     "@ada",
+        budget: "$1000–3000",
+        deadline: "Месяц",
+        contact: "@ada",
       })
     ).toEqual([]);
   });
@@ -63,8 +63,6 @@ describe("validateLead", () => {
   });
 
   test("caps the free-text field", () => {
-    expect(
-      validateLead({ contact: "@ada", freeText: "x".repeat(5001) })
-    ).not.toEqual([]);
+    expect(validateLead({ contact: "@ada", freeText: "x".repeat(5001) })).not.toEqual([]);
   });
 });

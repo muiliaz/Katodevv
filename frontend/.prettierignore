@@ -1,0 +1,20 @@
+# Not ours to format.
+node_modules
+build
+coverage
+playwright-report
+test-results
+package-lock.json
+
+# The GLSL lives in template literals inside this file. Prettier does not parse
+# shader source, and reflowing the JavaScript around it reindents the shaders
+# into something no longer readable as GLSL. The scene is also the one part of
+# the project with no test that would catch a mistake here.
+src/pages/web/BlackHole/BlackHole.jsx
+
+# Markdown, deliberately. Prettier pads table cells to a width it computes from
+# code points, and Cyrillic content comes out misaligned — the separator row
+# ends up wider than the rows it separates, which is worse than the hand-written
+# source. It does not manage prose width either (proseWrap stays "preserve"),
+# so there is nothing left for it to do here.
+*.md

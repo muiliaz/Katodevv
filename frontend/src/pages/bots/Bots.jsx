@@ -12,7 +12,12 @@ import "./Bots.css";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const CASE_VISUAL_KIND = { "tg-bot": "chat", "ai-bot": "pulse", "mini-app": "grid", "booking-bot": "calendar" };
+const CASE_VISUAL_KIND = {
+  "tg-bot": "chat",
+  "ai-bot": "pulse",
+  "mini-app": "grid",
+  "booking-bot": "calendar",
+};
 
 // Language-agnostic glyphs for the "how it works" pipeline, in order.
 const FLOW_ICONS = ["💬", "⚡", "📋", "🔁"];
@@ -35,29 +40,37 @@ const OFFER_ACCENTS = {
   "automation-pro": "#FFB000",
 };
 function CaseVisual({ kind }) {
-  if (kind === "chat") return (
-    <div className="bots-case-visual bots-case-visual--chat" aria-hidden="true">
-      <span className="bcv-bubble bcv-bubble-a" />
-      <span className="bcv-bubble bcv-bubble-b" />
-    </div>
-  );
-  if (kind === "pulse") return (
-    <div className="bots-case-visual bots-case-visual--pulse" aria-hidden="true">
-      {Array.from({ length: 5 }).map((_, i) => <span className="bcv-bar" key={i} />)}
-    </div>
-  );
-  if (kind === "grid") return (
-    <div className="bots-case-visual bots-case-visual--grid" aria-hidden="true">
-      {Array.from({ length: 4 }).map((_, i) => <span className="bcv-tile" key={i} />)}
-    </div>
-  );
-  if (kind === "calendar") return (
-    <div className="bots-case-visual bots-case-visual--calendar" aria-hidden="true">
-      {Array.from({ length: 9 }).map((_, i) => (
-        <span className={`bcv-cell ${i === 4 ? "bcv-cell--active" : ""}`} key={i} />
-      ))}
-    </div>
-  );
+  if (kind === "chat")
+    return (
+      <div className="bots-case-visual bots-case-visual--chat" aria-hidden="true">
+        <span className="bcv-bubble bcv-bubble-a" />
+        <span className="bcv-bubble bcv-bubble-b" />
+      </div>
+    );
+  if (kind === "pulse")
+    return (
+      <div className="bots-case-visual bots-case-visual--pulse" aria-hidden="true">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <span className="bcv-bar" key={i} />
+        ))}
+      </div>
+    );
+  if (kind === "grid")
+    return (
+      <div className="bots-case-visual bots-case-visual--grid" aria-hidden="true">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <span className="bcv-tile" key={i} />
+        ))}
+      </div>
+    );
+  if (kind === "calendar")
+    return (
+      <div className="bots-case-visual bots-case-visual--calendar" aria-hidden="true">
+        {Array.from({ length: 9 }).map((_, i) => (
+          <span className={`bcv-cell ${i === 4 ? "bcv-cell--active" : ""}`} key={i} />
+        ))}
+      </div>
+    );
   return null;
 }
 
@@ -78,7 +91,9 @@ function OfferCard({ o, lang, onMouseMove, onStart, cta }) {
         <p>{o.desc}</p>
         <div className="bots-offer-footer">
           <span className="bots-offer-price">{o.price}</span>
-          <button className="bots-offer-cta" onClick={onStart}>{cta} →</button>
+          <button className="bots-offer-cta" onClick={onStart}>
+            {cta} →
+          </button>
         </div>
       </div>
     </div>
@@ -94,7 +109,9 @@ function Bots() {
   }));
   const pageRef = useRef(null);
   const [modalOffer, setModalOffer] = useState(null);
-  const [reducedMotion] = useState(() => window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  const [reducedMotion] = useState(
+    () => window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  );
 
   const scrollToPillars = (e) => {
     e.preventDefault();
@@ -121,7 +138,8 @@ function Bots() {
         ScrollTrigger.batch(els, {
           start: "top 88%",
           once: true,
-          onEnter: (batch) => gsap.to(batch, { opacity: 1, y: 0, duration: 0.8, ease: "power3.out", stagger: 0.09 }),
+          onEnter: (batch) =>
+            gsap.to(batch, { opacity: 1, y: 0, duration: 0.8, ease: "power3.out", stagger: 0.09 }),
         });
       });
     }, pageRef);
@@ -144,9 +162,19 @@ function Bots() {
           <span className="bots-back-arrow">←</span> KATO DEVV
         </Link>
         <div className="bots-lang">
-          <button className={`bots-lang-btn ${lang === "en" ? "active" : ""}`} onClick={() => setLang("en")}>ENG</button>
+          <button
+            className={`bots-lang-btn ${lang === "en" ? "active" : ""}`}
+            onClick={() => setLang("en")}
+          >
+            ENG
+          </button>
           <span className="bots-lang-sep" />
-          <button className={`bots-lang-btn ${lang === "ru" ? "active" : ""}`} onClick={() => setLang("ru")}>RU</button>
+          <button
+            className={`bots-lang-btn ${lang === "ru" ? "active" : ""}`}
+            onClick={() => setLang("ru")}
+          >
+            RU
+          </button>
         </div>
       </header>
 
@@ -164,13 +192,18 @@ function Bots() {
         <div className="bots-copy">
           <div className="bots-eyebrow">{b.eyebrow}</div>
           <h1 className="bots-headline">
-            {b.headlineLead}<br />
+            {b.headlineLead}
+            <br />
             <span className="bots-headline-hot">{b.headlineHot}</span>
           </h1>
           <p className="bots-subtitle">{b.subtitle}</p>
           <div className="bots-cta-row">
-            <button className="bots-cta-primary" onClick={openChat}>{b.cta} →</button>
-            <a href="#bots-pillars" className="bots-cta-secondary" onClick={scrollToPillars}>{b.secondaryCta}</a>
+            <button className="bots-cta-primary" onClick={openChat}>
+              {b.cta} →
+            </button>
+            <a href="#bots-pillars" className="bots-cta-secondary" onClick={scrollToPillars}>
+              {b.secondaryCta}
+            </a>
           </div>
           <div className="bots-comingsoon">
             <img src="/kato-avatar.png" alt="" className="bots-comingsoon-icon" />
@@ -183,12 +216,22 @@ function Bots() {
         <div className="bots-flow-eyebrow">{b.flowEyebrow}</div>
         <h2 className="bots-flow-title">{b.flowTitle}</h2>
         <div className="bots-flow-grid">
-          <svg className="bots-flow-path" viewBox="0 0 400 56" preserveAspectRatio="none" aria-hidden="true">
+          <svg
+            className="bots-flow-path"
+            viewBox="0 0 400 56"
+            preserveAspectRatio="none"
+            aria-hidden="true"
+          >
             <path
               d="M 50 14 C 90 14, 110 42, 150 42 C 190 42, 210 14, 250 14 C 290 14, 310 42, 350 42"
               className="bots-flow-path-line"
             />
-            {[[50, 14], [150, 42], [250, 14], [350, 42]].map(([cx, cy]) => (
+            {[
+              [50, 14],
+              [150, 42],
+              [250, 14],
+              [350, 42],
+            ].map(([cx, cy]) => (
               <circle key={cx} cx={cx} cy={cy} r="3" className="bots-flow-path-node" />
             ))}
             {!reducedMotion && (
@@ -218,12 +261,26 @@ function Bots() {
         <div className="bots-offers-grid">
           <div className="bots-offers-row">
             {offers.slice(0, 3).map((o) => (
-              <OfferCard key={o.id} o={o} lang={lang} onMouseMove={onOfferMouseMove} onStart={() => setModalOffer(o)} cta={b.cta} />
+              <OfferCard
+                key={o.id}
+                o={o}
+                lang={lang}
+                onMouseMove={onOfferMouseMove}
+                onStart={() => setModalOffer(o)}
+                cta={b.cta}
+              />
             ))}
           </div>
           <div className="bots-offers-row bots-offers-row-2">
             {offers.slice(3, 5).map((o) => (
-              <OfferCard key={o.id} o={o} lang={lang} onMouseMove={onOfferMouseMove} onStart={() => setModalOffer(o)} cta={b.cta} />
+              <OfferCard
+                key={o.id}
+                o={o}
+                lang={lang}
+                onMouseMove={onOfferMouseMove}
+                onStart={() => setModalOffer(o)}
+                cta={b.cta}
+              />
             ))}
           </div>
         </div>
@@ -249,7 +306,9 @@ function StartProjectModal({ offer, copy, onClose }) {
   const [turnstileToken, setTurnstileToken] = useState(null);
 
   useEffect(() => {
-    const onKey = (e) => { if (e.key === "Escape") onClose(); };
+    const onKey = (e) => {
+      if (e.key === "Escape") onClose();
+    };
     window.addEventListener("keydown", onKey);
     document.body.style.overflow = "hidden";
     return () => {
@@ -284,9 +343,16 @@ function StartProjectModal({ offer, copy, onClose }) {
   };
 
   return (
-    <div className="bots-modal-overlay" onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}>
+    <div
+      className="bots-modal-overlay"
+      onMouseDown={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
       <div className="bots-modal" role="dialog" aria-modal="true" aria-label={copy.title}>
-        <button className="bots-modal-close" onClick={onClose} aria-label="Close">×</button>
+        <button className="bots-modal-close" onClick={onClose} aria-label="Close">
+          ×
+        </button>
         <div className="bots-modal-tag">{offer.name}</div>
         <h3 className="bots-modal-title">{copy.title}</h3>
 
@@ -309,15 +375,32 @@ function StartProjectModal({ offer, copy, onClose }) {
             </div>
             <label className="bots-modal-field">
               <span>{copy.nameLabel}</span>
-              <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder={copy.namePlaceholder} required />
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder={copy.namePlaceholder}
+                required
+              />
             </label>
             <label className="bots-modal-field">
               <span>{copy.emailLabel}</span>
-              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder={copy.emailPlaceholder} required />
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder={copy.emailPlaceholder}
+                required
+              />
             </label>
             <label className="bots-modal-field">
               <span>{copy.ideaLabel}</span>
-              <textarea value={idea} onChange={(e) => setIdea(e.target.value)} placeholder={copy.ideaPlaceholder} rows={3} />
+              <textarea
+                value={idea}
+                onChange={(e) => setIdea(e.target.value)}
+                placeholder={copy.ideaPlaceholder}
+                rows={3}
+              />
             </label>
             {status === "error" && <p className="bots-modal-status is-error">{copy.error}</p>}
             <Turnstile onToken={setTurnstileToken} />

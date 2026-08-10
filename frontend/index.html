@@ -1,91 +1,103 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- Primary Meta -->
-  <title>Kato Devv — Web & Mobile Development Agency</title>
-  <meta name="description" content="Kato Devv — we build websites, mobile apps, automation systems and AI bots that drive real results for modern businesses." />
-  <meta name="keywords" content="web development, mobile apps, AI bots, automation, React, Node.js, Kyrgyzstan" />
+    <!-- Primary Meta -->
+    <title>Kato Devv — Web & Mobile Development Agency</title>
+    <meta
+      name="description"
+      content="Kato Devv — we build websites, mobile apps, automation systems and AI bots that drive real results for modern businesses."
+    />
+    <meta
+      name="keywords"
+      content="web development, mobile apps, AI bots, automation, React, Node.js, Kyrgyzstan"
+    />
 
-  <!-- Open Graph -->
-  <meta property="og:type"        content="website" />
-  <meta property="og:title"       content="Kato Devv — Web & Mobile Development Agency" />
-  <meta property="og:description" content="We build websites, mobile apps, automation systems and AI bots that drive real results for modern businesses." />
-  <meta property="og:image"       content="https://katodevv.com/og-image.png" />
-  <meta property="og:url"         content="https://katodevv.com" />
-  <meta property="og:site_name"   content="Kato Devv" />
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Kato Devv — Web & Mobile Development Agency" />
+    <meta
+      property="og:description"
+      content="We build websites, mobile apps, automation systems and AI bots that drive real results for modern businesses."
+    />
+    <meta property="og:image" content="https://katodevv.com/og-image.png" />
+    <meta property="og:url" content="https://katodevv.com" />
+    <meta property="og:site_name" content="Kato Devv" />
 
-  <!-- Twitter Card -->
-  <meta name="twitter:card"        content="summary_large_image" />
-  <meta name="twitter:title"       content="Kato Devv — Web & Mobile Development Agency" />
-  <meta name="twitter:description" content="We build websites, mobile apps, automation systems and AI bots." />
-  <meta name="twitter:image"       content="https://katodevv.com/og-image.png" />
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Kato Devv — Web & Mobile Development Agency" />
+    <meta
+      name="twitter:description"
+      content="We build websites, mobile apps, automation systems and AI bots."
+    />
+    <meta name="twitter:image" content="https://katodevv.com/og-image.png" />
 
-  <!-- Canonical -->
-  <link rel="canonical" href="https://katodevv.com/" />
+    <!-- Canonical -->
+    <link rel="canonical" href="https://katodevv.com/" />
 
-  <!-- Favicon -->
-  <link rel="icon" type="image/png" href="/favicon-kd.png" id="favicon" />
-  <link rel="apple-touch-icon" href="/favicon-kd.png" />
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/favicon-kd.png" id="favicon" />
+    <link rel="apple-touch-icon" href="/favicon-kd.png" />
 
-  <!-- Structured data -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    "name": "Kato Devv",
-    "url": "https://katodevv.com",
-    "logo": "https://katodevv.com/logo-kd.png",
-    "description": "Kato Devv — we build websites, mobile apps, automation systems and AI bots that drive real results for modern businesses.",
-    "sameAs": [
-      "https://instagram.com/katodevv",
-      "https://t.me/katodevv"
-    ]
-  }
-  </script>
+    <!-- Structured data -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "Kato Devv",
+        "url": "https://katodevv.com",
+        "logo": "https://katodevv.com/logo-kd.png",
+        "description": "Kato Devv — we build websites, mobile apps, automation systems and AI bots that drive real results for modern businesses.",
+        "sameAs": ["https://instagram.com/katodevv", "https://t.me/katodevv"]
+      }
+    </script>
 
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Cormorant+Garamond:wght@300;400&family=JetBrains+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap">
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Cormorant+Garamond:wght@300;400&family=JetBrains+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap"
+    />
 
-  <script>
-    /* Prevent FOUC on dark background */
-    document.documentElement.style.background = "#000000";
+    <script>
+      /* Prevent FOUC on dark background */
+      document.documentElement.style.background = "#000000";
 
-    /* Rounded favicon via canvas */
-    (function() {
-      var img = new Image();
-      img.onload = function() {
-        var size = 64;
-        var radius = 14;
-        var canvas = document.createElement("canvas");
-        canvas.width = size;
-        canvas.height = size;
-        var ctx = canvas.getContext("2d");
-        ctx.beginPath();
-        ctx.moveTo(radius, 0);
-        ctx.lineTo(size - radius, 0);
-        ctx.quadraticCurveTo(size, 0, size, radius);
-        ctx.lineTo(size, size - radius);
-        ctx.quadraticCurveTo(size, size, size - radius, size);
-        ctx.lineTo(radius, size);
-        ctx.quadraticCurveTo(0, size, 0, size - radius);
-        ctx.lineTo(0, radius);
-        ctx.quadraticCurveTo(0, 0, radius, 0);
-        ctx.closePath();
-        ctx.clip();
-        ctx.drawImage(img, 0, 0, size, size);
-        var link = document.getElementById("favicon");
-        link.href = canvas.toDataURL("image/png");
-      };
-      img.src = "/favicon-kd.png";
-    })();
-  </script>
-</head>
-<body>
-  <div id="root"></div>
-  <script type="module" src="/src/index.jsx"></script>
-</body>
+      /* Rounded favicon via canvas */
+      (function () {
+        var img = new Image();
+        img.onload = function () {
+          var size = 64;
+          var radius = 14;
+          var canvas = document.createElement("canvas");
+          canvas.width = size;
+          canvas.height = size;
+          var ctx = canvas.getContext("2d");
+          ctx.beginPath();
+          ctx.moveTo(radius, 0);
+          ctx.lineTo(size - radius, 0);
+          ctx.quadraticCurveTo(size, 0, size, radius);
+          ctx.lineTo(size, size - radius);
+          ctx.quadraticCurveTo(size, size, size - radius, size);
+          ctx.lineTo(radius, size);
+          ctx.quadraticCurveTo(0, size, 0, size - radius);
+          ctx.lineTo(0, radius);
+          ctx.quadraticCurveTo(0, 0, radius, 0);
+          ctx.closePath();
+          ctx.clip();
+          ctx.drawImage(img, 0, 0, size, size);
+          var link = document.getElementById("favicon");
+          link.href = canvas.toDataURL("image/png");
+        };
+        img.src = "/favicon-kd.png";
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/index.jsx"></script>
+  </body>
 </html>

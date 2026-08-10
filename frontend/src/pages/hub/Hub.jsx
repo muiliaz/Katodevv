@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState, lazy, Suspense } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, lazy, Suspense } from "react";
 import { Link } from "react-router-dom";
 import gsap from "gsap";
 import { useLang } from "../../shared/LangContext";
@@ -26,7 +26,9 @@ function HubStars() {
     const ctx = canvas.getContext("2d");
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     let stars = [];
-    let w = 0, h = 0, dpr = 1;
+    let w = 0,
+      h = 0,
+      dpr = 1;
     let resizeTimer;
     let rafId;
     const mouse = { x: 0, y: 0 }; // normalized -1..1, eased toward target
@@ -80,7 +82,9 @@ function HubStars() {
         ctx.arc(
           s.x + mouse.x * parallaxRange * s.depth,
           s.y + mouse.y * parallaxRange * s.depth,
-          s.r, 0, Math.PI * 2
+          s.r,
+          0,
+          Math.PI * 2
         );
         ctx.fill();
       }
@@ -175,7 +179,10 @@ function HubConnector({ cardsWrapRef, cardKeys, hideToken, revealToken, hoveredK
       const wrapEl = wrapRef.current;
       const cardsEl = cardsWrapRef.current;
       if (!wrapEl || !cardsEl) return;
-      if (window.innerWidth < 861) { setPaths([]); return; }
+      if (window.innerWidth < 861) {
+        setPaths([]);
+        return;
+      }
 
       const wrapRect = wrapEl.getBoundingClientRect();
       const cardEls = cardsEl.querySelectorAll(".hub-card");
@@ -201,8 +208,7 @@ function HubConnector({ cardsWrapRef, cardKeys, hideToken, revealToken, hoveredK
       ro.disconnect();
       window.removeEventListener("resize", measure);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cardKeys.join(",")]);
+  }, [cardKeys, cardsWrapRef]);
 
   // Continuous "alive" wobble + hover retract, driven straight off the
   // DOM (setAttribute, no React re-render) — same reasoning as the
@@ -221,7 +227,12 @@ function HubConnector({ cardsWrapRef, cardKeys, hideToken, revealToken, hoveredK
         const cx = nodeXRef.current;
         const tSec = t / 1000;
         for (const g of pathsRef.current) {
-          if (!phases[g.key]) phases[g.key] = { p1: Math.random() * Math.PI * 2, p2: Math.random() * Math.PI * 2, speed: 0.35 + Math.random() * 0.25 };
+          if (!phases[g.key])
+            phases[g.key] = {
+              p1: Math.random() * Math.PI * 2,
+              p2: Math.random() * Math.PI * 2,
+              speed: 0.35 + Math.random() * 0.25,
+            };
           const ph = phases[g.key];
           const targetRetract = hoveredKeyRef.current === g.key ? HOVER_RETRACT : 0;
           const cur = retractStateRef.current[g.key] ?? 0;
@@ -246,7 +257,8 @@ function HubConnector({ cardsWrapRef, cardKeys, hideToken, revealToken, hoveredK
   // deferred to the reveal cue — otherwise a replay, e.g. a language
   // switch, would leave the connector sitting fully-drawn while the text
   // resets, then have it snap to hidden only once reveal fires).
-   
+
+  const hasPaths = paths.length > 0;
   useLayoutEffect(() => {
     const pathEls = Object.values(pathRefs.current).filter(Boolean);
     if (!pathEls.length) return;
@@ -262,8 +274,7 @@ function HubConnector({ cardsWrapRef, cardKeys, hideToken, revealToken, hoveredK
       gsap.set(p, { strokeDasharray: len, strokeDashoffset: len });
     });
     gsap.set(nodeRef.current, { opacity: 0, scale: 0.4 });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [paths.length > 0, hideToken]);
+  }, [hasPaths, hideToken]);
 
   // Draws in on cue from the parent, once the headline/subtitle have
   // finished (see Hub()'s timeline) — always fires after a hideToken bump,
@@ -273,11 +284,17 @@ function HubConnector({ cardsWrapRef, cardKeys, hideToken, revealToken, hoveredK
     const pathEls = Object.values(pathRefs.current).filter(Boolean);
     if (!pathEls.length) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const tl = gsap.timeline({ onComplete: () => { animateEnabledRef.current = true; } });
-    tl.to(nodeRef.current, { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(2)" })
-      .to(pathEls, { strokeDashoffset: 0, duration: 0.7, stagger: 0.08, ease: "power2.inOut" }, "-=0.15");
+    const tl = gsap.timeline({
+      onComplete: () => {
+        animateEnabledRef.current = true;
+      },
+    });
+    tl.to(nodeRef.current, { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(2)" }).to(
+      pathEls,
+      { strokeDashoffset: 0, duration: 0.7, stagger: 0.08, ease: "power2.inOut" },
+      "-=0.15"
+    );
     return () => tl.kill();
-     
   }, [revealToken]);
 
   return (
@@ -285,7 +302,8 @@ function HubConnector({ cardsWrapRef, cardKeys, hideToken, revealToken, hoveredK
       {paths.length > 0 && (
         <svg
           className="hub-connector-svg"
-          width={box.w} height={box.h}
+          width={box.w}
+          height={box.h}
           viewBox={`0 0 ${box.w} ${box.h}`}
           preserveAspectRatio="none"
         >
@@ -295,7 +313,9 @@ function HubConnector({ cardsWrapRef, cardKeys, hideToken, revealToken, hoveredK
             return (
               <g key={p.key} className={lit ? "is-lit" : ""} style={{ color: CARD_ACCENT[p.key] }}>
                 <path
-                  ref={(el) => { pathRefs.current[p.key] = el; }}
+                  ref={(el) => {
+                    pathRefs.current[p.key] = el;
+                  }}
                   className="hub-connector-path"
                   data-key={p.key}
                   d={p.d}
@@ -334,7 +354,11 @@ function CardIcon({ variant }) {
   if (variant === "web") {
     return (
       <div className="hci hci-web">
-        <div className="hci-web-bar"><span /><span /><span /></div>
+        <div className="hci-web-bar">
+          <span />
+          <span />
+          <span />
+        </div>
         <div className="hci-web-line w1" />
         <div className="hci-web-line w2" />
       </div>
@@ -387,7 +411,10 @@ function Hub() {
   const headlineRef = useRef(null);
   const subtitleRef = useRef(null);
   const cardsWrapRef = useRef(null);
-  const cardKeys = h.cards.map((c) => c.key);
+  // Memoised so HubConnector can depend on it directly. Rebuilt on a language
+  // switch and never otherwise, which is exactly when the connector has to
+  // re-measure.
+  const cardKeys = useMemo(() => h.cards.map((c) => c.key), [h.cards]);
 
   useEffect(() => {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -395,7 +422,12 @@ function Hub() {
     const words = Array.from(headlineRef.current?.querySelectorAll(".hub-word-inner") ?? []);
 
     if (reduced) {
-      gsap.set([eyebrowRef.current, subtitleRef.current, ...cards], { opacity: 1, y: 0, scale: 1, filter: "none" });
+      gsap.set([eyebrowRef.current, subtitleRef.current, ...cards], {
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        filter: "none",
+      });
       gsap.set(words, { y: 0 });
       setConnectorRevealToken((v) => v + 1);
       return;
@@ -418,10 +450,13 @@ function Hub() {
       // place — it's a separate, self-contained entrance (see
       // HubConnector), cued here rather than driven from this timeline.
       .call(() => setConnectorRevealToken((v) => v + 1))
-      .to(cards, { opacity: 1, y: 0, scale: 1, filter: "blur(0px)", duration: 0.65, stagger: 0.09 }, "-=0.1");
+      .to(
+        cards,
+        { opacity: 1, y: 0, scale: 1, filter: "blur(0px)", duration: 0.65, stagger: 0.09 },
+        "-=0.1"
+      );
 
     return () => tl.kill();
-     
   }, [lang]);
 
   return (
@@ -440,36 +475,49 @@ function Hub() {
           <div className="hub-logo-frame">
             <img src="/logo-kd.png" alt="" className="hub-logo" />
           </div>
-          <span className="hub-wordmark">Kato<span className="hub-wordmark-accent">Devv</span></span>
+          <span className="hub-wordmark">
+            Kato<span className="hub-wordmark-accent">Devv</span>
+          </span>
         </div>
         <div className="hub-lang">
           <button
             className={`hub-lang-btn ${lang === "en" ? "active" : ""}`}
             onClick={() => setLang("en")}
-          >ENG</button>
+          >
+            ENG
+          </button>
           <span className="hub-lang-sep" />
           <button
             className={`hub-lang-btn ${lang === "ru" ? "active" : ""}`}
             onClick={() => setLang("ru")}
-          >RU</button>
+          >
+            RU
+          </button>
         </div>
       </header>
 
       <main className="hub-main">
         <div className="hub-eyebrow-wrap">
-          <div className="hub-eyebrow" ref={eyebrowRef}>{h.eyebrow}</div>
+          <div className="hub-eyebrow" ref={eyebrowRef}>
+            {h.eyebrow}
+          </div>
           <span className="hub-eyebrow-rule" />
         </div>
 
         <h1 className="hub-headline" ref={headlineRef}>
           {h.headline.split(" ").map((word, i) => (
             <span className="hub-word-mask" key={i}>
-              <span className="hub-word-inner">{word}{i < h.headline.split(" ").length - 1 ? " " : ""}</span>
+              <span className="hub-word-inner">
+                {word}
+                {i < h.headline.split(" ").length - 1 ? " " : ""}
+              </span>
             </span>
           ))}
         </h1>
 
-        <p className="hub-subtitle" ref={subtitleRef}>{h.subtitle}</p>
+        <p className="hub-subtitle" ref={subtitleRef}>
+          {h.subtitle}
+        </p>
 
         {/* Rendered before HubConnector so cardsWrapRef is already attached
             to the DOM by the time HubConnector's own layout effect measures
@@ -539,19 +587,44 @@ function Hub() {
       </main>
 
       <div className="hub-social">
-        <a href="https://instagram.com/katodevv" target="_blank" rel="noreferrer" className="hub-social-btn ig" aria-label="Instagram">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="17" height="17">
+        <a
+          href="https://instagram.com/katodevv"
+          target="_blank"
+          rel="noreferrer"
+          className="hub-social-btn ig"
+          aria-label="Instagram"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            width="17"
+            height="17"
+          >
             <rect x="2" y="2" width="20" height="20" rx="5" />
             <circle cx="12" cy="12" r="4.2" />
             <circle cx="17.4" cy="6.6" r="1.1" fill="currentColor" stroke="none" />
           </svg>
         </a>
-        <a href="https://t.me/katodevv" target="_blank" rel="noreferrer" className="hub-social-btn tg" aria-label="Telegram">
+        <a
+          href="https://t.me/katodevv"
+          target="_blank"
+          rel="noreferrer"
+          className="hub-social-btn tg"
+          aria-label="Telegram"
+        >
           <svg viewBox="0 0 24 24" fill="currentColor" width="17" height="17">
             <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248-1.97 9.289c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.17 14.086l-2.95-.924c-.64-.203-.654-.64.136-.949l11.52-4.443c.535-.194 1.004.131.686.478z" />
           </svg>
         </a>
-        <a href="https://wa.me/" target="_blank" rel="noreferrer" className="hub-social-btn wa" aria-label="WhatsApp">
+        <a
+          href="https://wa.me/"
+          target="_blank"
+          rel="noreferrer"
+          className="hub-social-btn wa"
+          aria-label="WhatsApp"
+        >
           <svg viewBox="0 0 24 24" fill="currentColor" width="17" height="17">
             <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.87 9.87 0 0 0 4.74 1.21h.01c5.46 0 9.91-4.45 9.91-9.91C21.96 6.46 17.5 2 12.04 2zm5.8 14.03c-.24.68-1.4 1.3-1.93 1.35-.5.05-1 .25-3.36-.7-2.84-1.16-4.67-4.06-4.81-4.25-.14-.19-1.15-1.53-1.15-2.92 0-1.39.73-2.07.99-2.35.26-.28.57-.35.76-.35.19 0 .38 0 .55.01.18.01.42-.07.65.5.24.58.82 2.01.89 2.16.07.14.11.32.02.51-.09.19-.14.31-.27.48-.14.17-.29.37-.41.5-.14.14-.28.29-.12.57.16.28.71 1.17 1.53 1.9 1.05.94 1.94 1.23 2.22 1.37.28.14.44.12.6-.07.17-.19.71-.83.9-1.11.19-.28.38-.24.64-.14.26.09 1.68.79 1.97.94.28.14.47.21.54.33.07.12.07.71-.17 1.4z" />
           </svg>

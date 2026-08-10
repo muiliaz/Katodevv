@@ -1,8 +1,13 @@
-const { sendMessage, escapeHtml } = require('./lib/telegram');
-const { isHoneypotFilled, validateContact } = require('./lib/validation');
-const { checkRateLimit, clientIp } = require('./lib/rateLimit');
-const { verifyTurnstile } = require('./lib/turnstile');
-const { GENERIC_ERROR, INVALID_JSON, TOO_MANY_REQUESTS, CHALLENGE_FAILED } = require('./lib/responses');
+const { sendMessage, escapeHtml } = require("./lib/telegram");
+const { isHoneypotFilled, validateContact } = require("./lib/validation");
+const { checkRateLimit, clientIp } = require("./lib/rateLimit");
+const { verifyTurnstile } = require("./lib/turnstile");
+const {
+  GENERIC_ERROR,
+  INVALID_JSON,
+  TOO_MANY_REQUESTS,
+  CHALLENGE_FAILED,
+} = require("./lib/responses");
 
 exports.handler = async (event) => {
   if (event.httpMethod !== "POST") {
@@ -10,11 +15,11 @@ exports.handler = async (event) => {
   }
 
   // Before parsing, so a flood costs us as little work as possible.
-  const limit = checkRateLimit(event, 'contact');
+  const limit = checkRateLimit(event, "contact");
   if (!limit.allowed) {
     return {
       statusCode: 429,
-      headers: { 'Retry-After': String(limit.retryAfterSeconds) },
+      headers: { "Retry-After": String(limit.retryAfterSeconds) },
       body: JSON.stringify({ error: TOO_MANY_REQUESTS }),
     };
   }
@@ -46,7 +51,7 @@ exports.handler = async (event) => {
     if (errors.length) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: errors.join(', ') }),
+        body: JSON.stringify({ error: errors.join(", ") }),
       };
     }
 
@@ -71,7 +76,7 @@ exports.handler = async (event) => {
     // function is misconfigured or the bot rejected the payload — free recon.
     // Validation errors above are still returned verbatim: those describe the
     // caller's own input, not our internals.
-    console.error('contact function error:', err);
+    console.error("contact function error:", err);
     return { statusCode: 500, body: JSON.stringify({ error: GENERIC_ERROR }) };
   }
 };

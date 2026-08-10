@@ -60,22 +60,23 @@ describe("the canonical site URL", () => {
     expect(read("netlify/functions/contact.js")).toContain(HOST);
   });
 
-  test.each([
-    "index.html",
-    "public/sitemap.xml",
-    "public/robots.txt",
-  ])("%s points at the same host", (rel) => {
-    const src = read(rel);
+  test.each(["index.html", "public/sitemap.xml", "public/robots.txt"])(
+    "%s points at the same host",
+    (rel) => {
+      const src = read(rel);
 
-    // Listing third-party hosts to ignore would need updating every time a
-    // font or an analytics script is added. Matching our own name instead is
-    // precise: it catches the half-finished rename and the typo — the two ways
-    // these files actually go wrong — and stays quiet about everyone else.
-    const ours = [...src.matchAll(/https?:\/\/[a-z0-9.-]*katodevv[a-z0-9.-]*/gi)].map((m) => m[0]);
+      // Listing third-party hosts to ignore would need updating every time a
+      // font or an analytics script is added. Matching our own name instead is
+      // precise: it catches the half-finished rename and the typo — the two ways
+      // these files actually go wrong — and stays quiet about everyone else.
+      const ours = [...src.matchAll(/https?:\/\/[a-z0-9.-]*katodevv[a-z0-9.-]*/gi)].map(
+        (m) => m[0]
+      );
 
-    expect(ours.length).toBeGreaterThan(0);
-    for (const url of ours) {
-      expect(url).toBe(`https://${HOST}`);
+      expect(ours.length).toBeGreaterThan(0);
+      for (const url of ours) {
+        expect(url).toBe(`https://${HOST}`);
+      }
     }
-  });
+  );
 });

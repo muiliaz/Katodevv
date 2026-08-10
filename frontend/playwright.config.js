@@ -1,4 +1,4 @@
-import { defineConfig, devices } from '@playwright/test';
+import { defineConfig, devices } from "@playwright/test";
 
 // End-to-end tests — the gap the tests audit called out at step 2: nothing in
 // the project checked a full visitor path, and /web was not covered at all.
@@ -12,7 +12,7 @@ import { defineConfig, devices } from '@playwright/test';
 // Deliberately kept out of `npm test`: this needs a browser binary and a built
 // site, and it runs as its own CI job for that reason.
 export default defineConfig({
-  testDir: './e2e',
+  testDir: "./e2e",
 
   // The suite is one page and a handful of interactions. Serial is fast enough
   // and keeps the port from `webServer` uncontended.
@@ -24,7 +24,7 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
 
-  reporter: process.env.CI ? [['list'], ['html', { open: 'never' }]] : 'list',
+  reporter: process.env.CI ? [["list"], ["html", { open: "never" }]] : "list",
 
   // Generous, because a headless runner renders the hero's shaders in software.
   // The enquiry tests take about three seconds each — the budget exists for the
@@ -33,22 +33,22 @@ export default defineConfig({
   expect: { timeout: 15_000 },
 
   use: {
-    baseURL: 'http://localhost:4173',
+    baseURL: "http://localhost:4173",
     // Only kept for failures — a trace per run is tens of megabytes.
-    trace: 'retain-on-failure',
-    screenshot: 'only-on-failure',
+    trace: "retain-on-failure",
+    screenshot: "only-on-failure",
   },
 
   projects: [
     {
-      name: 'chromium',
+      name: "chromium",
       use: {
-        ...devices['Desktop Chrome'],
+        ...devices["Desktop Chrome"],
         launchOptions: {
           // The hero renders a WebGL scene. Headless Chrome falls back to
           // SwiftShader, which is slow but correct; without this it can end up
           // with no GL at all on a CI runner and the page never settles.
-          args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader'],
+          args: ["--use-gl=swiftshader", "--enable-unsafe-swiftshader"],
         },
       },
     },
@@ -58,8 +58,8 @@ export default defineConfig({
   // publishes rather than the dev server's module graph. The build is part of
   // the command because a stale build/ would silently test yesterday's code.
   webServer: {
-    command: 'npm run build && npm run preview -- --port 4173 --strictPort',
-    url: 'http://localhost:4173',
+    command: "npm run build && npm run preview -- --port 4173 --strictPort",
+    url: "http://localhost:4173",
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
   },

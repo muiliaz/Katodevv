@@ -88,7 +88,7 @@ describe("identifying the caller", () => {
     const event = (forwarded) => ({
       headers: {
         "x-nf-client-connection-ip": "1.1.1.1",
-        "x-forwarded-for":           forwarded,
+        "x-forwarded-for": forwarded,
       },
     });
 

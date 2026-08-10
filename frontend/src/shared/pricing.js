@@ -15,16 +15,16 @@
 
 export const PRICING = {
   // Bot tariffs — shown on /bots, in the /web terminal and in the chat
-  'tg-bot':         { from: 100 },
-  'booking-bot':    { from: 300, to: 400 },
-  'ai-bot':         { from: 600, to: 800 },
-  'mini-app':       { from: 400, to: 600 },
+  "tg-bot": { from: 100 },
+  "booking-bot": { from: 300, to: 400 },
+  "ai-bot": { from: 600, to: 800 },
+  "mini-app": { from: 400, to: 600 },
   // "Custom Automation" on /bots. Same floor as custom-ai below — see the note
   // there.
-  'automation-pro': { from: 1000 },
+  "automation-pro": { from: 1000 },
 
   // Shown in the /web terminal only.
-  'shop-bot':       { from: 600 },
+  "shop-bot": { from: 600 },
 
   // "Custom AI agent". Still a separate id from automation-pro: the two are
   // named differently and sold on different pages, and merging them would be a
@@ -32,14 +32,14 @@ export const PRICING = {
   // decide, on 2026-08-08, is the price — the two used to quote $2000 and
   // $1500–2000 for work a customer could not tell apart, so both now start at
   // the same $1000. See docs/handoff.md.
-  'custom-ai':      { from: 1000 },
+  "custom-ai": { from: 1000 },
 
   // Shown in the chat price list only
-  'landing':        { from: 400 },
-  'business-site':  { from: 800 },
-  'ecommerce':      { from: 1500 },
-  'mobile-app':     { from: 3000 },
-  'automation':     { from: 300 },
+  landing: { from: 400 },
+  "business-site": { from: 800 },
+  ecommerce: { from: 1500 },
+  "mobile-app": { from: 3000 },
+  automation: { from: 300 },
 };
 
 // Hours we promise to answer within. Used by the chat and the contact copy.
@@ -51,12 +51,12 @@ export const PRICING = {
 // are. So: not an oversight, and not something to "fix" by trimming either one.
 export const RESPONSE_SLA_HOURS = 24;
 
-const PREFIX = { ru: 'от', en: 'from' };
+const PREFIX = { ru: "от", en: "from" };
 
 /**
  * "от $600–800" / "from $600–800". An en dash, matching the existing copy.
  */
-export function formatPrice(id, lang = 'ru') {
+export function formatPrice(id, lang = "ru") {
   const entry = PRICING[id];
   if (!entry) throw new Error(`Unknown price id: ${id}`);
 

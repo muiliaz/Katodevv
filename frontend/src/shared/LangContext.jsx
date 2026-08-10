@@ -24,9 +24,5 @@ export const T = { en, ru };
 export function LangProvider({ children }) {
   const [lang, setLang] = useState("en");
   const t = T[lang];
-  return (
-    <LangContext.Provider value={{ lang, setLang, t }}>
-      {children}
-    </LangContext.Provider>
-  );
+  return <LangContext.Provider value={{ lang, setLang, t }}>{children}</LangContext.Provider>;
 }

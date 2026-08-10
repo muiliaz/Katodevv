@@ -6,26 +6,38 @@ import "../Services.css";
 function BotExample() {
   const { t } = useLang();
   const st = t.services;
-  const [shown, setShown]   = useState([]);
+  const [shown, setShown] = useState([]);
   const [typing, setTyping] = useState(false);
-  const msgRef              = useRef(null);
+  const msgRef = useRef(null);
 
+  // Replays the scripted conversation, one message at a time.
+  //
+  // Keyed on the script rather than mounted once: the array identity changes
+  // only when the visitor switches language, and that is exactly when the
+  // conversation has to start over. Appending to a half-played English chat
+  // was what the previous `[]` did, and it left the two languages interleaved
+  // in the same window.
+  const { botScript } = st;
   useEffect(() => {
+    setShown([]);
+    setTyping(false);
+
     const timers = [];
     let cum = 0;
-    st.botScript.forEach((msg, i) => {
+    botScript.forEach((msg, i) => {
       cum += msg.delay;
       if (msg.sender === "bot" && i > 0) {
         timers.push(setTimeout(() => setTyping(true), cum - 700));
       }
-      timers.push(setTimeout(() => {
-        setTyping(false);
-        setShown(prev => [...prev, msg]);
-      }, cum));
+      timers.push(
+        setTimeout(() => {
+          setTyping(false);
+          setShown((prev) => [...prev, msg]);
+        }, cum)
+      );
     });
     return () => timers.forEach(clearTimeout);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [botScript]);
 
   useEffect(() => {
     if (msgRef.current) msgRef.current.scrollTop = msgRef.current.scrollHeight;
@@ -43,11 +55,15 @@ function BotExample() {
       </div>
       <div className="chat-msgs-light" ref={msgRef}>
         {shown.map((m, i) => (
-          <div key={i} className={`chat-bubble ${m.sender}`}>{m.text}</div>
+          <div key={i} className={`chat-bubble ${m.sender}`}>
+            {m.text}
+          </div>
         ))}
         {typing && (
           <div className="chat-bubble bot typing">
-            <span /><span /><span />
+            <span />
+            <span />
+            <span />
           </div>
         )}
       </div>

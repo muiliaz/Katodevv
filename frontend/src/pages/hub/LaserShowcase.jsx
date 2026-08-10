@@ -166,7 +166,7 @@ export default function LaserShowcase({ onClose }) {
       }
 
       applyLayout();
-      const idx = (((Math.round(pos.current) % n) + n) % n);
+      const idx = ((Math.round(pos.current) % n) + n) % n;
       setActive((prev) => (prev !== idx ? idx : prev));
       rafRef.current = requestAnimationFrame(tick);
     };
@@ -176,7 +176,9 @@ export default function LaserShowcase({ onClose }) {
   }, [n, spacing, depth, angle]);
 
   useEffect(() => {
-    const onKey = (e) => { if (e.key === "Escape") onClose(); };
+    const onKey = (e) => {
+      if (e.key === "Escape") onClose();
+    };
     window.addEventListener("keydown", onKey);
     document.body.style.overflow = "hidden";
     return () => {
@@ -232,10 +234,14 @@ export default function LaserShowcase({ onClose }) {
       role="dialog"
       aria-modal="true"
       aria-label={s.eyebrow}
-      onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}
+      onMouseDown={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
     >
       <div className="laser-vignette" />
-      <button className="laser-close" onClick={onClose} aria-label={s.close}>×</button>
+      <button className="laser-close" onClick={onClose} aria-label={s.close}>
+        ×
+      </button>
       <div className="laser-eyebrow">{s.eyebrow}</div>
 
       <div className="laser-scene">
@@ -254,7 +260,9 @@ export default function LaserShowcase({ onClose }) {
             return (
               <div
                 key={slide.key}
-                ref={(el) => { cardRefs.current[i] = el; }}
+                ref={(el) => {
+                  cardRefs.current[i] = el;
+                }}
                 className={`laser-card ${i === active ? "is-active" : ""} ${slide.isSignature ? "is-signature" : ""} ${hasMedia ? "has-media" : ""}`}
                 style={{ background: slide.gradient }}
                 onClick={() => goTo(i)}
@@ -289,7 +297,13 @@ export default function LaserShowcase({ onClose }) {
       <div className="laser-hint">{s.dragHint}</div>
 
       <div className="laser-controls">
-        <button className="laser-nav" onClick={() => goTo((active - 1 + n) % n)} aria-label="Previous">‹</button>
+        <button
+          className="laser-nav"
+          onClick={() => goTo((active - 1 + n) % n)}
+          aria-label="Previous"
+        >
+          ‹
+        </button>
         <div className="laser-dots">
           {slides.map((slide, i) => (
             <button
@@ -300,7 +314,9 @@ export default function LaserShowcase({ onClose }) {
             />
           ))}
         </div>
-        <button className="laser-nav" onClick={() => goTo((active + 1) % n)} aria-label="Next">›</button>
+        <button className="laser-nav" onClick={() => goTo((active + 1) % n)} aria-label="Next">
+          ›
+        </button>
       </div>
 
       <button

@@ -58,6 +58,13 @@ jobs:
         # cluster cannot quietly accumulate again.
         run: npm run check:dead
 
+      - name: Check for dead CSS
+        # knip does not read CSS, and re-running the dead-code audit found 149
+        # classes no element could ever carry — a whole hero variant's
+        # stylesheet outliving its JSX. Nothing in the toolchain had a reason
+        # to notice. Now something does.
+        run: npm run check:css
+
       - name: Test
         # With coverage: the thresholds in vite.config.mjs are a ratchet, so a
         # change that drops coverage below where it stands today fails here.

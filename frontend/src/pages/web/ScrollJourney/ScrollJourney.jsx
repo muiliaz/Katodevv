@@ -3,7 +3,7 @@
  * ScrollJourney — GSAP ScrollTrigger timeline.
  *
  * Journey (300vh sticky Hero):
- *   0–35%   hero text + sidebars sucked into BH center (convergence + spaghettification)
+ *   0–35%   hero text sucked into BH center (convergence + spaghettification)
  *   15–75%  glass cubes fly from startPos → endPos (BlackHole useFrame)
  *   75–100% cubes land, rotation slows, float amplitude shrinks
  *   70–90%  canvas fades concurrently with cube landing
@@ -35,33 +35,12 @@ export default function ScrollJourney() {
       onUpdate(self) { window.__scrollProgress = self.progress },
     })
 
-    // ── Sidebars: suck toward BH center (5–30%) ───────────────────────────
-    // Left sidebar moves RIGHT toward center; right sidebar moves LEFT toward center.
-    // scaleX narrows, scaleY stretches — spaghettification matching the text.
-    const heroCtx = gsap.context(() => {
-      gsap.fromTo('.hero-sidebar-left',
-        { opacity: 1, x: 0, scaleX: 1, scaleY: 1 },
-        {
-          opacity: 0, x: 320, scaleX: 0.15, scaleY: 1.3, ease: 'none',
-          transformOrigin: 'center center',
-          scrollTrigger: {
-            trigger: '#journey-scroll',
-            start: '5% top', end: '30% top', scrub: 1.2,
-          },
-        }
-      )
-      gsap.fromTo('.hero-sidebar-right',
-        { opacity: 1, x: 0, scaleX: 1, scaleY: 1 },
-        {
-          opacity: 0, x: -320, scaleX: 0.15, scaleY: 1.3, ease: 'none',
-          transformOrigin: 'center center',
-          scrollTrigger: {
-            trigger: '#journey-scroll',
-            start: '5% top', end: '30% top', scrub: 1.2,
-          },
-        }
-      )
-    })
+    // The hero used to carry two sidebars that were sucked toward the black
+    // hole alongside the text. They were removed from Hero.jsx, but the tweens
+    // that animated them stayed — and GSAP said so, twice, in the console of
+    // every visitor who opened /web ("GSAP target .hero-sidebar-left not
+    // found"). Removed together with their stylesheet, which had gone dead the
+    // same way. See audit-fixes/18-dead-css.md.
 
     // ── Hero suck-into-BH ─────────────────────────────────────────────────────
     // transformOrigin '50% 120%' pulls the collapse point below center of each
@@ -203,7 +182,6 @@ export default function ScrollJourney() {
 
     return () => {
       progressST.kill()
-      heroCtx.revert()
       titleTl?.kill()
       sLineTl?.kill()
       btnsTl?.kill()

@@ -48,7 +48,8 @@
     "test:e2e": "playwright test",
     "lint": "eslint .",
     "check:env": "node scripts/check-env-contract.js",
-    "check:dead": "knip"
+    "check:dead": "knip",
+    "check:css": "node scripts/check-dead-css.js"
   },
   "browserslist": {
     "production": [

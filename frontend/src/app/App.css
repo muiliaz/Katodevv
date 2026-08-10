@@ -13,23 +13,6 @@ body::after {
   z-index: 99998;
 }
 
-/* ── Language Switcher ── */
-.lang-switcher {
-  position: fixed;
-  top: 22px;
-  right: 28px;
-  z-index: 99999;
-  display: flex;
-  align-items: center;
-  border: 1.5px solid rgba(255, 255, 255, 0.28);
-  border-radius: 28px;
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.25);
-}
-
 .lang-btn {
   padding: 7px 15px;
   background: transparent;
@@ -50,12 +33,5 @@ body::after {
 .lang-btn.active {
   color: #fff;
   background: rgba(255, 255, 255, 0.14);
-}
-
-.lang-divider {
-  width: 1px;
-  height: 16px;
-  background: rgba(255, 255, 255, 0.2);
-  flex-shrink: 0;
 }
 

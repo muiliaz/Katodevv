@@ -1,9 +1,9 @@
 // The enquiry path on /web, end to end in a real browser.
 //
 // This is the site's reason to exist: a visitor lands on /web, scrolls past the
-// black hole, fills in the contact form and the studio gets a lead. Until now
-// no automated check walked it — the unit suite cannot even mount the page,
-// because BlackHole compiles real GLSL and jsdom has no WebGL.
+// black hole, fills in the contact form and the studio gets a lead. Until this
+// existed no automated check walked it — the unit suite cannot even mount the
+// page, because BlackHole compiles real GLSL and jsdom has no WebGL.
 //
 // What is real here and what is not:
 //
@@ -11,69 +11,21 @@
 //          the form and its client-side validation. The WebGL hero renders for
 //          real too, in the last test in this file.
 //   not  — the Netlify function (intercepted; it needs Telegram credentials)
-//          and Cloudflare's Turnstile service (stubbed, see below).
+//          and Cloudflare's Turnstile service (stubbed — the reasoning is in
+//          support.js, next to the stub).
 //
-// Stubbing Turnstile is a deliberate call, and a different one from the WebGL
-// decision. Turnstile is a third-party service on the far side of a network
-// boundary; what this project owns is the integration — that the widget is
-// rendered, that its token reaches component state, and that it goes out in the
-// request body. The stub asserts exactly that, and it does it without a network
-// round trip that would make CI depend on Cloudflare being up.
-//
-// Cloudflare also publishes test keys that always pass
-// (https://developers.cloudflare.com/turnstile/troubleshooting/testing/), which
-// would exercise their script for real. That needs the site key to become
-// configurable and still reaches the network on every run, so it is the option
-// to reach for only if the integration itself starts breaking in production.
+// The other two lead paths — the chat widget and the /bots tariff modal — are
+// in lead-paths.spec.js.
 import { test, expect } from '@playwright/test';
-
-const CONTACT_ENDPOINT = '**/.netlify/functions/contact';
-const STUB_TOKEN = 'e2e-turnstile-token';
-
-// Stands in for challenges.cloudflare.com/turnstile/v0/api.js. Turnstile.jsx
-// injects that script and reads window.turnstile once it loads, so a script
-// that defines the same two methods is indistinguishable from its point of view.
-const TURNSTILE_STUB = `
-  window.turnstile = {
-    render(el, opts) {
-      el.setAttribute('data-e2e-turnstile', 'rendered');
-      setTimeout(() => opts.callback('${STUB_TOKEN}'), 0);
-      return 'e2e-widget-id';
-    },
-    remove() {},
-  };
-`;
-
-// A headless runner has no GPU, so Chrome renders the hero's shaders and bloom
-// pass in software. At the full 1280×720 that costs about ten seconds per
-// click — every interaction below times out, and on a slower CI runner it would
-// be worse. Shrinking the canvas container to two pixels makes each frame free:
-// react-three-fiber sizes the drawing buffer from this element, so the scene
-// still runs, still compiles its shaders, and simply has almost nothing to fill.
-//
-// It is injected before the app mounts so the full-size buffer is never
-// allocated in the first place. The hero at its real size is checked in the last
-// test in this file, which does not apply any of this.
-const SHRINK_HERO = `
-  document.addEventListener('DOMContentLoaded', () => {
-    const style = document.createElement('style');
-    style.textContent = '.bh-canvas-wrapper{width:2px!important;height:2px!important;overflow:hidden!important}';
-    document.head.appendChild(style);
-  });
-`;
+import {
+  CONTACT_ENDPOINT, STUB_TOKEN, captureEndpoint, parkLenis, shrinkHero, stubTurnstile,
+} from './support.js';
 
 /** Scrolls to the contact form and hands back the locators the tests assert on. */
 async function openContactForm(page) {
   await page.goto('/web');
 
-  // Lenis eases the page toward its own scroll target on every frame, so after
-  // any scroll the form keeps drifting for a second or so — and Playwright will
-  // not click an element whose box is still moving. Parking Lenis is what the
-  // page itself does whenever it opens a modal (see Services.jsx), so this uses
-  // the app's own handle rather than fighting it with force clicks, which would
-  // hide a genuinely unclickable button.
-  await page.waitForFunction(() => window.__lenis);
-  await page.evaluate(() => window.__lenis.stop());
+  await parkLenis(page);
 
   const form = page.locator('.contact-form');
   await form.scrollIntoViewIfNeeded();
@@ -101,24 +53,12 @@ async function fillValidEnquiry(f) {
 
 test.describe('sending an enquiry', () => {
   test.beforeEach(async ({ page }) => {
-    await page.addInitScript(SHRINK_HERO);
-    await page.route('https://challenges.cloudflare.com/**', (route) =>
-      route.fulfill({ contentType: 'application/javascript', body: TURNSTILE_STUB })
-    );
+    await shrinkHero(page);
+    await stubTurnstile(page);
   });
 
   test('the form reaches the endpoint and the visitor sees it acknowledged', async ({ page }) => {
-    /** @type {object|null} */
-    let payload = null;
-
-    await page.route(CONTACT_ENDPOINT, async (route) => {
-      payload = route.request().postDataJSON();
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({ success: true }),
-      });
-    });
+    const contact = await captureEndpoint(page, CONTACT_ENDPOINT);
 
     const f = await openContactForm(page);
 
@@ -135,7 +75,7 @@ test.describe('sending an enquiry', () => {
     // worth asserting on — not the request having been made.
     await expect(f.submit).toHaveText(/sent/i);
 
-    expect(payload).toMatchObject({
+    expect(contact.payloads[0]).toMatchObject({
       name: 'Ada Lovelace',
       email: 'ada@example.com',
       message: 'We need a landing page for a new product.',
@@ -145,13 +85,11 @@ test.describe('sending an enquiry', () => {
     });
     // The honeypot travels empty for a human. A bot fills every input it finds,
     // and the function rejects the submission when this arrives non-empty.
-    expect(payload.company).toBeFalsy();
+    expect(contact.payloads[0].company).toBeFalsy();
   });
 
   test('the fields are cleared, so a second enquiry needs no reload', async ({ page }) => {
-    await page.route(CONTACT_ENDPOINT, (route) =>
-      route.fulfill({ status: 200, contentType: 'application/json', body: '{"success":true}' })
-    );
+    await captureEndpoint(page, CONTACT_ENDPOINT);
 
     const f = await openContactForm(page);
     await fillValidEnquiry(f);
@@ -163,11 +101,7 @@ test.describe('sending an enquiry', () => {
   });
 
   test('a whitespace-only form is refused without spending a request', async ({ page }) => {
-    let requests = 0;
-    await page.route(CONTACT_ENDPOINT, (route) => {
-      requests += 1;
-      return route.fulfill({ status: 200, contentType: 'application/json', body: '{}' });
-    });
+    const contact = await captureEndpoint(page, CONTACT_ENDPOINT);
 
     const f = await openContactForm(page);
 
@@ -180,13 +114,11 @@ test.describe('sending an enquiry', () => {
     await f.submit.click();
 
     await expect(f.error).toHaveText('Please fill in all fields.');
-    expect(requests).toBe(0);
+    expect(contact.count()).toBe(0);
   });
 
   test('a failing endpoint tells the visitor instead of pretending it sent', async ({ page }) => {
-    await page.route(CONTACT_ENDPOINT, (route) =>
-      route.fulfill({ status: 500, contentType: 'application/json', body: '{"error":"boom"}' })
-    );
+    await captureEndpoint(page, CONTACT_ENDPOINT, { status: 500, success: false });
 
     const f = await openContactForm(page);
     await fillValidEnquiry(f);
@@ -206,7 +138,7 @@ test('the WebGL hero actually renders', async ({ page }) => {
   // compile leaves the canvas blank, and every other test in this file would
   // still pass — the form lives three screens below it.
   //
-  // No SHRINK_HERO here: this one wants the scene at the size a visitor gets.
+  // No shrinkHero() here: this one wants the scene at the size a visitor gets.
   await page.goto('/web');
 
   const canvas = page.locator('.bh-canvas-wrapper canvas');

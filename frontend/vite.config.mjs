@@ -53,13 +53,14 @@ export default defineConfig({
       // The server side is held to a much higher bar than the React side: it
       // handles every enquiry, it is cheap to test, and it has no WebGL or
       // scroll animation standing in the way.
-      // Raised on 2026-08-08 (from 32/25/22/33) after the Services section was
-      // split up and covered — see docs/handoff.md.
+      // Raised on 2026-08-08: 32/25/22/33 -> 43/33/34/45 when the Services
+      // section was split up and covered, then again to these after the chat
+      // widget — the second path to a lead — went from 36% to 84%.
       thresholds: {
-        statements: 43,
-        branches:   33,
-        functions:  34,
-        lines:      45,
+        statements: 48,
+        branches:   40,
+        functions:  40,
+        lines:      50,
         'netlify/functions/**': {
           statements: 95,
           branches:   78,

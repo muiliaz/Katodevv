@@ -40,10 +40,14 @@ export default [
       // Three.js components, which is its own project.
       'react-hooks/rules-of-hooks': 'error',
 
-      // The GSAP and Three.js timelines legitimately capture values once on
-      // mount; the codebase carries deliberate suppressions of this rule.
-      // Warning keeps them visible without turning existing code red.
-      'react-hooks/exhaustive-deps': 'warn',
+      // Was a warning while five suppressions were still in the tree, so they
+      // stayed visible without turning the build red. All five are gone —
+      // four were dependency arrays holding an expression or a stale-by-design
+      // capture that turned out not to be needed, and the fifth was a real
+      // defect: the bot demo replayed its script in the language it mounted
+      // with, so a language switch interleaved English and Russian in the same
+      // chat window. An error now, because there is nothing left to grandfather.
+      'react-hooks/exhaustive-deps': 'error',
 
       // JSX compiles to references the base config cannot see.
       'no-unused-vars': ['error', {

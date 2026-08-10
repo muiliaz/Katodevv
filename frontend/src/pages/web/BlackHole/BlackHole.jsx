@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import { Suspense, useRef, useMemo, useEffect } from 'react'
 import './BlackHole.css'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
@@ -368,9 +367,15 @@ function RaymarchedBlackHole({mouseRef}){
     typeof window!=='undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
   ,[])
 
+  // Created once and mutated in place: handing the material a new uniforms
+  // object would swap what the compiled shader is reading mid-flight. The
+  // resolution starts empty rather than at the current canvas size — useFrame
+  // below writes it every frame, so seeding it here only looked like a
+  // dependency on `size` and was what the file-wide exhaustive-deps
+  // suppression existed for.
   const uniforms = useMemo(()=>({
     uTime:           {value:0},
-    uResolution:     {value:new Vector2(size.width,size.height)},
+    uResolution:     {value:new Vector2()},
     uMouse:          {value:new Vector2(0.5,0.5)},
     uCamPos:         {value:new Vector3(0,2.5,9)},
     uCamTarget:      {value:new Vector3(0,0,0)},

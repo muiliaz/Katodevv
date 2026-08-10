@@ -10,10 +10,21 @@ function BotExample() {
   const [typing, setTyping] = useState(false);
   const msgRef              = useRef(null);
 
+  // Replays the scripted conversation, one message at a time.
+  //
+  // Keyed on the script rather than mounted once: the array identity changes
+  // only when the visitor switches language, and that is exactly when the
+  // conversation has to start over. Appending to a half-played English chat
+  // was what the previous `[]` did, and it left the two languages interleaved
+  // in the same window.
+  const { botScript } = st;
   useEffect(() => {
+    setShown([]);
+    setTyping(false);
+
     const timers = [];
     let cum = 0;
-    st.botScript.forEach((msg, i) => {
+    botScript.forEach((msg, i) => {
       cum += msg.delay;
       if (msg.sender === "bot" && i > 0) {
         timers.push(setTimeout(() => setTyping(true), cum - 700));
@@ -24,8 +35,7 @@ function BotExample() {
       }, cum));
     });
     return () => timers.forEach(clearTimeout);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [botScript]);
 
   useEffect(() => {
     if (msgRef.current) msgRef.current.scrollTop = msgRef.current.scrollHeight;

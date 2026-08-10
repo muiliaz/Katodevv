@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState, lazy, Suspense } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, lazy, Suspense } from "react";
 import { Link } from "react-router-dom";
 import gsap from "gsap";
 import { useLang } from "../../shared/LangContext";
@@ -201,8 +201,7 @@ function HubConnector({ cardsWrapRef, cardKeys, hideToken, revealToken, hoveredK
       ro.disconnect();
       window.removeEventListener("resize", measure);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cardKeys.join(",")]);
+  }, [cardKeys, cardsWrapRef]);
 
   // Continuous "alive" wobble + hover retract, driven straight off the
   // DOM (setAttribute, no React re-render) — same reasoning as the
@@ -247,6 +246,7 @@ function HubConnector({ cardsWrapRef, cardKeys, hideToken, revealToken, hoveredK
   // switch, would leave the connector sitting fully-drawn while the text
   // resets, then have it snap to hidden only once reveal fires).
    
+  const hasPaths = paths.length > 0;
   useLayoutEffect(() => {
     const pathEls = Object.values(pathRefs.current).filter(Boolean);
     if (!pathEls.length) return;
@@ -262,8 +262,7 @@ function HubConnector({ cardsWrapRef, cardKeys, hideToken, revealToken, hoveredK
       gsap.set(p, { strokeDasharray: len, strokeDashoffset: len });
     });
     gsap.set(nodeRef.current, { opacity: 0, scale: 0.4 });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [paths.length > 0, hideToken]);
+  }, [hasPaths, hideToken]);
 
   // Draws in on cue from the parent, once the headline/subtitle have
   // finished (see Hub()'s timeline) — always fires after a hideToken bump,
@@ -387,7 +386,10 @@ function Hub() {
   const headlineRef = useRef(null);
   const subtitleRef = useRef(null);
   const cardsWrapRef = useRef(null);
-  const cardKeys = h.cards.map((c) => c.key);
+  // Memoised so HubConnector can depend on it directly. Rebuilt on a language
+  // switch and never otherwise, which is exactly when the connector has to
+  // re-measure.
+  const cardKeys = useMemo(() => h.cards.map((c) => c.key), [h.cards]);
 
   useEffect(() => {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;

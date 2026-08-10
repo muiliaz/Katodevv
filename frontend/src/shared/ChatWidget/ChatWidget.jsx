@@ -178,14 +178,6 @@ export default function ChatWidget() {
     endRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isTyping]);
 
-  // ── Escape key closes chat ────────────────────────────────────────────────
-  useEffect(() => {
-    const onKey = (e) => { if (e.key === 'Escape' && isOpen) triggerClose(); };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen]);
-
   // ── Cleanup timers on unmount ─────────────────────────────────────────────
   useEffect(() => () => { timers.current.forEach(clearTimeout); }, []);
 
@@ -247,6 +239,18 @@ export default function ChatWidget() {
       },
     });
   }, []);
+
+  // ── Escape key closes chat ────────────────────────────────────────────────
+  //
+  // Sits below triggerClose rather than with the other effects: naming it in
+  // the dependency array evaluates it during render, and a `const` declared
+  // further down is still in its temporal dead zone at that point. The tests
+  // caught it as "Cannot access 'triggerClose' before initialization".
+  useEffect(() => {
+    const onKey = (e) => { if (e.key === 'Escape' && isOpen) triggerClose(); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [isOpen, triggerClose]);
 
   // ── Quick reply handler ───────────────────────────────────────────────────
   const handleReply = useCallback((reply) => {

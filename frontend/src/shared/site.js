@@ -14,4 +14,4 @@
 //
 // contracts.test.js checks all five agree, which is the documented-list half of
 // what the audit asked for.
-export const SITE_URL = 'https://katodevv.com';
+export const SITE_URL = "https://katodevv.com";

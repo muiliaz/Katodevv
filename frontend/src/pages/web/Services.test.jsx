@@ -164,9 +164,9 @@ describe("the bot card's hover terminal", () => {
     await userEvent.unhover(card);
     // The teardown runs inside a GSAP tween's onComplete, so it lands a frame
     // or two later rather than synchronously with the mouseleave.
-    await act(() => vi.waitFor(() =>
-      expect(container.querySelector(".bot-terminal").textContent).toBe("")
-    ));
+    await act(() =>
+      vi.waitFor(() => expect(container.querySelector(".bot-terminal").textContent).toBe(""))
+    );
   });
 });
 
@@ -198,13 +198,17 @@ describe("the bot demo's scripted conversation", () => {
         fireEvent.click(cardTitled("Bots / AI Bots"));
       });
       // Far enough in for the first two English lines to have landed.
-      await act(async () => { vi.advanceTimersByTime(2100); });
+      await act(async () => {
+        vi.advanceTimersByTime(2100);
+      });
       expect(screen.getByText(T.en.services.botScript[0].text)).toBeInTheDocument();
 
       await act(async () => {
         fireEvent.click(screen.getByRole("button", { name: "switch" }));
       });
-      await act(async () => { vi.advanceTimersByTime(2100); });
+      await act(async () => {
+        vi.advanceTimersByTime(2100);
+      });
 
       // The English lines are gone rather than sitting above the Russian ones.
       expect(screen.queryByText(T.en.services.botScript[0].text)).not.toBeInTheDocument();

@@ -8,8 +8,7 @@ import { verifyTurnstile, VERIFY_URL } from "../../netlify/functions/lib/turnsti
 
 const SECRET = "0x-test-secret";
 
-const cloudflareSays = (payload) => () =>
-  Promise.resolve({ json: () => Promise.resolve(payload) });
+const cloudflareSays = (payload) => () => Promise.resolve({ json: () => Promise.resolve(payload) });
 
 beforeEach(() => {
   process.env.TURNSTILE_SECRET_KEY = SECRET;

@@ -21,13 +21,21 @@ import { STEPS, TG_HANDLE } from "./chatScenarios";
 
 vi.mock("gsap", () => {
   const tween = { kill() {}, pause() {}, resume() {} };
-  const run = (_target, vars) => { vars?.onComplete?.(); return tween; };
+  const run = (_target, vars) => {
+    vars?.onComplete?.();
+    return tween;
+  };
   const gsap = {
     set: () => {},
     to: run,
     fromTo: (_target, _from, to) => run(_target, to),
     killTweensOf: () => {},
-    timeline: () => ({ to() { return this; }, kill() {} }),
+    timeline: () => ({
+      to() {
+        return this;
+      },
+      kill() {},
+    }),
   };
   return { default: gsap, gsap };
 });
@@ -65,22 +73,34 @@ const input = () => screen.getByLabelText("Введите сообщение");
 
 /** Opens the widget and lets the welcome step arrive. */
 async function open() {
-  await act(async () => { fireEvent.click(openButton()); });
-  await act(async () => { vi.advanceTimersByTime(OPEN_DELAY + TYPING_DELAY); });
+  await act(async () => {
+    fireEvent.click(openButton());
+  });
+  await act(async () => {
+    vi.advanceTimersByTime(OPEN_DELAY + TYPING_DELAY);
+  });
 }
 
 /** Clicks a quick reply and lets the next step's messages arrive. */
 async function reply(label) {
-  await act(async () => { fireEvent.click(pill(label)); });
-  await act(async () => { vi.advanceTimersByTime(TYPING_DELAY); });
+  await act(async () => {
+    fireEvent.click(pill(label));
+  });
+  await act(async () => {
+    vi.advanceTimersByTime(TYPING_DELAY);
+  });
 }
 
 async function type(text) {
   await act(async () => {
     fireEvent.change(input(), { target: { value: text } });
   });
-  await act(async () => { fireEvent.click(screen.getByRole("button", { name: "Отправить" })); });
-  await act(async () => { vi.advanceTimersByTime(TYPING_DELAY); });
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: "Отправить" }));
+  });
+  await act(async () => {
+    vi.advanceTimersByTime(TYPING_DELAY);
+  });
 }
 
 beforeEach(() => {
@@ -127,8 +147,12 @@ describe("opening the widget", () => {
     // The Hero's service picker and the /bots CTA both do exactly this.
     render(<ChatWidget />);
 
-    await act(async () => { window.dispatchEvent(new CustomEvent("kato:openChat")); });
-    await act(async () => { vi.advanceTimersByTime(OPEN_DELAY + TYPING_DELAY); });
+    await act(async () => {
+      window.dispatchEvent(new CustomEvent("kato:openChat"));
+    });
+    await act(async () => {
+      vi.advanceTimersByTime(OPEN_DELAY + TYPING_DELAY);
+    });
 
     expect(chatWindow()).toHaveAttribute("aria-hidden", "false");
     expect(message(STEPS.welcome.msgs[0])).toBeInTheDocument();
@@ -138,7 +162,9 @@ describe("opening the widget", () => {
     render(<ChatWidget />);
     await open();
 
-    await act(async () => { fireEvent.keyDown(window, { key: "Escape" }); });
+    await act(async () => {
+      fireEvent.keyDown(window, { key: "Escape" });
+    });
 
     expect(chatWindow()).toHaveAttribute("aria-hidden", "true");
   });
@@ -245,7 +271,10 @@ describe("the qualification funnel", () => {
 
 describe("when the lead does not get through", () => {
   test("a rejected submission offers a retry rather than claiming success", async () => {
-    global.fetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ success: false }) });
+    global.fetch.mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve({ success: false }),
+    });
 
     render(<ChatWidget />);
     await open();
@@ -269,7 +298,10 @@ describe("when the lead does not get through", () => {
   });
 
   test("retrying asks for the contact again and can succeed", async () => {
-    global.fetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ success: false }) });
+    global.fetch.mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve({ success: false }),
+    });
 
     render(<ChatWidget />);
     await open();
@@ -295,7 +327,9 @@ describe("the conversation survives a page change", () => {
     // A visitor moving from /bots to /apps remounts the widget; losing the
     // answers they already gave would restart the funnel from scratch.
     render(<ChatWidget />);
-    await act(async () => { fireEvent.click(openButton()); });
+    await act(async () => {
+      fireEvent.click(openButton());
+    });
 
     expect(message(STEPS.ask_project_type.msgs[0])).toBeInTheDocument();
     expect(pill("Сайт")).toBeInTheDocument();
@@ -308,7 +342,9 @@ describe("the conversation survives a page change", () => {
     await type("@ada");
 
     await reply("🏠 Начать заново");
-    await act(async () => { vi.advanceTimersByTime(300 + TYPING_DELAY); });
+    await act(async () => {
+      vi.advanceTimersByTime(300 + TYPING_DELAY);
+    });
 
     expect(sessionStorage.getItem("kato_chat")).not.toContain("@ada");
     expect(within(chatWindow()).getByText(collapsed(STEPS.welcome.msgs[0]))).toBeInTheDocument();

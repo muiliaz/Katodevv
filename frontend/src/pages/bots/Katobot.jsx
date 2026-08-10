@@ -18,16 +18,16 @@ import "./Katobot.css";
  */
 function Katobot({ size = 320, interactive = true, className = "" }) {
   const stageRef = useRef(null);
-  const faceRef  = useRef(null);
-  const target   = useRef({ x: 0, y: 0 });
-  const current  = useRef({ x: 0, y: 0 });
-  const rafRef   = useRef(null);
+  const faceRef = useRef(null);
+  const target = useRef({ x: 0, y: 0 });
+  const current = useRef({ x: 0, y: 0 });
+  const rafRef = useRef(null);
 
   useEffect(() => {
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const isTouch      = window.matchMedia("(hover: none)").matches;
+    const isTouch = window.matchMedia("(hover: none)").matches;
     const stage = stageRef.current;
-    const face  = faceRef.current;
+    const face = faceRef.current;
     if (!stage || !face) return;
 
     const cleanups = [];
@@ -52,7 +52,10 @@ function Katobot({ size = 320, interactive = true, className = "" }) {
           target.current.x = ((e.clientX - r.left) / r.width - 0.5) * 2;
           target.current.y = ((e.clientY - r.top) / r.height - 0.5) * 2;
         };
-        const onLeave = () => { target.current.x = 0; target.current.y = 0; };
+        const onLeave = () => {
+          target.current.x = 0;
+          target.current.y = 0;
+        };
         stage.addEventListener("mousemove", onMove);
         stage.addEventListener("mouseleave", onLeave);
         cleanups.push(() => {
@@ -68,7 +71,9 @@ function Katobot({ size = 320, interactive = true, className = "" }) {
           target.current.y = (Math.random() - 0.5) * 1.1;
           setTimeout(idle, 2400 + Math.random() * 1800);
         })();
-        cleanups.push(() => { alive = false; });
+        cleanups.push(() => {
+          alive = false;
+        });
       }
     }
 
@@ -77,14 +82,20 @@ function Katobot({ size = 320, interactive = true, className = "" }) {
       let alive = true;
       let blinkTimer;
       (function blinkLoop() {
-        blinkTimer = setTimeout(() => {
-          if (!alive) return;
-          face.classList.add("blinking");
-          setTimeout(() => face.classList.remove("blinking"), 130);
-          blinkLoop();
-        }, 2800 + Math.random() * 2600);
+        blinkTimer = setTimeout(
+          () => {
+            if (!alive) return;
+            face.classList.add("blinking");
+            setTimeout(() => face.classList.remove("blinking"), 130);
+            blinkLoop();
+          },
+          2800 + Math.random() * 2600
+        );
       })();
-      cleanups.push(() => { alive = false; clearTimeout(blinkTimer); });
+      cleanups.push(() => {
+        alive = false;
+        clearTimeout(blinkTimer);
+      });
     }
 
     return () => cleanups.forEach((fn) => fn());

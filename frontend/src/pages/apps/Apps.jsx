@@ -26,9 +26,19 @@ function Apps() {
         </Link>
         <div className="apps-eyebrow">{a.eyebrow}</div>
         <div className="apps-lang">
-          <button className={`apps-lang-btn ${lang === "en" ? "active" : ""}`} onClick={() => setLang("en")}>ENG</button>
+          <button
+            className={`apps-lang-btn ${lang === "en" ? "active" : ""}`}
+            onClick={() => setLang("en")}
+          >
+            ENG
+          </button>
           <span className="apps-lang-sep" />
-          <button className={`apps-lang-btn ${lang === "ru" ? "active" : ""}`} onClick={() => setLang("ru")}>RU</button>
+          <button
+            className={`apps-lang-btn ${lang === "ru" ? "active" : ""}`}
+            onClick={() => setLang("ru")}
+          >
+            RU
+          </button>
         </div>
       </header>
 

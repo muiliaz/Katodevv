@@ -11,11 +11,12 @@ function Navbar() {
 
   // Entrance: navbar slides down after loader cascade (1.9s from mount)
   useEffect(() => {
-    gsap.fromTo('.navbar',
+    gsap.fromTo(
+      ".navbar",
       { opacity: 0, y: -10 },
-      { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out', delay: 1.9, clearProps: 'transform' }
-    )
-  }, [])
+      { opacity: 1, y: 0, duration: 0.4, ease: "power2.out", delay: 1.9, clearProps: "transform" }
+    );
+  }, []);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 30);
@@ -51,12 +52,16 @@ function Navbar() {
             <button
               className={`nlang-btn ${lang === "en" ? "active" : ""}`}
               onClick={() => setLang("en")}
-            >ENG</button>
+            >
+              ENG
+            </button>
             <span className="nlang-sep" />
             <button
               className={`nlang-btn ${lang === "ru" ? "active" : ""}`}
               onClick={() => setLang("ru")}
-            >RU</button>
+            >
+              RU
+            </button>
           </div>
 
           <button className="navbar-cta" onClick={() => scrollTo(".contact")}>
@@ -69,7 +74,9 @@ function Navbar() {
             onClick={() => setMenuOpen(!menuOpen)}
             aria-label="menu"
           >
-            <span /><span /><span />
+            <span />
+            <span />
+            <span />
           </button>
         </div>
       </div>
@@ -80,7 +87,9 @@ function Navbar() {
           <button onClick={() => scrollTo(".services")}>{nav.services}</button>
           <button onClick={() => scrollTo(".about")}>{nav.about}</button>
           <button onClick={() => scrollTo(".contact")}>{nav.contact}</button>
-          <button className="mobile-cta" onClick={() => scrollTo(".contact")}>{nav.cta}</button>
+          <button className="mobile-cta" onClick={() => scrollTo(".contact")}>
+            {nav.cta}
+          </button>
         </div>
       )}
     </header>

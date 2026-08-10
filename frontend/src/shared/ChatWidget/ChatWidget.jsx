@@ -1,17 +1,22 @@
 import React, {
-  useReducer, useEffect, useLayoutEffect, useRef, useCallback, useState,
-} from 'react';
-import gsap from 'gsap';
-import { STEPS } from './chatScenarios';
-import Turnstile from '../Turnstile';
-import styles from './ChatWidget.module.css';
+  useReducer,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useCallback,
+  useState,
+} from "react";
+import gsap from "gsap";
+import { STEPS } from "./chatScenarios";
+import Turnstile from "../Turnstile";
+import styles from "./ChatWidget.module.css";
 
 // ─── State ────────────────────────────────────────────────────────────────────
 
 const BLANK = {
   isOpen: false,
   messages: [],
-  step: 'idle',
+  step: "idle",
   collectedData: {},
   isTyping: false,
   isSending: false,
@@ -19,24 +24,38 @@ const BLANK = {
 
 function reducer(state, action) {
   switch (action.type) {
-    case 'OPEN':        return { ...state, isOpen: true };
-    case 'CLOSE':       return { ...state, isOpen: false };
-    case 'ADD_MSG':     return { ...state, messages: [...state.messages, action.msg] };
-    case 'SET_TYPING':  return { ...state, isTyping: action.v };
-    case 'SET_STEP':    return { ...state, step: action.step };
-    case 'MERGE_DATA':  return { ...state, collectedData: { ...state.collectedData, ...action.data } };
-    case 'SET_SENDING': return { ...state, isSending: action.v };
-    case 'RESET':       return { ...BLANK, isOpen: state.isOpen };
-    default:            return state;
+    case "OPEN":
+      return { ...state, isOpen: true };
+    case "CLOSE":
+      return { ...state, isOpen: false };
+    case "ADD_MSG":
+      return { ...state, messages: [...state.messages, action.msg] };
+    case "SET_TYPING":
+      return { ...state, isTyping: action.v };
+    case "SET_STEP":
+      return { ...state, step: action.step };
+    case "MERGE_DATA":
+      return { ...state, collectedData: { ...state.collectedData, ...action.data } };
+    case "SET_SENDING":
+      return { ...state, isSending: action.v };
+    case "RESET":
+      return { ...BLANK, isOpen: state.isOpen };
+    default:
+      return state;
   }
 }
 
 function initState() {
   try {
-    const saved = sessionStorage.getItem('kato_chat');
+    const saved = sessionStorage.getItem("kato_chat");
     if (saved) {
       const p = JSON.parse(saved);
-      return { ...BLANK, messages: p.messages || [], step: p.step || 'idle', collectedData: p.collectedData || {} };
+      return {
+        ...BLANK,
+        messages: p.messages || [],
+        step: p.step || "idle",
+        collectedData: p.collectedData || {},
+      };
     }
   } catch {
     // Deliberately silent. sessionStorage throws in private mode and on
@@ -54,10 +73,14 @@ const makeMsg = (sender, text) => ({ id: ++_msgId, sender, text });
 
 async function postLead(data, turnstileToken) {
   try {
-    const res = await fetch('/.netlify/functions/lead', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...data, turnstileToken, timestamp: new Date().toLocaleString('ru-RU') }),
+    const res = await fetch("/.netlify/functions/lead", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        ...data,
+        turnstileToken,
+        timestamp: new Date().toLocaleString("ru-RU"),
+      }),
     });
     const json = await res.json();
     return !!json.success;
@@ -69,13 +92,13 @@ async function postLead(data, turnstileToken) {
 // ─── Focus trap helper ────────────────────────────────────────────────────────
 
 function trapFocus(e, container) {
-  if (e.key !== 'Tab' || !container) return;
+  if (e.key !== "Tab" || !container) return;
   const els = container.querySelectorAll(
     'button:not([disabled]), textarea:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])'
   );
   if (!els.length) return;
   const first = els[0];
-  const last  = els[els.length - 1];
+  const last = els[els.length - 1];
   if (e.shiftKey && document.activeElement === first) {
     e.preventDefault();
     last.focus();
@@ -93,26 +116,26 @@ export default function ChatWidget() {
 
   const [showBadge, setShowBadge] = useState(false);
 
-  const btnRef    = useRef(null);
-  const winRef    = useRef(null);
-  const endRef    = useRef(null);
+  const btnRef = useRef(null);
+  const winRef = useRef(null);
+  const endRef = useRef(null);
   const breathRef = useRef(null);
-  const timers    = useRef([]);
-  const wasOpen   = useRef(false);
+  const timers = useRef([]);
+  const wasOpen = useRef(false);
   // Held in a ref, not state: re-rendering the widget would burn the token.
   const turnstileTokenRef = useRef(null);
 
   // ── Persist to sessionStorage ─────────────────────────────────────────────
   useEffect(() => {
-    if (step !== 'idle' || messages.length > 0) {
-      sessionStorage.setItem('kato_chat', JSON.stringify({ messages, step, collectedData }));
+    if (step !== "idle" || messages.length > 0) {
+      sessionStorage.setItem("kato_chat", JSON.stringify({ messages, step, collectedData }));
     }
   }, [messages, step, collectedData]);
 
   // ── Set initial GSAP state before first paint ─────────────────────────────
   useLayoutEffect(() => {
     if (btnRef.current) gsap.set(btnRef.current, { opacity: 0, scale: 0 });
-    if (winRef.current) gsap.set(winRef.current, { visibility: 'hidden', opacity: 0 });
+    if (winRef.current) gsap.set(winRef.current, { visibility: "hidden", opacity: 0 });
   }, []);
 
   // ── Button appear + idle animations ──────────────────────────────────────
@@ -125,12 +148,12 @@ export default function ChatWidget() {
         opacity: 1,
         scale: 1,
         duration: 0.6,
-        ease: 'back.out(1.7)',
+        ease: "back.out(1.7)",
         onComplete: () => {
           breathRef.current = gsap.to(btn, {
             scale: 1.03,
             duration: 3,
-            ease: 'sine.inOut',
+            ease: "sine.inOut",
             repeat: -1,
             yoyo: true,
           });
@@ -144,7 +167,7 @@ export default function ChatWidget() {
       gsap.to(btn, {
         rotation: -5,
         duration: 0.1,
-        ease: 'power2.inOut',
+        ease: "power2.inOut",
         yoyo: true,
         repeat: 3,
         onComplete: () => gsap.set(btn, { rotation: 0 }),
@@ -164,10 +187,11 @@ export default function ChatWidget() {
     if (!win) return;
 
     if (isOpen && !wasOpen.current) {
-      gsap.set(win, { visibility: 'visible' });
-      gsap.fromTo(win,
+      gsap.set(win, { visibility: "visible" });
+      gsap.fromTo(
+        win,
         { scale: 0.9, opacity: 0, y: 20 },
-        { scale: 1, opacity: 1, y: 0, duration: 0.35, ease: 'power3.out' }
+        { scale: 1, opacity: 1, y: 0, duration: 0.35, ease: "power3.out" }
       );
     }
     wasOpen.current = isOpen;
@@ -175,11 +199,16 @@ export default function ChatWidget() {
 
   // ── Auto-scroll to latest message ─────────────────────────────────────────
   useEffect(() => {
-    endRef.current?.scrollIntoView({ behavior: 'smooth' });
+    endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isTyping]);
 
   // ── Cleanup timers on unmount ─────────────────────────────────────────────
-  useEffect(() => () => { timers.current.forEach(clearTimeout); }, []);
+  useEffect(
+    () => () => {
+      timers.current.forEach(clearTimeout);
+    },
+    []
+  );
 
   // ── Helpers ───────────────────────────────────────────────────────────────
   const clearTimers = () => {
@@ -192,26 +221,24 @@ export default function ChatWidget() {
     clearTimers();
     const s = STEPS[stepKey];
     if (!s) return;
-    dispatch({ type: 'SET_TYPING', v: true });
+    dispatch({ type: "SET_TYPING", v: true });
     const t = setTimeout(() => {
-      dispatch({ type: 'SET_TYPING', v: false });
-      s.msgs.forEach((text) => dispatch({ type: 'ADD_MSG', msg: makeMsg('bot', text) }));
-      dispatch({ type: 'SET_STEP', step: stepKey });
+      dispatch({ type: "SET_TYPING", v: false });
+      s.msgs.forEach((text) => dispatch({ type: "ADD_MSG", msg: makeMsg("bot", text) }));
+      dispatch({ type: "SET_STEP", step: stepKey });
     }, 800);
     timers.current.push(t);
-     
   }, []);
 
   // ── Open / Close ──────────────────────────────────────────────────────────
   const triggerOpen = useCallback(() => {
     setShowBadge(false);
-    dispatch({ type: 'OPEN' });
-    if (step === 'idle') {
-      dispatch({ type: 'SET_STEP', step: 'starting' });
-      const t = setTimeout(() => runStep('welcome'), 600);
+    dispatch({ type: "OPEN" });
+    if (step === "idle") {
+      dispatch({ type: "SET_STEP", step: "starting" });
+      const t = setTimeout(() => runStep("welcome"), 600);
       timers.current.push(t);
     }
-     
   }, [step, runStep]);
 
   // External open trigger — any page can do
@@ -220,22 +247,25 @@ export default function ChatWidget() {
   //    the 'kato:serviceSelected' event used by the Hero service picker).
   useEffect(() => {
     const onExternalOpen = () => triggerOpen();
-    window.addEventListener('kato:openChat', onExternalOpen);
-    return () => window.removeEventListener('kato:openChat', onExternalOpen);
+    window.addEventListener("kato:openChat", onExternalOpen);
+    return () => window.removeEventListener("kato:openChat", onExternalOpen);
   }, [triggerOpen]);
 
   const triggerClose = useCallback(() => {
     const win = winRef.current;
-    if (!win) { dispatch({ type: 'CLOSE' }); return; }
+    if (!win) {
+      dispatch({ type: "CLOSE" });
+      return;
+    }
     gsap.to(win, {
       scale: 0.95,
       opacity: 0,
       y: 8,
       duration: 0.2,
-      ease: 'power2.in',
+      ease: "power2.in",
       onComplete: () => {
-        gsap.set(win, { visibility: 'hidden' });
-        dispatch({ type: 'CLOSE' });
+        gsap.set(win, { visibility: "hidden" });
+        dispatch({ type: "CLOSE" });
       },
     });
   }, []);
@@ -247,80 +277,89 @@ export default function ChatWidget() {
   // further down is still in its temporal dead zone at that point. The tests
   // caught it as "Cannot access 'triggerClose' before initialization".
   useEffect(() => {
-    const onKey = (e) => { if (e.key === 'Escape' && isOpen) triggerClose(); };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
+    const onKey = (e) => {
+      if (e.key === "Escape" && isOpen) triggerClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
   }, [isOpen, triggerClose]);
 
   // ── Quick reply handler ───────────────────────────────────────────────────
-  const handleReply = useCallback((reply) => {
-    dispatch({ type: 'ADD_MSG', msg: makeMsg('user', reply.label) });
-    if (reply.data) dispatch({ type: 'MERGE_DATA', data: reply.data });
+  const handleReply = useCallback(
+    (reply) => {
+      dispatch({ type: "ADD_MSG", msg: makeMsg("user", reply.label) });
+      if (reply.data) dispatch({ type: "MERGE_DATA", data: reply.data });
 
-    if (reply.next === 'restart') {
-      dispatch({ type: 'RESET' });
-      sessionStorage.removeItem('kato_chat');
-      const t = setTimeout(() => runStep('welcome'), 300);
-      timers.current.push(t);
-      return;
-    }
-    if (reply.next === 'retry_contact') {
-      runStep('ask_contact');
-      return;
-    }
-    runStep(reply.next);
-     
-  }, [runStep]);
+      if (reply.next === "restart") {
+        dispatch({ type: "RESET" });
+        sessionStorage.removeItem("kato_chat");
+        const t = setTimeout(() => runStep("welcome"), 300);
+        timers.current.push(t);
+        return;
+      }
+      if (reply.next === "retry_contact") {
+        runStep("ask_contact");
+        return;
+      }
+      runStep(reply.next);
+    },
+    [runStep]
+  );
 
   // ── Free text / contact input handler ────────────────────────────────────
-  const handleSubmit = useCallback(async (text) => {
-    const trimmed = text.trim();
-    if (!trimmed) return;
-    dispatch({ type: 'ADD_MSG', msg: makeMsg('user', trimmed) });
+  const handleSubmit = useCallback(
+    async (text) => {
+      const trimmed = text.trim();
+      if (!trimmed) return;
+      dispatch({ type: "ADD_MSG", msg: makeMsg("user", trimmed) });
 
-    const s = STEPS[step];
-    if (s?.input) {
-      const isDirectOrFree = step === 'direct' || step === 'ask_free_contact';
-      const merged = { ...collectedData, contact: trimmed };
-      dispatch({ type: 'MERGE_DATA', data: { contact: trimmed } });
-      dispatch({ type: 'SET_SENDING', v: true });
+      const s = STEPS[step];
+      if (s?.input) {
+        const isDirectOrFree = step === "direct" || step === "ask_free_contact";
+        const merged = { ...collectedData, contact: trimmed };
+        dispatch({ type: "MERGE_DATA", data: { contact: trimmed } });
+        dispatch({ type: "SET_SENDING", v: true });
 
-      const ok = await postLead({
-        ...merged,
-        type: merged.type || (isDirectOrFree ? 'direct' : 'project'),
-      }, turnstileTokenRef.current);
+        const ok = await postLead(
+          {
+            ...merged,
+            type: merged.type || (isDirectOrFree ? "direct" : "project"),
+          },
+          turnstileTokenRef.current
+        );
 
-      dispatch({ type: 'SET_SENDING', v: false });
-      runStep(ok ? (isDirectOrFree ? 'done_direct' : 'done') : 'error');
-    } else {
-      dispatch({ type: 'MERGE_DATA', data: { freeText: trimmed } });
-      runStep('ask_free_contact');
-    }
-     
-  }, [step, collectedData, runStep]);
+        dispatch({ type: "SET_SENDING", v: false });
+        runStep(ok ? (isDirectOrFree ? "done_direct" : "done") : "error");
+      } else {
+        dispatch({ type: "MERGE_DATA", data: { freeText: trimmed } });
+        runStep("ask_free_contact");
+      }
+    },
+    [step, collectedData, runStep]
+  );
 
   // ── Button hover ─────────────────────────────────────────────────────────
   const onBtnEnter = () => {
     breathRef.current?.pause();
-    gsap.to(btnRef.current, { scale: 1.1, duration: 0.2, ease: 'power2.out' });
+    gsap.to(btnRef.current, { scale: 1.1, duration: 0.2, ease: "power2.out" });
   };
   const onBtnLeave = () => {
     gsap.to(btnRef.current, {
       scale: 1,
       duration: 0.2,
-      ease: 'power2.out',
+      ease: "power2.out",
       onComplete: () => breathRef.current?.resume(),
     });
   };
 
   // ── Derived values ────────────────────────────────────────────────────────
-  const stepDef      = STEPS[step];
+  const stepDef = STEPS[step];
   const quickReplies = stepDef?.replies || [];
-  const inputDisabled = ['done', 'done_direct'].includes(step);
+  const inputDisabled = ["done", "done_direct"].includes(step);
   const inputPlaceholder =
-    step === 'ask_contact' || step === 'ask_free_contact' || step === 'direct'
-      ? 'Telegram или email...'
-      : 'Введите сообщение...';
+    step === "ask_contact" || step === "ask_free_contact" || step === "direct"
+      ? "Telegram или email..."
+      : "Введите сообщение...";
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
@@ -366,14 +405,19 @@ export default function ChatWidget() {
         {/* Messages */}
         <div className={styles.msgs} role="log" aria-live="polite" aria-label="Сообщения">
           {messages.map((m) => (
-            <div key={m.id} className={`${styles.msg} ${m.sender === 'user' ? styles.msgUser : styles.msgBot}`}>
+            <div
+              key={m.id}
+              className={`${styles.msg} ${m.sender === "user" ? styles.msgUser : styles.msgBot}`}
+            >
               <span className={styles.msgText}>{m.text}</span>
             </div>
           ))}
           {isTyping && (
             <div className={`${styles.msg} ${styles.msgBot}`} aria-label="Бот печатает">
               <span className={styles.typing}>
-                <span /><span /><span />
+                <span />
+                <span />
+                <span />
               </span>
             </div>
           )}
@@ -393,7 +437,11 @@ export default function ChatWidget() {
 
         {/* Cloudflare challenge. Rendered inside the chat window so it only
             loads for visitors who actually open the widget. */}
-        <Turnstile onToken={(t) => { turnstileTokenRef.current = t; }} />
+        <Turnstile
+          onToken={(t) => {
+            turnstileTokenRef.current = t;
+          }}
+        />
 
         {/* Input */}
         <ChatInput
@@ -410,19 +458,19 @@ export default function ChatWidget() {
 // ─── ChatInput ────────────────────────────────────────────────────────────────
 
 function ChatInput({ onSubmit, disabled, loading, placeholder }) {
-  const [text, setText] = useState('');
+  const [text, setText] = useState("");
   const taRef = useRef(null);
 
   const resize = (el) => {
-    el.style.height = 'auto';
-    el.style.height = Math.min(el.scrollHeight, 80) + 'px';
+    el.style.height = "auto";
+    el.style.height = Math.min(el.scrollHeight, 80) + "px";
   };
 
   const submit = () => {
     if (!text.trim() || disabled || loading) return;
     onSubmit(text.trim());
-    setText('');
-    if (taRef.current) taRef.current.style.height = 'auto';
+    setText("");
+    if (taRef.current) taRef.current.style.height = "auto";
   };
 
   return (
@@ -434,9 +482,15 @@ function ChatInput({ onSubmit, disabled, loading, placeholder }) {
         rows={1}
         placeholder={placeholder}
         disabled={disabled || loading}
-        onChange={(e) => { setText(e.target.value); resize(e.target); }}
+        onChange={(e) => {
+          setText(e.target.value);
+          resize(e.target);
+        }}
         onKeyDown={(e) => {
-          if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); submit(); }
+          if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            submit();
+          }
         }}
         aria-label="Введите сообщение"
       />
@@ -446,7 +500,7 @@ function ChatInput({ onSubmit, disabled, loading, placeholder }) {
         disabled={!text.trim() || disabled || loading}
         aria-label="Отправить"
       >
-        {loading ? <span className={styles.spin} /> : '→'}
+        {loading ? <span className={styles.spin} /> : "→"}
       </button>
     </div>
   );

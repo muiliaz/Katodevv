@@ -1,65 +1,85 @@
-import { formatPrice, RESPONSE_SLA_HOURS } from '../pricing';
+import { formatPrice, RESPONSE_SLA_HOURS } from "../pricing";
 
-export const TG_HANDLE = '@katodevv';
+export const TG_HANDLE = "@katodevv";
 
 export const STEPS = {
   welcome: {
-    msgs: ['👋 Привет! Я ассистент Kato Devv.\nПомогу подобрать решение или отвечу на вопросы.\nС чего начнём?'],
+    msgs: [
+      "👋 Привет! Я ассистент Kato Devv.\nПомогу подобрать решение или отвечу на вопросы.\nС чего начнём?",
+    ],
     replies: [
-      { label: '💬 У меня есть проект',      next: 'ask_project_type', data: { type: 'project' } },
-      { label: '💰 Узнать цены',              next: 'prices' },
-      { label: '🤖 Хочу бота для бизнеса',   next: 'ask_bot_type',    data: { type: 'bot' } },
-      { label: '👤 Связаться напрямую',       next: 'direct' },
+      { label: "💬 У меня есть проект", next: "ask_project_type", data: { type: "project" } },
+      { label: "💰 Узнать цены", next: "prices" },
+      { label: "🤖 Хочу бота для бизнеса", next: "ask_bot_type", data: { type: "bot" } },
+      { label: "👤 Связаться напрямую", next: "direct" },
     ],
   },
 
   ask_project_type: {
-    msgs: ['Отлично! Расскажите кратко — что нужно сделать?'],
+    msgs: ["Отлично! Расскажите кратко — что нужно сделать?"],
     replies: [
-      { label: 'Сайт',                 next: 'ask_budget', data: { projectType: 'Сайт' } },
-      { label: 'Мобильное приложение', next: 'ask_budget', data: { projectType: 'Мобильное приложение' } },
-      { label: 'Бот',                  next: 'ask_budget', data: { projectType: 'Бот' } },
-      { label: 'Автоматизация',        next: 'ask_budget', data: { projectType: 'Автоматизация' } },
-      { label: 'Другое',               next: 'ask_budget', data: { projectType: 'Другое' } },
+      { label: "Сайт", next: "ask_budget", data: { projectType: "Сайт" } },
+      {
+        label: "Мобильное приложение",
+        next: "ask_budget",
+        data: { projectType: "Мобильное приложение" },
+      },
+      { label: "Бот", next: "ask_budget", data: { projectType: "Бот" } },
+      { label: "Автоматизация", next: "ask_budget", data: { projectType: "Автоматизация" } },
+      { label: "Другое", next: "ask_budget", data: { projectType: "Другое" } },
     ],
   },
 
   ask_bot_type: {
-    msgs: ['Какой бот нужен?'],
+    msgs: ["Какой бот нужен?"],
     replies: [
-      { label: 'Запись клиентов',    next: 'ask_budget', data: { projectType: 'Запись клиентов' } },
-      { label: 'AI-консультант',     next: 'ask_budget', data: { projectType: 'AI-консультант' } },
-      { label: 'Магазин в Telegram', next: 'ask_budget', data: { projectType: 'Магазин в Telegram' } },
-      { label: 'Парсер/уведомления', next: 'ask_budget', data: { projectType: 'Парсер/уведомления' } },
-      { label: 'Другое',             next: 'ask_budget', data: { projectType: 'Другое' } },
+      { label: "Запись клиентов", next: "ask_budget", data: { projectType: "Запись клиентов" } },
+      { label: "AI-консультант", next: "ask_budget", data: { projectType: "AI-консультант" } },
+      {
+        label: "Магазин в Telegram",
+        next: "ask_budget",
+        data: { projectType: "Магазин в Telegram" },
+      },
+      {
+        label: "Парсер/уведомления",
+        next: "ask_budget",
+        data: { projectType: "Парсер/уведомления" },
+      },
+      { label: "Другое", next: "ask_budget", data: { projectType: "Другое" } },
     ],
   },
 
   ask_budget: {
-    msgs: ['Понял. Какой ориентировочный бюджет?'],
+    msgs: ["Понял. Какой ориентировочный бюджет?"],
     replies: [
-      { label: 'До $1000',    next: 'ask_deadline', data: { budget: 'До $1000' } },
-      { label: '$1000–3000',  next: 'ask_deadline', data: { budget: '$1000–3000' } },
-      { label: '$3000–10000', next: 'ask_deadline', data: { budget: '$3000–10000' } },
-      { label: '$10000+',     next: 'ask_deadline', data: { budget: '$10000+' } },
-      { label: 'Не знаю',     next: 'ask_deadline', data: { budget: 'Не знаю' } },
+      { label: "До $1000", next: "ask_deadline", data: { budget: "До $1000" } },
+      { label: "$1000–3000", next: "ask_deadline", data: { budget: "$1000–3000" } },
+      { label: "$3000–10000", next: "ask_deadline", data: { budget: "$3000–10000" } },
+      { label: "$10000+", next: "ask_deadline", data: { budget: "$10000+" } },
+      { label: "Не знаю", next: "ask_deadline", data: { budget: "Не знаю" } },
     ],
   },
 
   ask_deadline: {
-    msgs: ['Когда нужно запустить?'],
+    msgs: ["Когда нужно запустить?"],
     replies: [
-      { label: 'Срочно (1–2 недели)', next: 'ask_contact', data: { deadline: 'Срочно (1–2 недели)' } },
-      { label: 'Месяц',               next: 'ask_contact', data: { deadline: 'Месяц' } },
-      { label: '2–3 месяца',          next: 'ask_contact', data: { deadline: '2–3 месяца' } },
-      { label: 'Не горит',            next: 'ask_contact', data: { deadline: 'Не горит' } },
+      {
+        label: "Срочно (1–2 недели)",
+        next: "ask_contact",
+        data: { deadline: "Срочно (1–2 недели)" },
+      },
+      { label: "Месяц", next: "ask_contact", data: { deadline: "Месяц" } },
+      { label: "2–3 месяца", next: "ask_contact", data: { deadline: "2–3 месяца" } },
+      { label: "Не горит", next: "ask_contact", data: { deadline: "Не горит" } },
     ],
   },
 
   ask_contact: {
     // The promise has to match the one the forms make — it used to say "within
     // the hour" here while six other places said 24 hours.
-    msgs: [`Супер. Оставьте ваш контакт — Telegram или email — и я передам бриф команде. Свяжемся в течение ${RESPONSE_SLA_HOURS} часов.`],
+    msgs: [
+      `Супер. Оставьте ваш контакт — Telegram или email — и я передам бриф команде. Свяжемся в течение ${RESPONSE_SLA_HOURS} часов.`,
+    ],
     replies: [],
     input: true,
   },
@@ -68,25 +88,25 @@ export const STEPS = {
     // Every amount comes from shared/pricing.js — never hard-code one here.
     msgs: [
       [
-        '🌐 Сайты',
-        `  • Лендинг — ${formatPrice('landing')}`,
-        `  • Бизнес-сайт — ${formatPrice('business-site')}`,
-        `  • Интернет-магазин — ${formatPrice('ecommerce')}`,
-        '',
-        '🤖 Боты',
-        `  • Telegram-бот — ${formatPrice('tg-bot')}`,
-        `  • AI-консультант — ${formatPrice('ai-bot')}`,
-        `  • Mini App — ${formatPrice('mini-app')}`,
-        '',
-        `📱 Мобильные приложения — ${formatPrice('mobile-app')}`,
-        `⚙️ Автоматизация — ${formatPrice('automation')}`,
-        '',
-        'Финальная цена зависит от задач. Обсудим?',
-      ].join('\n'),
+        "🌐 Сайты",
+        `  • Лендинг — ${formatPrice("landing")}`,
+        `  • Бизнес-сайт — ${formatPrice("business-site")}`,
+        `  • Интернет-магазин — ${formatPrice("ecommerce")}`,
+        "",
+        "🤖 Боты",
+        `  • Telegram-бот — ${formatPrice("tg-bot")}`,
+        `  • AI-консультант — ${formatPrice("ai-bot")}`,
+        `  • Mini App — ${formatPrice("mini-app")}`,
+        "",
+        `📱 Мобильные приложения — ${formatPrice("mobile-app")}`,
+        `⚙️ Автоматизация — ${formatPrice("automation")}`,
+        "",
+        "Финальная цена зависит от задач. Обсудим?",
+      ].join("\n"),
     ],
     replies: [
-      { label: 'Обсудить проект',    next: 'ask_project_type', data: { type: 'project' } },
-      { label: 'Связаться напрямую', next: 'direct' },
+      { label: "Обсудить проект", next: "ask_project_type", data: { type: "project" } },
+      { label: "Связаться напрямую", next: "direct" },
     ],
   },
 
@@ -97,26 +117,28 @@ export const STEPS = {
   },
 
   ask_free_contact: {
-    msgs: ['Я пока работаю по сценариям. Передам ваше сообщение Kato напрямую — он ответит лично. Оставьте, пожалуйста, контакт для связи:'],
+    msgs: [
+      "Я пока работаю по сценариям. Передам ваше сообщение Kato напрямую — он ответит лично. Оставьте, пожалуйста, контакт для связи:",
+    ],
     replies: [],
     input: true,
   },
 
   done: {
-    msgs: ['Спасибо! Бриф отправлен. Ждите сообщения от Kato в ближайшее время. 🚀'],
-    replies: [{ label: '🏠 Начать заново', next: 'restart' }],
+    msgs: ["Спасибо! Бриф отправлен. Ждите сообщения от Kato в ближайшее время. 🚀"],
+    replies: [{ label: "🏠 Начать заново", next: "restart" }],
   },
 
   done_direct: {
-    msgs: ['Отлично! Передал ваш контакт. Kato свяжется с вами совсем скоро 👍'],
-    replies: [{ label: '🏠 Начать заново', next: 'restart' }],
+    msgs: ["Отлично! Передал ваш контакт. Kato свяжется с вами совсем скоро 👍"],
+    replies: [{ label: "🏠 Начать заново", next: "restart" }],
   },
 
   error: {
     msgs: [`Что-то пошло не так. Напишите мне в Telegram: ${TG_HANDLE}`],
     replies: [
-      { label: 'Попробовать снова', next: 'retry_contact' },
-      { label: '🏠 Начать заново',  next: 'restart' },
+      { label: "Попробовать снова", next: "retry_contact" },
+      { label: "🏠 Начать заново", next: "restart" },
     ],
   },
 };

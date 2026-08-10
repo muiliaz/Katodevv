@@ -14,9 +14,21 @@ function ArchetypeDashboard({ archetypeKey }) {
             <span className="dash-balance-label">BALANCE</span>
             <span className="dash-balance-value">$12,480</span>
           </div>
-          <div className="dash-row"><span className="dash-row-icon">💳</span><span className="dash-row-label">Groceries</span><span className="dash-row-amt is-neg">-$42</span></div>
-          <div className="dash-row"><span className="dash-row-icon">💼</span><span className="dash-row-label">Salary</span><span className="dash-row-amt is-pos">+$3,200</span></div>
-          <div className="dash-row"><span className="dash-row-icon">☕</span><span className="dash-row-label">Coffee</span><span className="dash-row-amt is-neg">-$5</span></div>
+          <div className="dash-row">
+            <span className="dash-row-icon">💳</span>
+            <span className="dash-row-label">Groceries</span>
+            <span className="dash-row-amt is-neg">-$42</span>
+          </div>
+          <div className="dash-row">
+            <span className="dash-row-icon">💼</span>
+            <span className="dash-row-label">Salary</span>
+            <span className="dash-row-amt is-pos">+$3,200</span>
+          </div>
+          <div className="dash-row">
+            <span className="dash-row-icon">☕</span>
+            <span className="dash-row-label">Coffee</span>
+            <span className="dash-row-amt is-neg">-$5</span>
+          </div>
         </div>
       );
 
@@ -32,7 +44,9 @@ function ArchetypeDashboard({ archetypeKey }) {
     case "ondemand":
       return (
         <div className="abg-dash abg-dash--ondemand">
-          <div className="dash-map"><span className="dash-map-pin">📍</span></div>
+          <div className="dash-map">
+            <span className="dash-map-pin">📍</span>
+          </div>
           <div className="dash-eta-card">
             <span className="dash-eta-title">Arriving in</span>
             <span className="dash-eta-value">12 min</span>
@@ -44,10 +58,18 @@ function ArchetypeDashboard({ archetypeKey }) {
       return (
         <div className="abg-dash abg-dash--marketplace">
           <div className="dash-products">
-            <div className="dash-product"><span className="dash-product-tag">$29</span></div>
-            <div className="dash-product"><span className="dash-product-tag">$54</span></div>
-            <div className="dash-product"><span className="dash-product-tag">$18</span></div>
-            <div className="dash-product"><span className="dash-product-tag">$76</span></div>
+            <div className="dash-product">
+              <span className="dash-product-tag">$29</span>
+            </div>
+            <div className="dash-product">
+              <span className="dash-product-tag">$54</span>
+            </div>
+            <div className="dash-product">
+              <span className="dash-product-tag">$18</span>
+            </div>
+            <div className="dash-product">
+              <span className="dash-product-tag">$76</span>
+            </div>
           </div>
         </div>
       );
@@ -55,11 +77,23 @@ function ArchetypeDashboard({ archetypeKey }) {
     case "productivity":
       return (
         <div className="abg-dash abg-dash--productivity">
-          <div className="dash-task"><span className="dash-check is-done" /><span>Ship the release</span></div>
-          <div className="dash-task"><span className="dash-check" /><span>Review PRs</span></div>
-          <div className="dash-task"><span className="dash-check is-done" /><span>Sync with team</span></div>
+          <div className="dash-task">
+            <span className="dash-check is-done" />
+            <span>Ship the release</span>
+          </div>
+          <div className="dash-task">
+            <span className="dash-check" />
+            <span>Review PRs</span>
+          </div>
+          <div className="dash-task">
+            <span className="dash-check is-done" />
+            <span>Sync with team</span>
+          </div>
           <div className="dash-bars">
-            <span style={{ height: "40%" }} /><span style={{ height: "72%" }} /><span style={{ height: "55%" }} /><span style={{ height: "88%" }} />
+            <span style={{ height: "40%" }} />
+            <span style={{ height: "72%" }} />
+            <span style={{ height: "55%" }} />
+            <span style={{ height: "88%" }} />
           </div>
         </div>
       );
@@ -91,10 +125,22 @@ function ArchetypeDashboard({ archetypeKey }) {
     case "enterprise":
       return (
         <div className="abg-dash abg-dash--enterprise">
-          <div className="dash-table-header"><span>Project</span><span>Status</span></div>
-          <div className="dash-table-row"><span>Alpha</span><span className="dash-badge">Active</span></div>
-          <div className="dash-table-row"><span>Beta</span><span className="dash-badge is-done">Done</span></div>
-          <div className="dash-table-row"><span>Gamma</span><span className="dash-badge">Active</span></div>
+          <div className="dash-table-header">
+            <span>Project</span>
+            <span>Status</span>
+          </div>
+          <div className="dash-table-row">
+            <span>Alpha</span>
+            <span className="dash-badge">Active</span>
+          </div>
+          <div className="dash-table-row">
+            <span>Beta</span>
+            <span className="dash-badge is-done">Done</span>
+          </div>
+          <div className="dash-table-row">
+            <span>Gamma</span>
+            <span className="dash-badge">Active</span>
+          </div>
         </div>
       );
 

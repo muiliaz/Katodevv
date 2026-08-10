@@ -2,7 +2,9 @@
    mounted (body.custom-cursor-active), so it can never leak into other
    pages that don't render this component. */
 @media (hover: hover) {
-  body.custom-cursor-active * { cursor: none !important; }
+  body.custom-cursor-active * {
+    cursor: none !important;
+  }
 }
 
 /* ── Dot: snaps instantly to cursor position ─────────────────────────────── */
@@ -24,7 +26,9 @@
   box-shadow: 0 0 8px rgba(255, 255, 255, 0.7);
 }
 
-.cursor-dot.visible { opacity: 1; }
+.cursor-dot.visible {
+  opacity: 1;
+}
 
 /* ── Ring: lags behind with 10% lerp ────────────────────────────────────── */
 .cursor-ring {
@@ -50,7 +54,9 @@
   will-change: transform;
 }
 
-.cursor-ring.visible { opacity: 1; }
+.cursor-ring.visible {
+  opacity: 1;
+}
 
 /* Scale on interactive elements */
 .cursor-ring.grow {
@@ -69,5 +75,5 @@
   margin-left: -11px;
   margin-top: -11px;
   background: rgba(255, 255, 255, 0.12);
-  border-color: rgba(255, 255, 255, 0.80);
+  border-color: rgba(255, 255, 255, 0.8);
 }

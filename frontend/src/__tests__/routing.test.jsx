@@ -33,8 +33,8 @@ describe("App maps every path to its page", () => {
   // The routes are also the sitemap and the SEO surface, so a silently dropped
   // one is a real outage rather than a cosmetic bug.
   test.each([
-    ["/",     "hub page"],
-    ["/web",  "web page"],
+    ["/", "hub page"],
+    ["/web", "web page"],
     ["/bots", "bots page"],
     ["/apps", "apps page"],
   ])("renders %s", async (path, expected) => {

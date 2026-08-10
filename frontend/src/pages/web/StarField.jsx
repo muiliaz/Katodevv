@@ -1,5 +1,5 @@
-import { Canvas } from '@react-three/fiber'
-import { Stars } from '@react-three/drei'
+import { Canvas } from "@react-three/fiber";
+import { Stars } from "@react-three/drei";
 
 /**
  * Lightweight fixed starfield rendered behind all page content.
@@ -7,23 +7,17 @@ import { Stars } from '@react-three/drei'
  */
 export default function StarField() {
   return (
-    <div style={{
-      position: 'fixed',
-      inset: 0,
-      zIndex: 0,
-      pointerEvents: 'none',
-    }}>
+    <div
+      style={{
+        position: "fixed",
+        inset: 0,
+        zIndex: 0,
+        pointerEvents: "none",
+      }}
+    >
       <Canvas camera={{ position: [0, 0, 1], fov: 60 }} gl={{ antialias: false }}>
-        <Stars
-          radius={120}
-          depth={60}
-          count={4000}
-          factor={4}
-          saturation={0}
-          fade
-          speed={0.3}
-        />
+        <Stars radius={120} depth={60} count={4000} factor={4} saturation={0} fade speed={0.3} />
       </Canvas>
     </div>
-  )
+  );
 }

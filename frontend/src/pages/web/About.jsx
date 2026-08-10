@@ -2,10 +2,9 @@ import { useEffect, useRef } from "react";
 import { useLang, TEAM } from "../../shared/LangContext";
 import "./About.css";
 
-
 function About() {
   const { t } = useLang();
-  const a       = t.about;
+  const a = t.about;
   const sectionRef = useRef(null);
 
   useEffect(() => {
@@ -22,14 +21,12 @@ function About() {
     return () => observer.disconnect();
   }, []);
 
-
   return (
     <section className="about" ref={sectionRef}>
       <div className="about-blob about-blob-1" />
       <div className="about-blob about-blob-2" />
 
       <div className="about-container">
-
         {/* Header */}
         <div className="abt-header abt-fade">
           <div className="abt-tag-pill">{t.demos.about.tagPill}</div>
@@ -64,14 +61,15 @@ function About() {
           <div className="abt-team-overview-top">
             <div className="abt-team-avatars">
               {TEAM.map((m) => (
-                <div className="abt-team-avatar-circle" key={m.name}>{m.emoji}</div>
+                <div className="abt-team-avatar-circle" key={m.name}>
+                  {m.emoji}
+                </div>
               ))}
             </div>
             <div className="abt-team-overview-count">{t.demos.about.teamCount}</div>
             <div className="abt-team-overview-sub">{t.demos.about.teamSub}</div>
           </div>
         </div>
-
       </div>
     </section>
   );

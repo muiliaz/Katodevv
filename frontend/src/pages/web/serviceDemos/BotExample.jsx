@@ -6,9 +6,9 @@ import "../Services.css";
 function BotExample() {
   const { t } = useLang();
   const st = t.services;
-  const [shown, setShown]   = useState([]);
+  const [shown, setShown] = useState([]);
   const [typing, setTyping] = useState(false);
-  const msgRef              = useRef(null);
+  const msgRef = useRef(null);
 
   // Replays the scripted conversation, one message at a time.
   //
@@ -29,10 +29,12 @@ function BotExample() {
       if (msg.sender === "bot" && i > 0) {
         timers.push(setTimeout(() => setTyping(true), cum - 700));
       }
-      timers.push(setTimeout(() => {
-        setTyping(false);
-        setShown(prev => [...prev, msg]);
-      }, cum));
+      timers.push(
+        setTimeout(() => {
+          setTyping(false);
+          setShown((prev) => [...prev, msg]);
+        }, cum)
+      );
     });
     return () => timers.forEach(clearTimeout);
   }, [botScript]);
@@ -53,11 +55,15 @@ function BotExample() {
       </div>
       <div className="chat-msgs-light" ref={msgRef}>
         {shown.map((m, i) => (
-          <div key={i} className={`chat-bubble ${m.sender}`}>{m.text}</div>
+          <div key={i} className={`chat-bubble ${m.sender}`}>
+            {m.text}
+          </div>
         ))}
         {typing && (
           <div className="chat-bubble bot typing">
-            <span /><span /><span />
+            <span />
+            <span />
+            <span />
           </div>
         )}
       </div>

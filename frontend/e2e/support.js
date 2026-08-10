@@ -4,9 +4,9 @@
 // third-party challenge script and a hero that renders in software on a
 // runner — so the handling lives here rather than being copied per spec.
 
-export const CONTACT_ENDPOINT = '**/.netlify/functions/contact';
-export const LEAD_ENDPOINT = '**/.netlify/functions/lead';
-export const STUB_TOKEN = 'e2e-turnstile-token';
+export const CONTACT_ENDPOINT = "**/.netlify/functions/contact";
+export const LEAD_ENDPOINT = "**/.netlify/functions/lead";
+export const STUB_TOKEN = "e2e-turnstile-token";
 
 // Stands in for challenges.cloudflare.com/turnstile/v0/api.js. Turnstile.jsx
 // injects that script and reads window.turnstile once it loads, so a script
@@ -52,8 +52,8 @@ const SHRINK_HERO = `
 
 /** Serves the Turnstile stub instead of Cloudflare's script. */
 export async function stubTurnstile(page) {
-  await page.route('https://challenges.cloudflare.com/**', (route) =>
-    route.fulfill({ contentType: 'application/javascript', body: TURNSTILE_STUB })
+  await page.route("https://challenges.cloudflare.com/**", (route) =>
+    route.fulfill({ contentType: "application/javascript", body: TURNSTILE_STUB })
   );
 }
 
@@ -73,7 +73,7 @@ export async function captureEndpoint(page, endpoint, { success = true, status =
     payloads.push(route.request().postDataJSON());
     await route.fulfill({
       status,
-      contentType: 'application/json',
+      contentType: "application/json",
       body: JSON.stringify({ success }),
     });
   });

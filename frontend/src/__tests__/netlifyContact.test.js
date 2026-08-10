@@ -7,13 +7,18 @@ import { vi } from "vitest";
 // HTML escaping and the Telegram request itself. That is deliberate. Mocking
 // sendMessage would have left lib/telegram.js untested, and it is the module
 // that builds the request we actually depend on.
-import { GENERIC_ERROR, INVALID_JSON, TOO_MANY_REQUESTS, CHALLENGE_FAILED } from "../../netlify/functions/lib/responses";
+import {
+  GENERIC_ERROR,
+  INVALID_JSON,
+  TOO_MANY_REQUESTS,
+  CHALLENGE_FAILED,
+} from "../../netlify/functions/lib/responses";
 import { MAX_REQUESTS } from "../../netlify/functions/lib/rateLimit";
 import { handler } from "../../netlify/functions/contact";
 
 const validContact = {
-  name:    "Ada",
-  email:   "ada@example.com",
+  name: "Ada",
+  email: "ada@example.com",
   message: "I need a landing page for my shop.",
 };
 
@@ -23,7 +28,9 @@ const validContact = {
 // survives the fact that the CommonJS handler and this ESM test each hold their
 // own copy of the limiter module.
 let testNo = 0;
-beforeEach(() => { testNo += 1; });
+beforeEach(() => {
+  testNo += 1;
+});
 const currentIp = () => `203.0.113.${testNo}`;
 
 // Netlify hands the handler a raw string body, never an object.
@@ -32,8 +39,8 @@ const currentIp = () => `203.0.113.${testNo}`;
 function post(body, ip = currentIp()) {
   return handler({
     httpMethod: "POST",
-    headers:    { "x-nf-client-connection-ip": ip },
-    body:       typeof body === "string" ? body : JSON.stringify(body),
+    headers: { "x-nf-client-connection-ip": ip },
+    body: typeof body === "string" ? body : JSON.stringify(body),
   });
 }
 
@@ -209,14 +216,15 @@ describe("rate limiting", () => {
   test("keys on the header Netlify sets, not on a client-supplied one", async () => {
     // x-forwarded-for is caller-controlled: if it outranked the edge header,
     // rotating it would defeat the limiter outright.
-    const spoofed = (i) => handler({
-      httpMethod: "POST",
-      headers: {
-        "x-nf-client-connection-ip": "203.0.113.50",
-        "x-forwarded-for":           `10.0.0.${i}`,
-      },
-      body: JSON.stringify(validContact),
-    });
+    const spoofed = (i) =>
+      handler({
+        httpMethod: "POST",
+        headers: {
+          "x-nf-client-connection-ip": "203.0.113.50",
+          "x-forwarded-for": `10.0.0.${i}`,
+        },
+        body: JSON.stringify(validContact),
+      });
 
     for (let i = 0; i < MAX_REQUESTS; i++) await spoofed(i);
 

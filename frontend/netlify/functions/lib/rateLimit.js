@@ -22,7 +22,7 @@
 // Cloudflare Turnstile; both need accounts and credentials the repository
 // cannot provision for itself. See audit-fixes/03-rate-limiting.md.
 
-const WINDOW_MS    = 60 * 1000;
+const WINDOW_MS = 60 * 1000;
 const MAX_REQUESTS = 5;
 
 // Cap on distinct keys held at once. Without it a spray of forged addresses
@@ -38,13 +38,13 @@ const hits = new Map();
 // dev` and is client-controlled: treat a request that only carries that header
 // as weakly identified, never as trusted.
 function clientIp(headers = {}) {
-  const direct = headers['x-nf-client-connection-ip'];
+  const direct = headers["x-nf-client-connection-ip"];
   if (direct) return direct;
 
-  const forwarded = headers['x-forwarded-for'];
-  if (forwarded) return forwarded.split(',')[0].trim();
+  const forwarded = headers["x-forwarded-for"];
+  if (forwarded) return forwarded.split(",")[0].trim();
 
-  return 'unknown';
+  return "unknown";
 }
 
 function prune(now) {

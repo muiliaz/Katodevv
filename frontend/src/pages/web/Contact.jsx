@@ -6,14 +6,14 @@ import "./Contact.css";
 function Contact() {
   const { t } = useLang();
   const c = t.contact;
-  const [sent, setSent]             = useState(false);
-  const [loading, setLoading]       = useState(false);
-  const [error, setError]           = useState(null);
+  const [sent, setSent] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const [preService, setPreService] = useState(null);
   // Null until Cloudflare issues one. The server decides what an absent token
   // means, so the form stays submittable either way.
   const [turnstileToken, setTurnstileToken] = useState(null);
-  const formRef                     = useRef(null);
+  const formRef = useRef(null);
 
   // Listen for service selection from Hero picker
   useEffect(() => {
@@ -24,15 +24,15 @@ function Contact() {
         formRef.current?.querySelector('input[name="name"]')?.focus();
       }, 750);
     };
-    window.addEventListener('kato:serviceSelected', handler);
-    return () => window.removeEventListener('kato:serviceSelected', handler);
+    window.addEventListener("kato:serviceSelected", handler);
+    return () => window.removeEventListener("kato:serviceSelected", handler);
   }, []);
 
   async function handleSubmit(e) {
     e.preventDefault();
     const fd = new FormData(e.target);
-    const name    = (fd.get("name")    || "").trim();
-    const email   = (fd.get("email")   || "").trim();
+    const name = (fd.get("name") || "").trim();
+    const email = (fd.get("email") || "").trim();
     const message = (fd.get("message") || "").trim();
 
     // The `required` attributes only stop a genuinely empty field — a browser
@@ -47,17 +47,15 @@ function Contact() {
     setError(null);
     try {
       const res = await fetch("/.netlify/functions/contact", {
-        method:  "POST",
+        method: "POST",
         headers: { "Content-Type": "application/json" },
-        body:    JSON.stringify({
+        body: JSON.stringify({
           name,
           email,
           // Honeypot — humans never see this field, so a value means a bot.
           company: fd.get("company"),
           turnstileToken,
-          message: preService
-            ? `[${preService.icon} ${preService.label}]\n${message}`
-            : message,
+          message: preService ? `[${preService.icon} ${preService.label}]\n${message}` : message,
         }),
       });
       if (!res.ok) throw new Error();
@@ -78,7 +76,6 @@ function Contact() {
       <div className="contact-blob contact-blob-2" />
 
       <div className="contact-container">
-
         {/* Header */}
         <div className="contact-header">
           <div className="contact-tag-pill">{t.demos.contact.tagPill}</div>
@@ -87,10 +84,8 @@ function Contact() {
         </div>
 
         <div className="contact-body">
-
           {/* Left — contact info */}
           <div className="contact-info">
-
             {/* Telegram */}
             <a
               href="https://t.me/katodevv"
@@ -100,7 +95,7 @@ function Contact() {
             >
               <div className="cic-icon tg-icon">
                 <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22">
-                  <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248-1.97 9.289c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.17 14.086l-2.95-.924c-.64-.203-.654-.64.136-.949l11.52-4.443c.535-.194 1.004.131.686.478z"/>
+                  <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248-1.97 9.289c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.17 14.086l-2.95-.924c-.64-.203-.654-.64.136-.949l11.52-4.443c.535-.194 1.004.131.686.478z" />
                 </svg>
               </div>
               <div className="cic-body">
@@ -111,14 +106,18 @@ function Contact() {
             </a>
 
             {/* Email */}
-            <a
-              href="mailto:katodevv@proton.me"
-              className="contact-info-card email"
-            >
+            <a href="mailto:katodevv@proton.me" className="contact-info-card email">
               <div className="cic-icon email-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="22" height="22">
-                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-                  <polyline points="22,6 12,13 2,6"/>
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  width="22"
+                  height="22"
+                >
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                  <polyline points="22,6 12,13 2,6" />
                 </svg>
               </div>
               <div className="cic-body">
@@ -131,9 +130,16 @@ function Contact() {
             {/* Hours */}
             <div className="contact-info-card hours">
               <div className="cic-icon hours-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="22" height="22">
-                  <circle cx="12" cy="12" r="10"/>
-                  <polyline points="12,6 12,12 16,14"/>
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  width="22"
+                  height="22"
+                >
+                  <circle cx="12" cy="12" r="10" />
+                  <polyline points="12,6 12,12 16,14" />
                 </svg>
               </div>
               <div className="cic-body">
@@ -145,9 +151,16 @@ function Contact() {
             {/* Location */}
             <div className="contact-info-card location">
               <div className="cic-icon loc-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="22" height="22">
-                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
-                  <circle cx="12" cy="10" r="3"/>
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  width="22"
+                  height="22"
+                >
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
+                  <circle cx="12" cy="10" r="3" />
                 </svg>
               </div>
               <div className="cic-body">
@@ -197,7 +210,7 @@ function Contact() {
                   <span className="cform-chip-icon">{preService.icon}</span>
                   <div className="cform-chip-body">
                     <span className="cform-chip-label">
-                      {t.contact?.projectType || 'Project type'}
+                      {t.contact?.projectType || "Project type"}
                     </span>
                     <span className="cform-chip-value">{preService.label}</span>
                   </div>
@@ -206,7 +219,9 @@ function Contact() {
                     className="cform-chip-remove"
                     onClick={() => setPreService(null)}
                     aria-label="Remove"
-                  >✕</button>
+                  >
+                    ✕
+                  </button>
                 </div>
               )}
               <div className="cform-group">
@@ -216,12 +231,15 @@ function Contact() {
               {error && <div className="cform-error">{error}</div>}
               <Turnstile onToken={setTurnstileToken} />
 
-              <button type="submit" className={`cform-btn ${sent ? "sent" : ""}`} disabled={loading}>
+              <button
+                type="submit"
+                className={`cform-btn ${sent ? "sent" : ""}`}
+                disabled={loading}
+              >
                 {sent ? "✓ " + (c.sent || "Sent!") : loading ? "..." : c.send}
               </button>
             </form>
           </div>
-
         </div>
       </div>
     </section>

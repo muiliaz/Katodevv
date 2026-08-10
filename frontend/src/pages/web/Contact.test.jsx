@@ -17,9 +17,12 @@ function renderContact() {
 // fire-and-forget calls this file used to make silently stopped typing anything.
 const user = () => userEvent.setup();
 
-async function fillForm(u, { name = "Ada", email = "ada@example.com", message = "I need a landing page for my shop." } = {}) {
-  if (name)    await u.type(screen.getByPlaceholderText("Your name"), name);
-  if (email)   await u.type(screen.getByPlaceholderText("Your email"), email);
+async function fillForm(
+  u,
+  { name = "Ada", email = "ada@example.com", message = "I need a landing page for my shop." } = {}
+) {
+  if (name) await u.type(screen.getByPlaceholderText("Your name"), name);
+  if (email) await u.type(screen.getByPlaceholderText("Your email"), email);
   if (message) await u.type(screen.getByPlaceholderText("Tell us about your project"), message);
 }
 
@@ -94,8 +97,8 @@ test("posts the form values and shows the sent state", async () => {
   expect(url).toBe("/.netlify/functions/contact");
   expect(options.method).toBe("POST");
   expect(JSON.parse(options.body)).toMatchObject({
-    name:    "Ada",
-    email:   "ada@example.com",
+    name: "Ada",
+    email: "ada@example.com",
     message: "I need a landing page for my shop.",
   });
 
@@ -111,9 +114,7 @@ test("shows an error message when the request fails", async () => {
 
   await u.click(submitButton());
 
-  expect(
-    await screen.findByText("Something went wrong. Please try again.")
-  ).toBeInTheDocument();
+  expect(await screen.findByText("Something went wrong. Please try again.")).toBeInTheDocument();
   expect(screen.queryByRole("button", { name: /sent/i })).not.toBeInTheDocument();
 });
 

@@ -2,15 +2,12 @@ import js from "@eslint/js";
 import reactHooks from "eslint-plugin-react-hooks";
 import globals from "globals";
 
-// Lint only. No formatter, no style rules.
+// Correctness rules only. Formatting is Prettier's job (.prettierrc.json), and
+// the two do not overlap — there are no style rules here to disagree with it.
 //
 // create-react-app used to run ESLint on every build, and the Vite migration
 // removed it along with the rest of react-scripts — so for a while the project
 // had no linting at all. This restores the part that catches bugs.
-//
-// tech-health TH-005 also asks for a formatter. Deliberately not here: adding
-// Prettier rewrites nearly every file and buries real changes in whitespace
-// diffs. That is a separate decision, and it should be its own commit.
 export default [
   {
     ignores: [

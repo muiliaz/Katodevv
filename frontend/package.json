@@ -35,6 +35,7 @@
     "globals": "^17.9.0",
     "jsdom": "^29.1.1",
     "knip": "^6.32.0",
+    "prettier": "^3.9.6",
     "vite": "^8.2.1",
     "vitest": "^4.1.10"
   },
@@ -47,6 +48,8 @@
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
     "lint": "eslint .",
+    "format": "prettier --write .",
+    "check:format": "prettier --check .",
     "check:env": "node scripts/check-env-contract.js",
     "check:dead": "knip",
     "check:css": "node scripts/check-dead-css.js"

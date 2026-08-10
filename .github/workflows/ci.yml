@@ -46,6 +46,13 @@ jobs:
         # contract is reported in seconds rather than after the build.
         run: npm run check:env
 
+      - name: Check formatting
+        # Held off for three sessions because the first run rewrites almost
+        # every file. Done now as its own commit, containing nothing else, so
+        # this step failing means someone changed formatting — never that a
+        # real change is buried in whitespace.
+        run: npm run check:format
+
       - name: Lint
         # react-scripts used to lint on every build; the Vite migration removed
         # it, so for a while there was none. Restored as its own step, which is

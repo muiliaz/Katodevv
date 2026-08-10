@@ -133,6 +133,14 @@ describe("the price table itself", () => {
     expect(PRICING["booking-bot"]).toEqual({ from: 300, to: 400 });
     expect(PRICING["ai-bot"]).toEqual({ from: 600, to: 800 });
     expect(PRICING["mini-app"]).toEqual({ from: 400, to: 600 });
-    expect(PRICING["automation-pro"]).toEqual({ from: 1500, to: 2000 });
+  });
+
+  test("the two custom offerings quote the same floor, as decided on 2026-08-08", () => {
+    // They used to say $2000 and $1500–2000 for work a customer cannot tell
+    // apart, and the audit flagged the pair as an open product question. The
+    // owner's answer was the price, not a merge: two ids, one floor. This is
+    // the assertion that fails if one of them drifts again.
+    expect(PRICING["custom-ai"]).toEqual({ from: 1000 });
+    expect(PRICING["automation-pro"]).toEqual(PRICING["custom-ai"]);
   });
 });

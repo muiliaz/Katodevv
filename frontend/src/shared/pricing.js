@@ -19,14 +19,20 @@ export const PRICING = {
   'booking-bot':    { from: 300, to: 400 },
   'ai-bot':         { from: 600, to: 800 },
   'mini-app':       { from: 400, to: 600 },
-  'automation-pro': { from: 1500, to: 2000 },
+  // "Custom Automation" on /bots. Same floor as custom-ai below — see the note
+  // there.
+  'automation-pro': { from: 1000 },
 
-  // Shown in the /web terminal only. Kept separate from automation-pro on
-  // purpose: the two have different names and nothing in the repo says whether
-  // they are the same product, so merging them would be a guess about the
-  // product line, not a fix for the price divergence.
+  // Shown in the /web terminal only.
   'shop-bot':       { from: 600 },
-  'custom-ai':      { from: 2000 },
+
+  // "Custom AI agent". Still a separate id from automation-pro: the two are
+  // named differently and sold on different pages, and merging them would be a
+  // decision about the product line, not about prices. What the owner did
+  // decide, on 2026-08-08, is the price — the two used to quote $2000 and
+  // $1500–2000 for work a customer could not tell apart, so both now start at
+  // the same $1000. See docs/handoff.md.
+  'custom-ai':      { from: 1000 },
 
   // Shown in the chat price list only
   'landing':        { from: 400 },
@@ -37,6 +43,12 @@ export const PRICING = {
 };
 
 // Hours we promise to answer within. Used by the chat and the contact copy.
+//
+// This deliberately overlaps the working hours next to it on /web — "Mon–Fri ·
+// 9:00–18:00" and "we answer within 24 hours" cannot both hold for an enquiry
+// that arrives on Friday evening. The audit raised it as a contradiction to
+// resolve; the owner's decision on 2026-08-08 was to keep both lines as they
+// are. So: not an oversight, and not something to "fix" by trimming either one.
 export const RESPONSE_SLA_HOURS = 24;
 
 const PREFIX = { ru: 'от', en: 'from' };
